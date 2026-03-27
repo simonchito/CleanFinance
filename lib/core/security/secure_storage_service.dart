@@ -1,0 +1,36 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+class SecureStorageService {
+  static const _credentialKey = 'auth.credential';
+  static const _biometricEnabledKey = 'auth.biometric_enabled';
+
+  final FlutterSecureStorage _storage;
+
+  SecureStorageService({FlutterSecureStorage? storage})
+      : _storage = storage ?? const FlutterSecureStorage();
+
+  Future<void> saveCredential(String payload) {
+    return _storage.write(key: _credentialKey, value: payload);
+  }
+
+  Future<String?> readCredential() {
+    return _storage.read(key: _credentialKey);
+  }
+
+  Future<bool> hasCredential() async {
+    return (await readCredential()) != null;
+  }
+
+  Future<void> saveBiometricEnabled(bool enabled) {
+    return _storage.write(
+      key: _biometricEnabledKey,
+      value: enabled ? '1' : '0',
+    );
+  }
+
+  Future<bool> readBiometricEnabled() async {
+    return (await _storage.read(key: _biometricEnabledKey)) == '1';
+  }
+
+  Future<void> clearAll() => _storage.deleteAll();
+}
