@@ -36,8 +36,16 @@ class PasswordHasher {
   static const _bits = 256;
 
   Future<StoredCredential> hashPin(String pin) async {
+    return hashSecret(pin);
+  }
+
+  Future<bool> verifyPin(String pin, StoredCredential stored) async {
+    return verifySecret(pin, stored);
+  }
+
+  Future<StoredCredential> hashSecret(String secret) async {
     final salt = _generateSalt();
-    final hash = await _derive(pin, salt, _iterations);
+    final hash = await _derive(secret, salt, _iterations);
     return StoredCredential(
       hash: base64Encode(hash),
       salt: base64Encode(salt),
@@ -45,9 +53,9 @@ class PasswordHasher {
     );
   }
 
-  Future<bool> verifyPin(String pin, StoredCredential stored) async {
+  Future<bool> verifySecret(String secret, StoredCredential stored) async {
     final derived = await _derive(
-      pin,
+      secret,
       base64Decode(stored.salt),
       stored.iterations,
     );

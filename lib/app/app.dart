@@ -16,7 +16,7 @@ class CleanFinanceApp extends ConsumerWidget {
         settingsState.valueOrNull?.themeMode ?? ThemeMode.system;
 
     return MaterialApp(
-      title: 'Clean Finance',
+      title: 'CleanFinance',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

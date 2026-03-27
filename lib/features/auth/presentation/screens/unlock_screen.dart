@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/widgets/brand_logo.dart';
+import '../../../../brand_logo_asset.dart';
 import '../../../../shared/providers.dart';
+import 'recover_access_screen.dart';
 
 class UnlockScreen extends ConsumerStatefulWidget {
   const UnlockScreen({super.key});
@@ -14,6 +15,24 @@ class UnlockScreen extends ConsumerStatefulWidget {
 class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   final _pinController = TextEditingController();
   bool _loading = false;
+  bool _biometricAttempted = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final authState = ref.read(authControllerProvider);
+    if (_biometricAttempted ||
+        !authState.biometricAvailable ||
+        !authState.biometricEnabled) {
+      return;
+    }
+    _biometricAttempted = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _unlockWithBiometrics();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -120,6 +139,21 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                       icon: const Icon(Icons.fingerprint_rounded),
                       label: const Text('Usar biometría'),
                     ),
+                    if (authState.recoveryConfigured) ...[
+                      const SizedBox(height: 10),
+                      TextButton(
+                        onPressed: _loading
+                            ? null
+                            : () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const RecoverAccessScreen(),
+                                  ),
+                                );
+                              },
+                        child: const Text('Olvidé mi PIN'),
+                      ),
+                    ],
                   ],
                 ),
               ),

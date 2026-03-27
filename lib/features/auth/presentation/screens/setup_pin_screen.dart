@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/widgets/brand_logo.dart';
+import '../../../../brand_logo_asset.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/providers.dart';
 
@@ -15,26 +15,41 @@ class SetupPinScreen extends ConsumerStatefulWidget {
 class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
   final _pinController = TextEditingController();
   final _confirmController = TextEditingController();
+  final _birthDateController = TextEditingController();
+  final _documentController = TextEditingController();
   bool _isSubmitting = false;
+  bool _enableBiometrics = false;
 
   @override
   void dispose() {
     _pinController.dispose();
     _confirmController.dispose();
+    _birthDateController.dispose();
+    _documentController.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     final pin = _pinController.text.trim();
     final confirm = _confirmController.text.trim();
+    final birthDate = _birthDateController.text.trim();
+    final document = _documentController.text.trim();
     if (pin != confirm) {
       _showMessage('Los PIN no coinciden.');
       return;
     }
+    if (birthDate.isEmpty || document.isEmpty) {
+      _showMessage('Completá tus dos preguntas de recuperación.');
+      return;
+    }
 
     setState(() => _isSubmitting = true);
-    final success =
-        await ref.read(authControllerProvider.notifier).createPin(pin);
+    final success = await ref.read(authControllerProvider.notifier).createPin(
+          pin,
+          birthDate: birthDate,
+          documentId: document,
+          enableBiometrics: _enableBiometrics,
+        );
     setState(() => _isSubmitting = false);
 
     if (!success && mounted) {
@@ -51,6 +66,8 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final biometricAvailable =
+        ref.watch(authControllerProvider).biometricAvailable;
 
     return Scaffold(
       body: DecoratedBox(
@@ -114,6 +131,38 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                         labelText: 'Repetí tu PIN',
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _birthDateController,
+                      keyboardType: TextInputType.datetime,
+                      decoration: const InputDecoration(
+                        labelText: 'Fecha de nacimiento',
+                        hintText: 'Ejemplo: 10/02/1996',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _documentController,
+                      keyboardType: TextInputType.text,
+                      decoration: const InputDecoration(
+                        labelText: 'Documento personal',
+                        hintText: 'Ejemplo: 12345678',
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: _enableBiometrics,
+                      onChanged: biometricAvailable
+                          ? (value) => setState(() => _enableBiometrics = value)
+                          : null,
+                      title: const Text('Activar huella para entrar más rápido'),
+                      subtitle: Text(
+                        biometricAvailable
+                            ? 'La app te la va a ofrecer en el próximo desbloqueo.'
+                            : 'La biometría no está disponible en este dispositivo.',
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     FilledButton(
                       onPressed: _isSubmitting ? null : _submit,
@@ -132,7 +181,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Text(
-                  'Consejo: usá un PIN que recuerdes fácil, así entrar te lleva solo unos segundos.',
+                  'Guardamos estas respuestas solo para ayudarte a recuperar el acceso si olvidás tu PIN.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),

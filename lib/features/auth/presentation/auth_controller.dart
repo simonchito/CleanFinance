@@ -21,16 +21,23 @@ class AuthController extends StateNotifier<AuthState> {
     final hasCredential = await _authRepository.hasCredential();
     final biometricAvailable = await _authRepository.isBiometricAvailable();
     final biometricEnabled = await _authRepository.isBiometricEnabled();
+    final recoveryConfigured = await _authRepository.hasRecoveryData();
 
     state = state.copyWith(
       status: hasCredential ? AuthStatus.locked : AuthStatus.setupRequired,
       biometricAvailable: biometricAvailable,
       biometricEnabled: biometricEnabled,
+      recoveryConfigured: recoveryConfigured,
       clearError: true,
     );
   }
 
-  Future<bool> createPin(String pin) async {
+  Future<bool> createPin(
+    String pin, {
+    required String birthDate,
+    required String documentId,
+    bool enableBiometrics = false,
+  }) async {
     if (pin.length != AppConstants.defaultPinLength) {
       state = state.copyWith(
         errorMessage:
@@ -40,10 +47,19 @@ class AuthController extends StateNotifier<AuthState> {
     }
 
     await _authRepository.savePin(pin);
+    await _authRepository.saveRecoveryData(
+      birthDate: birthDate,
+      documentId: documentId,
+    );
+    if (enableBiometrics) {
+      await _authRepository.setBiometricEnabled(true);
+    }
     await _financeRepository.ensureSeedData();
 
     state = state.copyWith(
       status: AuthStatus.unlocked,
+      biometricEnabled: enableBiometrics,
+      recoveryConfigured: true,
       clearError: true,
     );
     return true;
@@ -94,6 +110,44 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(
       biometricAvailable: available,
       biometricEnabled: enabled,
+      clearError: true,
+    );
+    return true;
+  }
+
+  Future<bool> recoverAccess({
+    required String birthDate,
+    required String documentId,
+    required String newPin,
+    bool enableBiometrics = false,
+  }) async {
+    if (newPin.length != AppConstants.defaultPinLength) {
+      state = state.copyWith(
+        errorMessage:
+            'El PIN debe tener ${AppConstants.defaultPinLength} dígitos.',
+      );
+      return false;
+    }
+
+    final valid = await _authRepository.verifyRecoveryData(
+      birthDate: birthDate,
+      documentId: documentId,
+    );
+    if (!valid) {
+      state = state.copyWith(
+        errorMessage: 'Las respuestas de recuperación no coinciden.',
+      );
+      return false;
+    }
+
+    await _authRepository.savePin(newPin);
+    if (enableBiometrics) {
+      await _authRepository.setBiometricEnabled(true);
+    }
+    state = state.copyWith(
+      status: AuthStatus.unlocked,
+      biometricEnabled: enableBiometrics,
+      recoveryConfigured: true,
       clearError: true,
     );
     return true;

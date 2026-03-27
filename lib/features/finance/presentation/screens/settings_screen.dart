@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../app/widgets/brand_logo.dart';
+import '../../../../brand_logo_asset.dart';
 import '../../../../shared/providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';

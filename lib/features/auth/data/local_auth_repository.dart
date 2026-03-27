@@ -43,6 +43,57 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> saveRecoveryData({
+    required String birthDate,
+    required String documentId,
+  }) async {
+    final birthDateCredential =
+        await _passwordHasher.hashSecret(_normalizeBirthDate(birthDate));
+    final documentCredential =
+        await _passwordHasher.hashSecret(_normalizeDocument(documentId));
+    await _secureStorage.saveRecoveryBirthDate(
+      jsonEncode(birthDateCredential.toJson()),
+    );
+    await _secureStorage.saveRecoveryDocument(
+      jsonEncode(documentCredential.toJson()),
+    );
+  }
+
+  @override
+  Future<bool> hasRecoveryData() {
+    return _secureStorage.hasRecoveryData();
+  }
+
+  @override
+  Future<bool> verifyRecoveryData({
+    required String birthDate,
+    required String documentId,
+  }) async {
+    final birthDatePayload = await _secureStorage.readRecoveryBirthDate();
+    final documentPayload = await _secureStorage.readRecoveryDocument();
+    if (birthDatePayload == null || documentPayload == null) {
+      return false;
+    }
+
+    final birthDateStored = StoredCredential.fromJson(
+      jsonDecode(birthDatePayload) as Map<String, dynamic>,
+    );
+    final documentStored = StoredCredential.fromJson(
+      jsonDecode(documentPayload) as Map<String, dynamic>,
+    );
+
+    final validBirthDate = await _passwordHasher.verifySecret(
+      _normalizeBirthDate(birthDate),
+      birthDateStored,
+    );
+    final validDocument = await _passwordHasher.verifySecret(
+      _normalizeDocument(documentId),
+      documentStored,
+    );
+    return validBirthDate && validDocument;
+  }
+
+  @override
   Future<bool> isBiometricAvailable() {
     return _biometricService.isAvailable();
   }
@@ -60,5 +111,13 @@ class LocalAuthRepository implements AuthRepository {
   @override
   Future<bool> authenticateWithBiometrics() {
     return _biometricService.authenticate();
+  }
+
+  String _normalizeBirthDate(String value) {
+    return value.replaceAll(RegExp(r'[^0-9]'), '');
+  }
+
+  String _normalizeDocument(String value) {
+    return value.replaceAll(RegExp(r'[^0-9a-zA-Z]'), '').toUpperCase();
   }
 }
