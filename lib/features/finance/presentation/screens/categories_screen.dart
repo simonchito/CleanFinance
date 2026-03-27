@@ -175,7 +175,7 @@ class _CategoryTab extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: selectedParentId,
+                    initialValue: selectedParentId,
                     decoration: const InputDecoration(
                       labelText: 'Categoría padre',
                     ),

@@ -42,9 +42,9 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
         : '';
     _noteController.text = movement?.note ?? '';
     _paymentMethodController.text = movement?.paymentMethod ?? '';
-    _categoryId = movement?.categoryId?.isEmpty == true
+    _categoryId = movement == null || movement.categoryId.isEmpty
         ? null
-        : movement?.categoryId;
+        : movement.categoryId;
     _subcategoryId = movement?.subcategoryId;
     _goalId = movement?.goalId;
   }
@@ -151,7 +151,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 DropdownButtonFormField<MovementType>(
-                  value: _type,
+                  initialValue: _type,
                   decoration: const InputDecoration(labelText: 'Tipo'),
                   items: const [
                     DropdownMenuItem(
@@ -199,7 +199,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _categoryId,
+                  initialValue: _categoryId,
                   decoration: const InputDecoration(labelText: 'Categoría'),
                   items: topLevel
                       .map(
@@ -219,7 +219,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 if (subcategories.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: _subcategoryId,
+                    initialValue: _subcategoryId,
                     decoration: const InputDecoration(
                       labelText: 'Subcategoría',
                     ),
@@ -242,7 +242,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   const SizedBox(height: 12),
                   goalsState.when(
                     data: (goals) => DropdownButtonFormField<String>(
-                      value: _goalId,
+                      initialValue: _goalId,
                       decoration: const InputDecoration(
                         labelText: 'Meta de ahorro',
                       ),

@@ -83,7 +83,8 @@ class ReportsScreen extends ConsumerWidget {
                           ...snapshot.topExpenseCategories.map((item) {
                             final max =
                                 snapshot.topExpenseCategories.first.amount;
-                            final progress = max == 0 ? 0 : item.amount / max;
+                            final progress =
+                                max == 0 ? 0.0 : item.amount / max;
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12),
                               child: Column(

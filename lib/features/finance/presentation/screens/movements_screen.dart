@@ -108,7 +108,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: selectedCategoryId,
+                    initialValue: selectedCategoryId,
                     decoration: const InputDecoration(labelText: 'Categoría'),
                     items: [
                       const DropdownMenuItem<String>(

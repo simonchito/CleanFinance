@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/database/app_database.dart';
+import '../../../core/security/secure_storage_service.dart';
 import '../domain/entities/app_settings.dart';
 import '../domain/entities/category.dart';
 import '../domain/entities/dashboard_summary.dart';
@@ -16,9 +17,13 @@ import '../domain/entities/savings_goal.dart';
 import '../domain/repositories/finance_repository.dart';
 
 class LocalFinanceRepository implements FinanceRepository {
-  LocalFinanceRepository(this._appDatabase);
+  LocalFinanceRepository(
+    this._appDatabase, {
+    SecureStorageService? secureStorage,
+  }) : _secureStorage = secureStorage;
 
   final AppDatabase _appDatabase;
+  final SecureStorageService? _secureStorage;
   final Uuid _uuid = const Uuid();
 
   @override
@@ -478,6 +483,11 @@ class LocalFinanceRepository implements FinanceRepository {
         });
       }
     });
+    if (_secureStorage != null) {
+      final biometricEnabled = settings.isNotEmpty &&
+          ((settings.first['biometric_enabled'] as num?)?.toInt() ?? 0) == 1;
+      await _secureStorage.saveBiometricEnabled(biometricEnabled);
+    }
   }
 
   @override
@@ -499,6 +509,9 @@ class LocalFinanceRepository implements FinanceRepository {
         where: 'id = 1',
       );
     });
+    if (_secureStorage != null) {
+      await _secureStorage.saveBiometricEnabled(false);
+    }
     await ensureSeedData();
   }
 

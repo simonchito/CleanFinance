@@ -41,7 +41,10 @@ final authRepositoryProvider = Provider<AuthRepository>(
 );
 
 final financeRepositoryProvider = Provider<FinanceRepository>(
-  (ref) => LocalFinanceRepository(ref.watch(appDatabaseProvider)),
+  (ref) => LocalFinanceRepository(
+    ref.watch(appDatabaseProvider),
+    secureStorage: ref.watch(secureStorageProvider),
+  ),
 );
 
 final authControllerProvider =

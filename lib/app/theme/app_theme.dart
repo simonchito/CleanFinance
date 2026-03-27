@@ -15,7 +15,7 @@ class AppTheme {
       secondary: const Color(0xFF8C7B57),
       surface: _lightSurface,
     ).copyWith(
-      background: _lightBackground,
+      surface: _lightBackground,
       error: const Color(0xFFB84B4B),
     );
 
@@ -30,7 +30,7 @@ class AppTheme {
       secondary: const Color(0xFFD0C29A),
       surface: _darkSurface,
     ).copyWith(
-      background: _darkBackground,
+      surface: _darkBackground,
       error: const Color(0xFFF38B8B),
     );
 
@@ -41,7 +41,7 @@ class AppTheme {
     final base = ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      scaffoldBackgroundColor: scheme.background,
+      scaffoldBackgroundColor: scheme.surface,
     );
 
     return base.copyWith(
@@ -49,13 +49,13 @@ class AppTheme {
         centerTitle: false,
         elevation: 0,
         backgroundColor: Colors.transparent,
-        foregroundColor: scheme.onBackground,
+        foregroundColor: scheme.onSurface,
         titleTextStyle: base.textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.w700,
-          color: scheme.onBackground,
+          color: scheme.onSurface,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         color: scheme.surface,
         shape: RoundedRectangleBorder(

@@ -42,6 +42,9 @@ class SettingsScreen extends ConsumerWidget {
     if (path == null) {
       return;
     }
+    if (!context.mounted) {
+      return;
+    }
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -145,7 +148,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<ThemeMode>(
-                      value: settings.themeMode,
+                      initialValue: settings.themeMode,
                       decoration: const InputDecoration(labelText: 'Tema'),
                       items: const [
                         DropdownMenuItem(
@@ -171,13 +174,16 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: settings.currencyCode,
+                      initialValue: settings.currencyCode,
                       decoration: const InputDecoration(labelText: 'Moneda'),
                       items: const [
-                        DropdownMenuItem(value: 'ARS', child: Text('ARS ($)')),
+                        DropdownMenuItem(
+                          value: 'ARS',
+                          child: Text('ARS (\$)'),
+                        ),
                         DropdownMenuItem(
                           value: 'USD',
-                          child: Text('USD (US$)'),
+                          child: Text('USD (US\$)'),
                         ),
                         DropdownMenuItem(value: 'EUR', child: Text('EUR (€)')),
                       ],
@@ -230,7 +236,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
-                      value: settings.autoLockMinutes,
+                      initialValue: settings.autoLockMinutes,
                       decoration: const InputDecoration(
                         labelText: 'Bloqueo automático',
                       ),
