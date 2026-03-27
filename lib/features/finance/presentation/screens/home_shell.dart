@@ -73,9 +73,13 @@ class _HomeShellState extends ConsumerState<HomeShell>
             ],
           ),
         ),
-        child: IndexedStack(
-          index: _currentIndex,
-          children: pages,
+        child: SafeArea(
+          top: true,
+          bottom: false,
+          child: IndexedStack(
+            index: _currentIndex,
+            children: pages,
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
