@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/widgets/brand_logo.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/providers.dart';
 
@@ -49,56 +50,94 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).scaffoldBackgroundColor,
+              scheme.primaryContainer.withValues(alpha: 0.28),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(24),
             children: [
-              const Spacer(),
+              const SizedBox(height: 26),
+              const Center(
+                child: BrandLogo(size: 72),
+              ),
+              const SizedBox(height: 24),
               Text(
-                'Protegé tu app',
+                'Tu dinero, claro y bajo control',
                 style: Theme.of(context).textTheme.headlineMedium,
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'Creá un PIN local de ${AppConstants.defaultPinLength} dígitos para desbloquear la app.',
-                style: Theme.of(context).textTheme.bodyLarge,
+                'Creá un PIN corto para proteger tus datos. Todo queda guardado solo en tu dispositivo.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 28),
-              TextField(
-                controller: _pinController,
-                keyboardType: TextInputType.number,
-                obscureText: true,
-                maxLength: AppConstants.defaultPinLength,
-                decoration: const InputDecoration(
-                  labelText: 'PIN',
+              Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: scheme.surface,
+                  borderRadius: BorderRadius.circular(30),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _confirmController,
-                keyboardType: TextInputType.number,
-                obscureText: true,
-                maxLength: AppConstants.defaultPinLength,
-                decoration: const InputDecoration(
-                  labelText: 'Confirmar PIN',
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _pinController,
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                      maxLength: AppConstants.defaultPinLength,
+                      decoration: const InputDecoration(
+                        labelText: 'Elegí tu PIN',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _confirmController,
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                      maxLength: AppConstants.defaultPinLength,
+                      decoration: const InputDecoration(
+                        labelText: 'Repetí tu PIN',
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _isSubmitting ? null : _submit,
+                      child: Text(
+                        _isSubmitting ? 'Configurando...' : 'Empezar',
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 20),
-              FilledButton(
-                onPressed: _isSubmitting ? null : _submit,
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: scheme.surface.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(24),
+                ),
                 child: Text(
-                  _isSubmitting ? 'Guardando...' : 'Crear acceso',
+                  'Consejo: usá un PIN que recuerdes fácil, así entrar te lleva solo unos segundos.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
                 ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                'Tu PIN se guarda de forma local y segura. No se envía a ningún servidor.',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const Spacer(),
             ],
           ),
         ),

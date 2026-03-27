@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../app/widgets/brand_logo.dart';
 import '../../../../shared/providers.dart';
+import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 import 'categories_screen.dart';
 
@@ -39,10 +41,7 @@ class SettingsScreen extends ConsumerWidget {
       allowedExtensions: ['json'],
     );
     final path = result?.files.single.path;
-    if (path == null) {
-      return;
-    }
-    if (!context.mounted) {
+    if (path == null || !context.mounted) {
       return;
     }
 
@@ -50,9 +49,9 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Importar datos'),
+          title: const Text('Importar backup'),
           content: const Text(
-            'La importación reemplaza los datos actuales. Asegurate de tener un backup.',
+            'Esta acción reemplaza los datos actuales. Si querés, exportá un backup antes de seguir.',
           ),
           actions: [
             TextButton(
@@ -75,6 +74,7 @@ class SettingsScreen extends ConsumerWidget {
     final payload = await File(path).readAsString();
     await ref.read(financeRepositoryProvider).importData(payload);
     ref.invalidate(settingsControllerProvider);
+    ref.invalidate(financeOverviewProvider);
     ref.invalidate(dashboardSummaryProvider);
     ref.invalidate(recentMovementsProvider);
     ref.invalidate(reportsSnapshotProvider);
@@ -96,7 +96,7 @@ class SettingsScreen extends ConsumerWidget {
         return AlertDialog(
           title: const Text('Borrar datos'),
           content: const Text(
-            'Esta acción elimina movimientos, metas y categorías personalizadas del dispositivo.',
+            'Se eliminarán movimientos, metas y categorías personalizadas del dispositivo.',
           ),
           actions: [
             TextButton(
@@ -118,12 +118,19 @@ class SettingsScreen extends ConsumerWidget {
 
     await ref.read(financeRepositoryProvider).clearAllData();
     ref.invalidate(settingsControllerProvider);
+    ref.invalidate(financeOverviewProvider);
     ref.invalidate(dashboardSummaryProvider);
     ref.invalidate(recentMovementsProvider);
     ref.invalidate(reportsSnapshotProvider);
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(categoriesProvider);
     ref.invalidate(movementsProvider);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Se restablecieron tus datos locales.')),
+      );
+    }
   }
 
   @override
@@ -136,24 +143,64 @@ class SettingsScreen extends ConsumerWidget {
       body: settingsState.when(
         data: (settings) {
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
             children: [
+              SectionCard(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Theme.of(context).colorScheme.surface,
+                    Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withValues(alpha: 0.38),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const BrandLogo(size: 58),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Una app simple, privada y clara',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Configurá la experiencia para que se sienta realmente tuya.',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
               SectionCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Personalización',
+                      'Apariencia',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     DropdownButtonFormField<ThemeMode>(
                       initialValue: settings.themeMode,
                       decoration: const InputDecoration(labelText: 'Tema'),
                       items: const [
                         DropdownMenuItem(
                           value: ThemeMode.system,
-                          child: Text('Sistema'),
+                          child: Text('Seguir sistema'),
                         ),
                         DropdownMenuItem(
                           value: ThemeMode.light,
@@ -177,10 +224,7 @@ class SettingsScreen extends ConsumerWidget {
                       initialValue: settings.currencyCode,
                       decoration: const InputDecoration(labelText: 'Moneda'),
                       items: const [
-                        DropdownMenuItem(
-                          value: 'ARS',
-                          child: Text('ARS (\$)'),
-                        ),
+                        DropdownMenuItem(value: 'ARS', child: Text('ARS (\$)')),
                         DropdownMenuItem(
                           value: 'USD',
                           child: Text('USD (US\$)'),
@@ -204,7 +248,7 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               SectionCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,14 +257,21 @@ class SettingsScreen extends ConsumerWidget {
                       'Seguridad',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Mantené acceso rápido sin perder privacidad.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: 14),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Desbloqueo con biometría'),
                       subtitle: Text(
                         authState.biometricAvailable
-                            ? 'Usá huella o Face ID/Touch ID según el dispositivo.'
-                            : 'La biometría no está disponible en este dispositivo.',
+                            ? 'Usá huella o reconocimiento facial si está disponible.'
+                            : 'Este dispositivo no tiene biometría disponible.',
                       ),
                       value: settings.biometricEnabled,
                       onChanged: (value) async {
@@ -255,16 +306,17 @@ class SettingsScreen extends ConsumerWidget {
                       },
                     ),
                     const SizedBox(height: 12),
-                    OutlinedButton(
+                    OutlinedButton.icon(
                       onPressed: () {
                         ref.read(authControllerProvider.notifier).lock();
                       },
-                      child: const Text('Bloquear ahora'),
+                      icon: const Icon(Icons.lock_outline_rounded),
+                      label: const Text('Bloquear ahora'),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               SectionCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,18 +325,27 @@ class SettingsScreen extends ConsumerWidget {
                       'Datos',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 12),
-                    FilledButton(
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
                       onPressed: () => _exportData(context, ref),
-                      child: const Text('Exportar backup'),
+                      icon: const Icon(Icons.ios_share_rounded),
+                      label: const Text('Exportar backup'),
                     ),
                     const SizedBox(height: 12),
-                    OutlinedButton(
+                    OutlinedButton.icon(
                       onPressed: () => _importData(context, ref),
-                      child: const Text('Importar backup'),
+                      icon: const Icon(Icons.download_rounded),
+                      label: const Text('Importar backup'),
                     ),
                     const SizedBox(height: 12),
-                    OutlinedButton(
+                    OutlinedButton.icon(
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
@@ -292,7 +353,8 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                         );
                       },
-                      child: const Text('Gestionar categorías'),
+                      icon: const Icon(Icons.category_outlined),
+                      label: const Text('Gestionar categorías'),
                     ),
                     const SizedBox(height: 12),
                     TextButton(
@@ -302,18 +364,25 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               const SectionCard(
                 child: Text(
-                  'Privacidad: tus datos se guardan localmente en el dispositivo. La app no usa tracking ni envía información financiera a terceros.',
+                  'Privacidad primero: no hay tracking, no se suben datos financieros y todo queda bajo tu control local.',
                 ),
               ),
             ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Text('No se pudieron cargar los ajustes: $error'),
+        error: (error, _) => ListView(
+          padding: const EdgeInsets.all(24),
+          children: [
+            EmptyStateView(
+              icon: Icons.error_outline_rounded,
+              title: 'No se pudieron cargar los ajustes',
+              message: '$error',
+            ),
+          ],
         ),
       ),
     );

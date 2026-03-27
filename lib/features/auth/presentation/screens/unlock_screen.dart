@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/widgets/brand_logo.dart';
 import '../../../../shared/providers.dart';
 
 class UnlockScreen extends ConsumerStatefulWidget {
@@ -51,57 +52,93 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topCenter,
+            radius: 1.2,
+            colors: [
+              scheme.primaryContainer.withValues(alpha: 0.42),
+              Theme.of(context).scaffoldBackgroundColor,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(24),
             children: [
-              const Spacer(),
-              Text(
-                'Volvé a entrar',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Desbloqueá tu información con tu PIN local o biometría.',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
+              const SizedBox(height: 42),
+              const Center(child: BrandLogo(size: 74)),
               const SizedBox(height: 28),
-              TextField(
-                controller: _pinController,
-                keyboardType: TextInputType.number,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'PIN',
+              Text(
+                'Bienvenido otra vez',
+                style: Theme.of(context).textTheme.headlineMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Entrá con tu PIN o usá biometría para acceder rápido a tus finanzas.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 26),
+              Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: scheme.surface,
+                  borderRadius: BorderRadius.circular(30),
                 ),
-                onSubmitted: (_) => _unlockWithPin(),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: _loading ? null : _unlockWithPin,
-                child: Text(_loading ? 'Validando...' : 'Desbloquear'),
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: _loading ||
-                        !authState.biometricEnabled ||
-                        !authState.biometricAvailable
-                    ? null
-                    : _unlockWithBiometrics,
-                child: const Text('Usar biometría'),
-              ),
-              if (!authState.biometricAvailable)
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Text(
-                    'La biometría no está disponible en este dispositivo.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _pinController,
+                      keyboardType: TextInputType.number,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                        labelText: 'PIN',
+                        prefixIcon: Icon(Icons.lock_outline_rounded),
+                      ),
+                      onSubmitted: (_) => _unlockWithPin(),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _loading ? null : _unlockWithPin,
+                      child: Text(_loading ? 'Validando...' : 'Desbloquear'),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: _loading ||
+                              !authState.biometricEnabled ||
+                              !authState.biometricAvailable
+                          ? null
+                          : _unlockWithBiometrics,
+                      icon: const Icon(Icons.fingerprint_rounded),
+                      label: const Text('Usar biometría'),
+                    ),
+                  ],
                 ),
-              const Spacer(),
+              ),
+              const SizedBox(height: 18),
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: scheme.surface.withValues(alpha: 0.72),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Text(
+                  authState.biometricAvailable
+                      ? 'Tip: si activaste biometría, entrar te lleva un toque.'
+                      : 'La biometría no está disponible en este dispositivo, pero tu PIN sigue protegido localmente.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ),
             ],
           ),
         ),

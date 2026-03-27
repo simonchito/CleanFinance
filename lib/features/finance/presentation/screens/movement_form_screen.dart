@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../shared/providers.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/movement.dart';
+import '../widgets/section_card.dart';
 
 class MovementFormScreen extends ConsumerStatefulWidget {
   const MovementFormScreen({
     this.initialMovement,
+    this.initialType,
     super.key,
   });
 
   final Movement? initialMovement;
+  final MovementType? initialType;
 
   @override
   ConsumerState<MovementFormScreen> createState() => _MovementFormScreenState();
@@ -35,7 +39,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
   void initState() {
     super.initState();
     final movement = widget.initialMovement;
-    _type = movement?.type ?? MovementType.expense;
+    _type = movement?.type ?? widget.initialType ?? MovementType.expense;
     _selectedDate = movement?.occurredOn ?? DateTime.now();
     _amountController.text = movement != null && movement.amount > 0
         ? movement.amount.toStringAsFixed(2)
@@ -101,6 +105,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     );
 
     await ref.read(financeRepositoryProvider).upsertMovement(movement);
+    ref.invalidate(financeOverviewProvider);
     ref.invalidate(dashboardSummaryProvider);
     ref.invalidate(recentMovementsProvider);
     ref.invalidate(reportsSnapshotProvider);
@@ -148,8 +153,27 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
           return Form(
             key: _formKey,
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 32),
               children: [
+                SectionCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isEditing ? 'Actualizá tu registro' : 'Registrá un movimiento en segundos',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Usá lenguaje simple y dejá solo la información necesaria.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
                 DropdownButtonFormField<MovementType>(
                   initialValue: _type,
                   decoration: const InputDecoration(labelText: 'Tipo'),
@@ -268,15 +292,10 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   ),
                 ],
                 const SizedBox(height: 12),
-                TextFormField(
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    labelText: 'Fecha',
-                    suffixIcon: const Icon(Icons.calendar_month),
-                    hintText:
-                        '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                  ),
-                  onTap: _pickDate,
+                OutlinedButton.icon(
+                  onPressed: _pickDate,
+                  icon: const Icon(Icons.calendar_month_rounded),
+                  label: Text(DateFormat('d MMMM y', 'es').format(_selectedDate)),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
@@ -289,12 +308,15 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 TextFormField(
                   controller: _noteController,
                   maxLines: 3,
-                  decoration: const InputDecoration(labelText: 'Nota'),
+                  decoration: const InputDecoration(
+                    labelText: 'Nota',
+                    hintText: 'Ejemplo: compra semanal o pago de servicio',
+                  ),
                 ),
                 const SizedBox(height: 20),
                 FilledButton(
                   onPressed: _save,
-                  child: Text(isEditing ? 'Guardar cambios' : 'Crear movimiento'),
+                  child: Text(isEditing ? 'Guardar cambios' : 'Guardar movimiento'),
                 ),
               ],
             ),

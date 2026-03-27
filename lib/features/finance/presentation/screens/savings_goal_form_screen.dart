@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../shared/providers.dart';
+import '../widgets/section_card.dart';
 import '../../domain/entities/savings_goal.dart';
 
 class SavingsGoalFormScreen extends ConsumerStatefulWidget {
@@ -72,6 +74,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
 
     await ref.read(financeRepositoryProvider).upsertSavingsGoal(goal);
     ref.invalidate(savingsGoalsProvider);
+    ref.invalidate(financeOverviewProvider);
     if (mounted) {
       Navigator.of(context).pop();
     }
@@ -81,18 +84,35 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.initialGoal == null ? 'Nueva meta' : 'Editar meta',
-        ),
+        title: Text(widget.initialGoal == null ? 'Nueva meta' : 'Editar meta'),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 32),
           children: [
+            SectionCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Definí una meta simple y visible',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Nombre claro, monto objetivo y fecha opcional. Nada más.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nombre'),
+              decoration: const InputDecoration(labelText: 'Nombre de la meta'),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return 'Ingresá un nombre.';
@@ -117,11 +137,11 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: _pickDate,
-              icon: const Icon(Icons.calendar_month),
+              icon: const Icon(Icons.calendar_month_rounded),
               label: Text(
                 _targetDate == null
-                    ? 'Elegir fecha objetivo'
-                    : '${_targetDate!.day}/${_targetDate!.month}/${_targetDate!.year}',
+                    ? 'Agregar fecha objetivo'
+                    : DateFormat('d MMMM y', 'es').format(_targetDate!),
               ),
             ),
             const SizedBox(height: 20),

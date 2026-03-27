@@ -6,6 +6,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/movement_filter.dart';
+import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 import 'categories_screen.dart';
 import 'movement_form_screen.dart';
@@ -37,6 +38,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
   }
 
   void _refresh() {
+    ref.invalidate(financeOverviewProvider);
     ref.invalidate(dashboardSummaryProvider);
     ref.invalidate(recentMovementsProvider);
     ref.invalidate(reportsSnapshotProvider);
@@ -66,8 +68,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
       builder: (context) {
         return Padding(
           padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
+            left: 20,
+            right: 20,
             top: 24,
             bottom: MediaQuery.of(context).viewInsets.bottom + 24,
           ),
@@ -101,12 +103,20 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
 
               return Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Filtros',
+                    'Filtrar movimientos',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Elegí solo lo necesario para encontrar rápido lo que buscás.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                  const SizedBox(height: 18),
                   DropdownButtonFormField<String>(
                     initialValue: selectedCategoryId,
                     decoration: const InputDecoration(labelText: 'Categoría'),
@@ -139,7 +149,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: OutlinedButton(
                           onPressed: pickEnd,
@@ -152,22 +162,22 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
                   Row(
                     children: [
                       Expanded(
-                        child: TextButton(
+                        child: OutlinedButton(
                           onPressed: () {
-                            setModalState(() {
-                              startDate = null;
-                              endDate = null;
-                              selectedCategoryId = null;
+                            setState(() {
+                              _filter = const MovementFilter();
+                              _searchController.clear();
                             });
+                            Navigator.of(context).pop();
                           },
                           child: const Text('Limpiar'),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: FilledButton(
                           onPressed: () {
@@ -220,111 +230,183 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openEditor(),
-        child: const Icon(Icons.add),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _openEditor,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Nuevo'),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
         children: [
-          TextField(
-            controller: _searchController,
-            decoration: const InputDecoration(
-              hintText: 'Buscar por nota',
-              prefixIcon: Icon(Icons.search),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _filter = _filter.copyWith(
-                  search: value.trim().isEmpty ? null : value.trim(),
-                  clearSearch: value.trim().isEmpty,
-                );
-              });
-            },
-          ),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
+          SectionCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _FilterChip(
-                  label: 'Todos',
-                  selected: _filter.type == null,
-                  onTap: () => setState(() {
-                    _filter = _filter.copyWith(clearType: true);
-                  }),
+                TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    hintText: 'Buscar por nota o referencia',
+                    prefixIcon: Icon(Icons.search_rounded),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _filter = _filter.copyWith(
+                        search: value.trim().isEmpty ? null : value.trim(),
+                        clearSearch: value.trim().isEmpty,
+                      );
+                    });
+                  },
                 ),
-                _FilterChip(
-                  label: 'Ingresos',
-                  selected: _filter.type == MovementType.income,
-                  onTap: () => setState(() {
-                    _filter = _filter.copyWith(type: MovementType.income);
-                  }),
-                ),
-                _FilterChip(
-                  label: 'Gastos',
-                  selected: _filter.type == MovementType.expense,
-                  onTap: () => setState(() {
-                    _filter = _filter.copyWith(type: MovementType.expense);
-                  }),
-                ),
-                _FilterChip(
-                  label: 'Ahorros',
-                  selected: _filter.type == MovementType.saving,
-                  onTap: () => setState(() {
-                    _filter = _filter.copyWith(type: MovementType.saving);
-                  }),
+                const SizedBox(height: 16),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _TypeChip(
+                        label: 'Todos',
+                        selected: _filter.type == null,
+                        onTap: () => setState(() {
+                          _filter = _filter.copyWith(clearType: true);
+                        }),
+                      ),
+                      _TypeChip(
+                        label: 'Ingresos',
+                        selected: _filter.type == MovementType.income,
+                        onTap: () => setState(() {
+                          _filter = _filter.copyWith(type: MovementType.income);
+                        }),
+                      ),
+                      _TypeChip(
+                        label: 'Gastos',
+                        selected: _filter.type == MovementType.expense,
+                        onTap: () => setState(() {
+                          _filter = _filter.copyWith(type: MovementType.expense);
+                        }),
+                      ),
+                      _TypeChip(
+                        label: 'Ahorro',
+                        selected: _filter.type == MovementType.saving,
+                        onTap: () => setState(() {
+                          _filter = _filter.copyWith(type: MovementType.saving);
+                        }),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           movementsState.when(
             data: (movements) {
               if (movements.isEmpty) {
-                return const SectionCard(
-                  child: Text('No hay movimientos para este filtro.'),
+                return EmptyStateView(
+                  icon: Icons.receipt_long_outlined,
+                  title: 'No encontramos movimientos',
+                  message: 'Probá cambiando el filtro o agregando un nuevo registro.',
+                  actionLabel: 'Agregar movimiento',
+                  onAction: _openEditor,
                 );
               }
 
-              return SectionCard(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  children: movements.map((movement) {
-                    final color = switch (movement.type) {
-                      MovementType.income => Colors.green.shade700,
-                      MovementType.expense => Colors.red.shade700,
-                      MovementType.saving =>
-                        Theme.of(context).colorScheme.primary,
-                    };
+              return Column(
+                children: movements.map((movement) {
+                  final scheme = Theme.of(context).colorScheme;
+                  final (icon, color, prefix) = switch (movement.type) {
+                    MovementType.income => (
+                        Icons.arrow_upward_rounded,
+                        scheme.primary,
+                        '+',
+                      ),
+                    MovementType.expense => (
+                        Icons.arrow_downward_rounded,
+                        scheme.error,
+                        '-',
+                      ),
+                    MovementType.saving => (
+                        Icons.savings_rounded,
+                        scheme.secondary,
+                        '+',
+                      ),
+                  };
 
-                    return ListTile(
-                      title: Text(movement.categoryName ?? 'Sin categoría'),
-                      subtitle: Text(
-                        DateFormat('dd/MM/yyyy').format(movement.occurredOn) +
-                            (movement.note?.isNotEmpty == true
-                                ? ' · ${movement.note}'
-                                : ''),
-                      ),
-                      trailing: Text(
-                        CurrencyFormatter.format(movement.amount, symbol: symbol),
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(color: color),
-                      ),
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: SectionCard(
                       onTap: () => _openEditor(movement),
-                      onLongPress: () => _deleteMovement(movement),
-                    );
-                  }).toList(),
-                ),
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(icon, color: color),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  movement.categoryName ?? 'Sin categoría',
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  DateFormat('d MMM yyyy', 'es')
+                                          .format(movement.occurredOn) +
+                                      (movement.note?.isNotEmpty == true
+                                          ? ' · ${movement.note}'
+                                          : ''),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: scheme.onSurfaceVariant,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '$prefix ${CurrencyFormatter.format(movement.amount, symbol: symbol)}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge
+                                    ?.copyWith(color: color),
+                              ),
+                              const SizedBox(height: 10),
+                              IconButton(
+                                visualDensity: VisualDensity.compact,
+                                onPressed: () => _deleteMovement(movement),
+                                icon: const Icon(Icons.delete_outline_rounded),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
               );
             },
             loading: () => const Padding(
               padding: EdgeInsets.all(24),
               child: Center(child: CircularProgressIndicator()),
             ),
-            error: (error, _) => Text('No se pudieron cargar movimientos: $error'),
+            error: (error, _) => EmptyStateView(
+              icon: Icons.error_outline_rounded,
+              title: 'No se pudieron cargar los movimientos',
+              message: '$error',
+            ),
           ),
         ],
       ),
@@ -332,8 +414,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
   }
 }
 
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({
+class _TypeChip extends StatelessWidget {
+  const _TypeChip({
     required this.label,
     required this.selected,
     required this.onTap,
