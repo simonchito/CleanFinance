@@ -58,11 +58,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             return ListView(
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
               children: [
-                Row(
-                  children: [
-                    const BrandLogo(showWordmark: true),
-                    const Spacer(),
-                    Container(
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final monthChip = Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 10,
@@ -78,8 +76,35 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         monthLabel,
                         style: Theme.of(context).textTheme.labelLarge,
                       ),
-                    ),
-                  ],
+                    );
+
+                    if (constraints.maxWidth < 380) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const BrandLogo(showWordmark: true),
+                          const SizedBox(height: 12),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: monthChip,
+                          ),
+                        ],
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        const Expanded(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: BrandLogo(showWordmark: true),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Flexible(child: monthChip),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 22),
                 SectionCard(

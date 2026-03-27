@@ -25,6 +25,8 @@ class BiometricService {
         localizedReason: 'Usá tu biometría para desbloquear Clean Finance',
         biometricOnly: true,
       );
+    } on LocalAuthException {
+      return false;
     } catch (_) {
       return false;
     }

@@ -85,10 +85,20 @@ class AuthController extends StateNotifier<AuthState> {
       return false;
     }
 
-    final authenticated = await _authRepository.authenticateWithBiometrics();
+    bool authenticated;
+    try {
+      authenticated = await _authRepository.authenticateWithBiometrics();
+    } catch (_) {
+      state = state.copyWith(
+        errorMessage:
+            'No se pudo usar la biometría. Configurá una huella o bloqueo de pantalla en Android.',
+      );
+      return false;
+    }
     if (!authenticated) {
       state = state.copyWith(
-        errorMessage: 'No se pudo validar la biometría.',
+        errorMessage:
+            'No se pudo validar la biometría. Verificá que tengas una huella y bloqueo de pantalla configurados.',
       );
       return false;
     }
