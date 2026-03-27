@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/providers.dart';
@@ -65,6 +66,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final scheme = Theme.of(context).colorScheme;
     final biometricAvailable =
         ref.watch(authControllerProvider).biometricAvailable;
@@ -91,13 +93,15 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Tu dinero, claro y bajo control',
+                strings.setupTitle,
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
               Text(
-                'Creá un PIN corto para proteger tus datos. Todo queda guardado solo en tu dispositivo.',
+                strings.isEnglish
+                    ? 'Create a short PIN to protect your data. Everything stays only on your device.'
+                    : 'Creá un PIN corto para proteger tus datos. Todo queda guardado solo en tu dispositivo.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
@@ -117,8 +121,9 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       keyboardType: TextInputType.number,
                       obscureText: true,
                       maxLength: AppConstants.defaultPinLength,
-                      decoration: const InputDecoration(
-                        labelText: 'Elegí tu PIN',
+                      decoration: InputDecoration(
+                        labelText:
+                            strings.isEnglish ? 'Choose your PIN' : 'Elegí tu PIN',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -127,16 +132,17 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       keyboardType: TextInputType.number,
                       obscureText: true,
                       maxLength: AppConstants.defaultPinLength,
-                      decoration: const InputDecoration(
-                        labelText: 'Repetí tu PIN',
+                      decoration: InputDecoration(
+                        labelText:
+                            strings.isEnglish ? 'Repeat your PIN' : 'Repetí tu PIN',
                       ),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: _birthDateController,
                       keyboardType: TextInputType.datetime,
-                      decoration: const InputDecoration(
-                        labelText: 'Fecha de nacimiento',
+                      decoration: InputDecoration(
+                        labelText: strings.birthDate,
                         hintText: 'Ejemplo: 10/02/1996',
                       ),
                     ),
@@ -144,8 +150,8 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                     TextField(
                       controller: _documentController,
                       keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
-                        labelText: 'Documento personal',
+                      decoration: InputDecoration(
+                        labelText: strings.documentId,
                         hintText: 'Ejemplo: 12345678',
                       ),
                     ),
@@ -156,18 +162,28 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       onChanged: biometricAvailable
                           ? (value) => setState(() => _enableBiometrics = value)
                           : null,
-                      title: const Text('Activar huella para entrar más rápido'),
+                      title: Text(
+                        strings.isEnglish
+                            ? 'Enable fingerprint for faster access'
+                            : 'Activar huella para entrar más rápido',
+                      ),
                       subtitle: Text(
                         biometricAvailable
-                            ? 'La app te la va a ofrecer en el próximo desbloqueo.'
-                            : 'La biometría no está disponible en este dispositivo.',
+                            ? (strings.isEnglish
+                                ? 'The app will offer it on the next unlock.'
+                                : 'La app te la va a ofrecer en el próximo desbloqueo.')
+                            : (strings.isEnglish
+                                ? 'Biometrics are not available on this device.'
+                                : 'La biometría no está disponible en este dispositivo.'),
                       ),
                     ),
                     const SizedBox(height: 16),
                     FilledButton(
                       onPressed: _isSubmitting ? null : _submit,
                       child: Text(
-                        _isSubmitting ? 'Configurando...' : 'Empezar',
+                        _isSubmitting
+                            ? (strings.isEnglish ? 'Setting up...' : 'Configurando...')
+                            : (strings.isEnglish ? 'Start' : 'Empezar'),
                       ),
                     ),
                   ],
@@ -181,7 +197,9 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Text(
-                  'Guardamos estas respuestas solo para ayudarte a recuperar el acceso si olvidás tu PIN.',
+                  strings.isEnglish
+                      ? 'We store these answers only to help you recover access if you forget your PIN.'
+                      : 'Guardamos estas respuestas solo para ayudarte a recuperar el acceso si olvidás tu PIN.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),

@@ -122,55 +122,122 @@ class SavingsScreen extends ConsumerWidget {
                 0,
                 (sum, item) => sum + item.goal.targetAmount,
               );
+              final activeGoals =
+                  goals.where((goal) => !goal.completed).toList();
+              final completedGoals =
+                  goals.where((goal) => goal.completed).toList();
 
               return Column(
                 children: [
                   SectionCard(
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: _SummaryStat(
-                            label: 'Ahorrado',
-                            value: CurrencyFormatter.format(savedTotal, symbol: symbol),
-                          ),
+                        Text(
+                          'Podés ahorrar en varias metas al mismo tiempo',
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        Expanded(
-                          child: _SummaryStat(
-                            label: 'Objetivo',
-                            value: CurrencyFormatter.format(targetTotal, symbol: symbol),
-                          ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Organizá objetivos distintos como viaje, fondo de emergencia o compras grandes.',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
                         ),
-                        Expanded(
-                          child: _SummaryStat(
-                            label: 'Completadas',
-                            value: '${goals.where((goal) => goal.completed).length}',
-                          ),
+                        const SizedBox(height: 18),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _SummaryStat(
+                                label: 'Ahorrado',
+                                value: CurrencyFormatter.format(savedTotal, symbol: symbol),
+                              ),
+                            ),
+                            Expanded(
+                              child: _SummaryStat(
+                                label: 'Objetivo',
+                                value: CurrencyFormatter.format(targetTotal, symbol: symbol),
+                              ),
+                            ),
+                            Expanded(
+                              child: _SummaryStat(
+                                label: 'Completadas',
+                                value: '${completedGoals.length}',
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 14),
-                  ...goals.map(
-                    (progress) => Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: _GoalCard(
-                        progress: progress,
-                        symbol: symbol,
-                        onEdit: () => _openGoalEditor(
-                          context,
-                          ref,
-                          goal: progress.goal,
-                        ),
-                        onContribute: () => _openContribution(context, ref, progress),
-                        onDelete: () async {
-                          await ref
-                              .read(financeRepositoryProvider)
-                              .deleteSavingsGoal(progress.goal.id);
-                          _refresh(ref);
-                        },
+                  if (activeGoals.isNotEmpty) ...[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Metas activas',
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 10),
+                    ...activeGoals.map(
+                      (progress) => Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: _GoalCard(
+                          progress: progress,
+                          symbol: symbol,
+                          onEdit: () => _openGoalEditor(
+                            context,
+                            ref,
+                            goal: progress.goal,
+                          ),
+                          onContribute: () =>
+                              _openContribution(context, ref, progress),
+                          onDelete: () async {
+                            await ref
+                                .read(financeRepositoryProvider)
+                                .deleteSavingsGoal(progress.goal.id);
+                            _refresh(ref);
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (completedGoals.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Metas logradas',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ...completedGoals.map(
+                      (progress) => Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: _GoalCard(
+                          progress: progress,
+                          symbol: symbol,
+                          onEdit: () => _openGoalEditor(
+                            context,
+                            ref,
+                            goal: progress.goal,
+                          ),
+                          onContribute: () =>
+                              _openContribution(context, ref, progress),
+                          onDelete: () async {
+                            await ref
+                                .read(financeRepositoryProvider)
+                                .deleteSavingsGoal(progress.goal.id);
+                            _refresh(ref);
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               );
             },

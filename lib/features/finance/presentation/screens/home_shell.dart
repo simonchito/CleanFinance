@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../shared/providers.dart';
 import 'dashboard_screen.dart';
 import 'movements_screen.dart';
@@ -47,6 +48,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final pages = [
       const DashboardScreen(),
       const MovementsScreen(),
@@ -86,31 +88,31 @@ class _HomeShellState extends ConsumerState<HomeShell>
             onDestinationSelected: (index) {
               setState(() => _currentIndex = index);
             },
-            destinations: const [
+            destinations: [
               NavigationDestination(
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home_rounded),
-                label: 'Inicio',
+                label: strings.dashboard,
               ),
               NavigationDestination(
                 icon: Icon(Icons.receipt_long_outlined),
                 selectedIcon: Icon(Icons.receipt_long_rounded),
-                label: 'Movimientos',
+                label: strings.movements,
               ),
               NavigationDestination(
                 icon: Icon(Icons.savings_outlined),
                 selectedIcon: Icon(Icons.savings_rounded),
-                label: 'Ahorros',
+                label: strings.savings,
               ),
               NavigationDestination(
                 icon: Icon(Icons.insert_chart_outlined_rounded),
                 selectedIcon: Icon(Icons.insert_chart_rounded),
-                label: 'Reportes',
+                label: strings.reports,
               ),
               NavigationDestination(
                 icon: Icon(Icons.tune_outlined),
                 selectedIcon: Icon(Icons.tune_rounded),
-                label: 'Ajustes',
+                label: strings.settings,
               ),
             ],
           ),

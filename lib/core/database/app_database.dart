@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:async';
 
 import 'package:path/path.dart' as p;
@@ -71,7 +72,9 @@ class AppDatabase {
             currency_symbol TEXT NOT NULL,
             theme_mode TEXT NOT NULL,
             biometric_enabled INTEGER NOT NULL DEFAULT 0,
-            auto_lock_minutes INTEGER NOT NULL DEFAULT 5
+            auto_lock_minutes INTEGER NOT NULL DEFAULT 5,
+            locale_code TEXT NOT NULL DEFAULT 'es',
+            payment_methods TEXT NOT NULL
           )
         ''');
 
@@ -82,6 +85,8 @@ class AppDatabase {
           'theme_mode': 'system',
           'biometric_enabled': 0,
           'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,
+          'locale_code': AppConstants.defaultLocaleCode,
+          'payment_methods': jsonEncode(AppConstants.defaultPaymentMethods),
         });
 
         await db.execute(
@@ -95,7 +100,14 @@ class AppDatabase {
         );
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {}
+        if (oldVersion < 2) {
+          await db.execute(
+            "ALTER TABLE app_settings ADD COLUMN locale_code TEXT NOT NULL DEFAULT 'es'",
+          );
+          await db.execute(
+            "ALTER TABLE app_settings ADD COLUMN payment_methods TEXT NOT NULL DEFAULT '[\"Transferencia\",\"Tarjeta Debito\",\"Tarjeta Credito\",\"Efectivo\"]'",
+          );
+        }
       },
     );
   }

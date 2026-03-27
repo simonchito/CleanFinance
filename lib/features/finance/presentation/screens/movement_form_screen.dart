@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/movement.dart';
@@ -62,9 +63,10 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
   }
 
   Future<void> _pickDate() async {
+    final strings = AppStrings.of(context);
     final picked = await showDatePicker(
       context: context,
-      locale: const Locale('es'),
+      locale: strings.locale,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
       initialDate: _selectedDate,
@@ -124,15 +126,18 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final categoriesState =
         ref.watch(categoriesProvider(_scopeFromMovementType(_type)));
     final goalsState = ref.watch(savingsGoalsProvider);
     final isEditing =
         widget.initialMovement != null && widget.initialMovement!.id.isNotEmpty;
+    final paymentMethods =
+        ref.watch(settingsControllerProvider).valueOrNull?.paymentMethods ?? [];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Editar movimiento' : 'Nuevo movimiento'),
+        title: Text(isEditing ? strings.editMovement : strings.newMovement),
       ),
       body: categoriesState.when(
         data: (categories) {
@@ -160,12 +165,20 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isEditing ? 'Actualizá tu registro' : 'Registrá un movimiento en segundos',
+                        isEditing
+                            ? (strings.isEnglish
+                                ? 'Update your movement'
+                                : 'Actualizá tu registro')
+                            : (strings.isEnglish
+                                ? 'Add a movement in seconds'
+                                : 'Registrá un movimiento en segundos'),
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Usá lenguaje simple y dejá solo la información necesaria.',
+                        strings.isEnglish
+                            ? 'Use simple language and keep only what matters.'
+                            : 'Usá lenguaje simple y dejá solo la información necesaria.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
@@ -176,19 +189,19 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 const SizedBox(height: 16),
                 DropdownButtonFormField<MovementType>(
                   initialValue: _type,
-                  decoration: const InputDecoration(labelText: 'Tipo'),
-                  items: const [
+                  decoration: InputDecoration(labelText: strings.type),
+                  items: [
                     DropdownMenuItem(
                       value: MovementType.income,
-                      child: Text('Ingreso'),
+                      child: Text(strings.income),
                     ),
                     DropdownMenuItem(
                       value: MovementType.expense,
-                      child: Text('Gasto'),
+                      child: Text(strings.expense),
                     ),
                     DropdownMenuItem(
                       value: MovementType.saving,
-                      child: Text('Ahorro'),
+                      child: Text(strings.saving),
                     ),
                   ],
                   onChanged: (value) {
@@ -211,7 +224,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
-                  decoration: const InputDecoration(labelText: 'Monto'),
+                  decoration: InputDecoration(labelText: strings.amount),
                   validator: (value) {
                     final parsed =
                         double.tryParse((value ?? '').replaceAll(',', '.'));
@@ -224,7 +237,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: _categoryId,
-                  decoration: const InputDecoration(labelText: 'Categoría'),
+                  decoration: InputDecoration(labelText: strings.category),
                   items: topLevel
                       .map(
                         (category) => DropdownMenuItem(
@@ -244,13 +257,13 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: _subcategoryId,
-                    decoration: const InputDecoration(
-                      labelText: 'Subcategoría',
+                    decoration: InputDecoration(
+                      labelText: strings.subcategory,
                     ),
                     items: [
-                      const DropdownMenuItem<String>(
+                      DropdownMenuItem<String>(
                         value: null,
-                        child: Text('Sin subcategoría'),
+                        child: Text(strings.noSubcategory),
                       ),
                       ...subcategories.map(
                         (category) => DropdownMenuItem(
@@ -267,13 +280,13 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   goalsState.when(
                     data: (goals) => DropdownButtonFormField<String>(
                       initialValue: _goalId,
-                      decoration: const InputDecoration(
-                        labelText: 'Meta de ahorro',
+                      decoration: InputDecoration(
+                        labelText: strings.savingGoal,
                       ),
                       items: [
-                        const DropdownMenuItem<String>(
+                        DropdownMenuItem<String>(
                           value: null,
-                          child: Text('Sin meta'),
+                          child: Text(strings.noGoal),
                         ),
                         ...goals.map(
                           (goal) => DropdownMenuItem(
@@ -295,28 +308,46 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 OutlinedButton.icon(
                   onPressed: _pickDate,
                   icon: const Icon(Icons.calendar_month_rounded),
-                  label: Text(DateFormat('d MMMM y', 'es').format(_selectedDate)),
+                  label: Text(
+                    DateFormat('d MMMM y', strings.languageCode)
+                        .format(_selectedDate),
+                  ),
                 ),
                 const SizedBox(height: 12),
-                TextFormField(
-                  controller: _paymentMethodController,
-                  decoration: const InputDecoration(
-                    labelText: 'Medio de pago',
+                DropdownButtonFormField<String>(
+                  initialValue: _paymentMethodController.text.isEmpty
+                      ? null
+                      : _paymentMethodController.text,
+                  decoration: InputDecoration(
+                    labelText: strings.movementPaymentMethod,
                   ),
+                  items: paymentMethods
+                      .map(
+                        (method) => DropdownMenuItem(
+                          value: method,
+                          child: Text(method),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    _paymentMethodController.text = value ?? '';
+                  },
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _noteController,
                   maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Nota',
-                    hintText: 'Ejemplo: compra semanal o pago de servicio',
+                  decoration: InputDecoration(
+                    labelText: strings.note,
+                    hintText: strings.isEnglish
+                        ? 'Example: weekly groceries or utility bill'
+                        : 'Ejemplo: compra semanal o pago de servicio',
                   ),
                 ),
                 const SizedBox(height: 20),
                 FilledButton(
                   onPressed: _save,
-                  child: Text(isEditing ? 'Guardar cambios' : 'Guardar movimiento'),
+                  child: Text(isEditing ? strings.saveChanges : strings.saveMovement),
                 ),
               ],
             ),

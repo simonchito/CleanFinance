@@ -50,4 +50,18 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
     await _financeRepository.saveSettings(updated);
     state = AsyncData(updated);
   }
+
+  Future<void> setLocaleCode(String localeCode) async {
+    final current = state.valueOrNull ?? await _financeRepository.getSettings();
+    final updated = current.copyWith(localeCode: localeCode);
+    await _financeRepository.saveSettings(updated);
+    state = AsyncData(updated);
+  }
+
+  Future<void> setPaymentMethods(List<String> paymentMethods) async {
+    final current = state.valueOrNull ?? await _financeRepository.getSettings();
+    final updated = current.copyWith(paymentMethods: paymentMethods);
+    await _financeRepository.saveSettings(updated);
+    state = AsyncData(updated);
+  }
 }

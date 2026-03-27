@@ -6,16 +6,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 import 'categories_screen.dart';
+import 'payment_methods_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   Future<void> _exportData(BuildContext context, WidgetRef ref) async {
+    final strings = AppStrings.of(context);
     final payload = await ref.read(financeRepositoryProvider).exportData();
     final directory = await getApplicationDocumentsDirectory();
     final file = File(
@@ -25,17 +29,20 @@ class SettingsScreen extends ConsumerWidget {
 
     await Share.shareXFiles(
       [XFile(file.path)],
-      text: 'Backup local de Clean Finance',
+      text: strings.isEnglish
+          ? 'Local backup from CleanFinance'
+          : 'Backup local de CleanFinance',
     );
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Backup generado en ${file.path}')),
+        SnackBar(content: Text('${strings.exportBackup}: ${file.path}')),
       );
     }
   }
 
   Future<void> _importData(BuildContext context, WidgetRef ref) async {
+    final strings = AppStrings.of(context);
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
@@ -49,18 +56,20 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Importar backup'),
-          content: const Text(
-            'Esta acción reemplaza los datos actuales. Si querés, exportá un backup antes de seguir.',
+          title: Text(strings.importBackup),
+          content: Text(
+            strings.isEnglish
+                ? 'This will replace your current data. Export a backup first if you want a copy.'
+                : 'Esta acción reemplaza los datos actuales. Si querés, exportá un backup antes de seguir.',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancelar'),
+              child: Text(strings.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Importar'),
+              child: Text(strings.importBackup),
             ),
           ],
         );
@@ -84,28 +93,37 @@ class SettingsScreen extends ConsumerWidget {
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Datos importados correctamente.')),
+        SnackBar(
+          content: Text(
+            strings.isEnglish
+                ? 'Data imported successfully.'
+                : 'Datos importados correctamente.',
+          ),
+        ),
       );
     }
   }
 
   Future<void> _clearAllData(BuildContext context, WidgetRef ref) async {
+    final strings = AppStrings.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Borrar datos'),
-          content: const Text(
-            'Se eliminarán movimientos, metas y categorías personalizadas del dispositivo.',
+          title: Text(strings.isEnglish ? 'Delete data' : 'Borrar datos'),
+          content: Text(
+            strings.isEnglish
+                ? 'Movements, goals and custom categories will be removed from this device.'
+                : 'Se eliminarán movimientos, metas y categorías personalizadas del dispositivo.',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Cancelar'),
+              child: Text(strings.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: const Text('Borrar'),
+              child: Text(strings.isEnglish ? 'Delete' : 'Borrar'),
             ),
           ],
         );
@@ -128,18 +146,25 @@ class SettingsScreen extends ConsumerWidget {
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Se restablecieron tus datos locales.')),
+        SnackBar(
+          content: Text(
+            strings.isEnglish
+                ? 'Local data was reset.'
+                : 'Se restablecieron tus datos locales.',
+          ),
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = AppStrings.of(context);
     final settingsState = ref.watch(settingsControllerProvider);
     final authState = ref.watch(authControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Ajustes')),
+      appBar: AppBar(title: Text(strings.settings)),
       body: settingsState.when(
         data: (settings) {
           return ListView(
@@ -166,12 +191,16 @@ class SettingsScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Una app simple, privada y clara',
+                            strings.isEnglish
+                                ? 'A simple, private and clear app'
+                                : 'Una app simple, privada y clara',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Configurá la experiencia para que se sienta realmente tuya.',
+                            strings.isEnglish
+                                ? 'Adjust the experience so it really feels like yours.'
+                                : 'Configurá la experiencia para que se sienta realmente tuya.',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: Theme.of(context)
                                       .colorScheme
@@ -190,25 +219,52 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Apariencia',
+                      strings.appearance,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 14),
+                    DropdownButtonFormField<String>(
+                      initialValue: settings.localeCode,
+                      decoration: InputDecoration(labelText: strings.language),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'es',
+                          child: Text(strings.spanish),
+                        ),
+                        DropdownMenuItem(
+                          value: 'en',
+                          child: Text(strings.english),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null &&
+                            AppConstants.supportedLocaleCodes.contains(value)) {
+                          ref
+                              .read(settingsControllerProvider.notifier)
+                              .setLocaleCode(value);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 12),
                     DropdownButtonFormField<ThemeMode>(
                       initialValue: settings.themeMode,
-                      decoration: const InputDecoration(labelText: 'Tema'),
-                      items: const [
+                      decoration: InputDecoration(
+                        labelText: strings.isEnglish ? 'Theme' : 'Tema',
+                      ),
+                      items: [
                         DropdownMenuItem(
                           value: ThemeMode.system,
-                          child: Text('Seguir sistema'),
+                          child: Text(
+                            strings.isEnglish ? 'Follow system' : 'Seguir sistema',
+                          ),
                         ),
                         DropdownMenuItem(
                           value: ThemeMode.light,
-                          child: Text('Claro'),
+                          child: Text(strings.isEnglish ? 'Light' : 'Claro'),
                         ),
                         DropdownMenuItem(
                           value: ThemeMode.dark,
-                          child: Text('Oscuro'),
+                          child: Text(strings.isEnglish ? 'Dark' : 'Oscuro'),
                         ),
                       ],
                       onChanged: (value) {
@@ -222,7 +278,9 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
                       initialValue: settings.currencyCode,
-                      decoration: const InputDecoration(labelText: 'Moneda'),
+                      decoration: InputDecoration(
+                        labelText: strings.isEnglish ? 'Currency' : 'Moneda',
+                      ),
                       items: const [
                         DropdownMenuItem(value: 'ARS', child: Text('ARS (\$)')),
                         DropdownMenuItem(
@@ -254,12 +312,14 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Seguridad',
+                      strings.security,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Mantené acceso rápido sin perder privacidad.',
+                      strings.isEnglish
+                          ? 'Keep fast access without losing privacy.'
+                          : 'Mantené acceso rápido sin perder privacidad.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
@@ -267,11 +327,15 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(height: 14),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Desbloqueo con biometría'),
+                      title: Text(strings.biometric),
                       subtitle: Text(
                         authState.biometricAvailable
-                            ? 'Usá huella o reconocimiento facial si está disponible.'
-                            : 'Este dispositivo no tiene biometría disponible.',
+                            ? (strings.isEnglish
+                                ? 'Use fingerprint or face unlock if available.'
+                                : 'Usá huella o reconocimiento facial si está disponible.')
+                            : (strings.isEnglish
+                                ? 'This device does not support biometrics.'
+                                : 'Este dispositivo no tiene biometría disponible.'),
                       ),
                       value: settings.biometricEnabled,
                       onChanged: (value) async {
@@ -288,14 +352,26 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
                       initialValue: settings.autoLockMinutes,
-                      decoration: const InputDecoration(
-                        labelText: 'Bloqueo automático',
+                      decoration: InputDecoration(
+                        labelText: strings.isEnglish ? 'Auto lock' : 'Bloqueo automático',
                       ),
-                      items: const [
-                        DropdownMenuItem(value: 1, child: Text('1 minuto')),
-                        DropdownMenuItem(value: 5, child: Text('5 minutos')),
-                        DropdownMenuItem(value: 15, child: Text('15 minutos')),
-                        DropdownMenuItem(value: 30, child: Text('30 minutos')),
+                      items: [
+                        DropdownMenuItem(
+                          value: 1,
+                          child: Text(strings.isEnglish ? '1 minute' : '1 minuto'),
+                        ),
+                        DropdownMenuItem(
+                          value: 5,
+                          child: Text(strings.isEnglish ? '5 minutes' : '5 minutos'),
+                        ),
+                        DropdownMenuItem(
+                          value: 15,
+                          child: Text(strings.isEnglish ? '15 minutes' : '15 minutos'),
+                        ),
+                        DropdownMenuItem(
+                          value: 30,
+                          child: Text(strings.isEnglish ? '30 minutes' : '30 minutos'),
+                        ),
                       ],
                       onChanged: (value) {
                         if (value != null) {
@@ -311,7 +387,7 @@ class SettingsScreen extends ConsumerWidget {
                         ref.read(authControllerProvider.notifier).lock();
                       },
                       icon: const Icon(Icons.lock_outline_rounded),
-                      label: const Text('Bloquear ahora'),
+                      label: Text(strings.lockNow),
                     ),
                   ],
                 ),
@@ -322,27 +398,41 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Datos',
+                      strings.data,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.',
+                      strings.isEnglish
+                          ? 'Your data lives on your device. You can export or restore it whenever you need.'
+                          : 'Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PaymentMethodsScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.account_balance_wallet_outlined),
+                      label: Text(strings.managePaymentMethods),
+                    ),
+                    const SizedBox(height: 12),
                     FilledButton.icon(
                       onPressed: () => _exportData(context, ref),
                       icon: const Icon(Icons.ios_share_rounded),
-                      label: const Text('Exportar backup'),
+                      label: Text(strings.exportBackup),
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () => _importData(context, ref),
                       icon: const Icon(Icons.download_rounded),
-                      label: const Text('Importar backup'),
+                      label: Text(strings.importBackup),
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
@@ -354,20 +444,26 @@ class SettingsScreen extends ConsumerWidget {
                         );
                       },
                       icon: const Icon(Icons.category_outlined),
-                      label: const Text('Gestionar categorías'),
+                      label: Text(strings.manageCategories),
                     ),
                     const SizedBox(height: 12),
                     TextButton(
                       onPressed: () => _clearAllData(context, ref),
-                      child: const Text('Borrar todos los datos'),
+                      child: Text(
+                        strings.isEnglish
+                            ? 'Delete all data'
+                            : 'Borrar todos los datos',
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
-              const SectionCard(
+              SectionCard(
                 child: Text(
-                  'Privacidad primero: no hay tracking, no se suben datos financieros y todo queda bajo tu control local.',
+                  strings.isEnglish
+                      ? 'Privacy first: no tracking, no financial data uploads and everything stays under your local control.'
+                      : 'Privacidad primero: no hay tracking, no se suben datos financieros y todo queda bajo tu control local.',
                 ),
               ),
             ],
@@ -379,7 +475,9 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             EmptyStateView(
               icon: Icons.error_outline_rounded,
-              title: 'No se pudieron cargar los ajustes',
+              title: strings.isEnglish
+                  ? 'Could not load settings'
+                  : 'No se pudieron cargar los ajustes',
               message: '$error',
             ),
           ],

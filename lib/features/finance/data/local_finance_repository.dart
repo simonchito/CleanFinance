@@ -344,6 +344,9 @@ class LocalFinanceRepository implements FinanceRepository {
       biometricEnabled: (row['biometric_enabled'] as int? ?? 0) == 1,
       autoLockMinutes: (row['auto_lock_minutes'] as int?) ??
           AppConstants.defaultAutoLockMinutes,
+      localeCode:
+          (row['locale_code'] as String?) ?? AppConstants.defaultLocaleCode,
+      paymentMethods: _paymentMethodsFromDb(row['payment_methods'] as String?),
     );
   }
 
@@ -358,6 +361,8 @@ class LocalFinanceRepository implements FinanceRepository {
         'theme_mode': settings.themeMode.name,
         'biometric_enabled': settings.biometricEnabled ? 1 : 0,
         'auto_lock_minutes': settings.autoLockMinutes,
+        'locale_code': settings.localeCode,
+        'payment_methods': jsonEncode(settings.paymentMethods),
       },
       where: 'id = 1',
     );
@@ -480,6 +485,8 @@ class LocalFinanceRepository implements FinanceRepository {
           'theme_mode': 'system',
           'biometric_enabled': 0,
           'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,
+          'locale_code': AppConstants.defaultLocaleCode,
+          'payment_methods': jsonEncode(AppConstants.defaultPaymentMethods),
         });
       }
     });
@@ -505,6 +512,8 @@ class LocalFinanceRepository implements FinanceRepository {
           'theme_mode': 'system',
           'biometric_enabled': 0,
           'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,
+          'locale_code': AppConstants.defaultLocaleCode,
+          'payment_methods': jsonEncode(AppConstants.defaultPaymentMethods),
         },
         where: 'id = 1',
       );
@@ -579,6 +588,21 @@ class LocalFinanceRepository implements FinanceRepository {
         return ThemeMode.dark;
       default:
         return ThemeMode.system;
+    }
+  }
+
+  List<String> _paymentMethodsFromDb(String? raw) {
+    if (raw == null || raw.isEmpty) {
+      return AppConstants.defaultPaymentMethods;
+    }
+    try {
+      final decoded = (jsonDecode(raw) as List<dynamic>)
+          .map((item) => item.toString().trim())
+          .where((item) => item.isNotEmpty)
+          .toList();
+      return decoded.isEmpty ? AppConstants.defaultPaymentMethods : decoded;
+    } catch (_) {
+      return AppConstants.defaultPaymentMethods;
     }
   }
 }

@@ -7,6 +7,8 @@ class AppSettings {
     required this.themeMode,
     required this.biometricEnabled,
     required this.autoLockMinutes,
+    required this.localeCode,
+    required this.paymentMethods,
   });
 
   final String currencyCode;
@@ -14,6 +16,8 @@ class AppSettings {
   final ThemeMode themeMode;
   final bool biometricEnabled;
   final int autoLockMinutes;
+  final String localeCode;
+  final List<String> paymentMethods;
 
   AppSettings copyWith({
     String? currencyCode,
@@ -21,6 +25,8 @@ class AppSettings {
     ThemeMode? themeMode,
     bool? biometricEnabled,
     int? autoLockMinutes,
+    String? localeCode,
+    List<String>? paymentMethods,
   }) {
     return AppSettings(
       currencyCode: currencyCode ?? this.currencyCode,
@@ -28,6 +34,8 @@ class AppSettings {
       themeMode: themeMode ?? this.themeMode,
       biometricEnabled: biometricEnabled ?? this.biometricEnabled,
       autoLockMinutes: autoLockMinutes ?? this.autoLockMinutes,
+      localeCode: localeCode ?? this.localeCode,
+      paymentMethods: paymentMethods ?? this.paymentMethods,
     );
   }
 }
