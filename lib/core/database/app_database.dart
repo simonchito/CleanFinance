@@ -66,6 +66,15 @@ class AppDatabase {
         ''');
 
         await db.execute('''
+          CREATE TABLE budgets(
+            id TEXT PRIMARY KEY,
+            category_id TEXT NOT NULL,
+            monthly_limit REAL NOT NULL CHECK (monthly_limit >= 0),
+            month TEXT NOT NULL
+          )
+        ''');
+
+        await db.execute('''
           CREATE TABLE app_settings(
             id INTEGER PRIMARY KEY CHECK (id = 1),
             currency_code TEXT NOT NULL,
@@ -98,6 +107,10 @@ class AppDatabase {
         await db.execute(
           'CREATE INDEX idx_movements_goal_id ON movements(goal_id)',
         );
+        await db.execute(
+          'CREATE UNIQUE INDEX idx_budgets_category_month ON budgets(category_id, month)',
+        );
+        await db.execute('CREATE INDEX idx_budgets_month ON budgets(month)');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
@@ -106,6 +119,22 @@ class AppDatabase {
           );
           await db.execute(
             "ALTER TABLE app_settings ADD COLUMN payment_methods TEXT NOT NULL DEFAULT '[\"Transferencia\",\"Tarjeta Debito\",\"Tarjeta Credito\",\"Efectivo\"]'",
+          );
+        }
+        if (oldVersion < 3) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS budgets(
+              id TEXT PRIMARY KEY,
+              category_id TEXT NOT NULL,
+              monthly_limit REAL NOT NULL CHECK (monthly_limit >= 0),
+              month TEXT NOT NULL
+            )
+          ''');
+          await db.execute(
+            'CREATE UNIQUE INDEX IF NOT EXISTS idx_budgets_category_month ON budgets(category_id, month)',
+          );
+          await db.execute(
+            'CREATE INDEX IF NOT EXISTS idx_budgets_month ON budgets(month)',
           );
         }
       },

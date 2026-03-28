@@ -133,6 +133,7 @@ class _CategoryTab extends ConsumerWidget {
     try {
       await ref.read(financeRepositoryProvider).deleteCategory(categoryId);
       ref.invalidate(categoriesProvider(scope));
+      ref.invalidate(categoryBudgetStatusProvider);
     } catch (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -223,6 +224,7 @@ class _CategoryTab extends ConsumerWidget {
                 );
                 await ref.read(financeRepositoryProvider).upsertCategory(category);
                 ref.invalidate(categoriesProvider(scope));
+                ref.invalidate(categoryBudgetStatusProvider);
                 if (dialogContext.mounted) {
                   Navigator.of(dialogContext).pop();
                 }

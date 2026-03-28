@@ -8,6 +8,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../widgets/empty_state_view.dart';
+import '../widgets/end_of_month_projection_card.dart';
 import '../widgets/insight_banner.dart';
 import '../widgets/metric_chip.dart';
 import '../widgets/section_card.dart';
@@ -258,6 +259,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                EndOfMonthProjectionCard(
+                  projection: overview.endOfMonthProjection,
+                  currencySymbol: symbol,
+                ),
                 const SizedBox(height: 22),
                 Text(
                   strings.isEnglish ? 'Insights' : 'Recomendaciones',
@@ -419,23 +425,52 @@ class _QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shadowColor = Colors.black.withValues(alpha: 0.14);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Ink(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        height: 96,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.14),
+          color: Colors.white.withValues(alpha: 0.18),
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.28),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: shadowColor,
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: Colors.white.withValues(alpha: 0.08),
+              blurRadius: 0,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(height: 8),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: Colors.white, size: 17),
+            ),
+            const SizedBox(height: 6),
             Text(
               label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: Colors.white,
+                    fontWeight: FontWeight.w800,
                   ),
             ),
           ],
@@ -497,3 +532,4 @@ class _MovementTile extends StatelessWidget {
     );
   }
 }
+

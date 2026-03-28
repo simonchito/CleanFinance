@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/reports_snapshot.dart';
-import '../models/finance_overview.dart';
 
 class DonutChart extends StatelessWidget {
   const DonutChart({
@@ -163,53 +163,74 @@ class MonthlyTrendChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final maxValue = points.fold<double>(
       0,
-      (max, point) => math.max(max, math.max(point.income, point.expense)),
+      (max, point) => math.max(
+        max,
+        math.max(point.income, math.max(point.expense, point.savings)),
+      ),
     );
     final scheme = Theme.of(context).colorScheme;
 
     return SizedBox(
       height: 220,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+      child: Stack(
         children: [
-          for (final point in points)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _TrendBar(
-                              value: point.income,
-                              maxValue: maxValue,
-                              color: scheme.primary,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (final point in points)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _TrendBar(
+                                  value: point.income,
+                                  maxValue: maxValue,
+                                  color: scheme.primary,
+                                ),
+                                const SizedBox(width: 4),
+                                _TrendBar(
+                                  value: point.expense,
+                                  maxValue: maxValue,
+                                  color: scheme.error,
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 4),
-                            _TrendBar(
-                              value: point.expense,
-                              maxValue: maxValue,
-                              color: scheme.error,
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                        Text(
+                          point.label,
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      point.label,
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                  ],
+                  ),
+                ),
+            ],
+          ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 28),
+                child: CustomPaint(
+                  painter: _SavingsLinePainter(
+                    points: points,
+                    maxValue: maxValue,
+                    color: scheme.tertiary,
+                  ),
                 ),
               ),
             ),
+          ),
         ],
       ),
     );
@@ -290,5 +311,76 @@ class _DonutPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _DonutPainter oldDelegate) {
     return oldDelegate.items != items || oldDelegate.colors != colors;
+  }
+}
+
+class _SavingsLinePainter extends CustomPainter {
+  const _SavingsLinePainter({
+    required this.points,
+    required this.maxValue,
+    required this.color,
+  });
+
+  final List<MonthlyTrendPoint> points;
+  final double maxValue;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.isEmpty) {
+      return;
+    }
+
+    final path = Path();
+    final dotPaint = Paint()..color = color;
+    final linePaint = Paint()
+      ..color = color
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final usableHeight = size.height - 10;
+    final sectionWidth = size.width / points.length;
+
+    for (var index = 0; index < points.length; index++) {
+      final point = points[index];
+      final x = (sectionWidth * index) + (sectionWidth / 2);
+      final normalized = maxValue == 0
+          ? 0.02
+          : (point.savings / maxValue).clamp(0.02, 1.0);
+      final y = usableHeight - (usableHeight * normalized);
+
+      if (index == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+
+    canvas.drawPath(path, linePaint);
+
+    for (var index = 0; index < points.length; index++) {
+      final point = points[index];
+      final x = (sectionWidth * index) + (sectionWidth / 2);
+      final normalized = maxValue == 0
+          ? 0.02
+          : (point.savings / maxValue).clamp(0.02, 1.0);
+      final y = usableHeight - (usableHeight * normalized);
+
+      canvas.drawCircle(Offset(x, y), 4.5, dotPaint);
+      canvas.drawCircle(
+        Offset(x, y),
+        2.4,
+        Paint()..color = Colors.white,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SavingsLinePainter oldDelegate) {
+    return oldDelegate.points != points ||
+        oldDelegate.maxValue != maxValue ||
+        oldDelegate.color != color;
   }
 }

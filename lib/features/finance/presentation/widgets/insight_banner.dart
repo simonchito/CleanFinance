@@ -12,6 +12,7 @@ class InsightBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
     final scheme = Theme.of(context).colorScheme;
     final (icon, color) = switch (insight.tone) {
       FinanceInsightTone.positive => (Icons.trending_up_rounded, scheme.primary),
@@ -42,9 +43,32 @@ class InsightBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  insight.title,
-                  style: Theme.of(context).textTheme.titleSmall,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        insight.title,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        _kindLabel(insight.kind, isEnglish),
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                              color: color,
+                            ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -59,5 +83,14 @@ class InsightBanner extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _kindLabel(FinanceInsightKind kind, bool isEnglish) {
+    return switch (kind) {
+      FinanceInsightKind.descriptive => isEnglish ? 'Overview' : 'Descriptivo',
+      FinanceInsightKind.diagnostic => isEnglish ? 'Cause' : 'Diagnóstico',
+      FinanceInsightKind.predictive => isEnglish ? 'Forecast' : 'Proyección',
+      FinanceInsightKind.actionable => isEnglish ? 'Action' : 'Acción',
+    };
   }
 }

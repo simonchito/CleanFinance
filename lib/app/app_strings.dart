@@ -72,6 +72,15 @@ class AppStrings {
       isEnglish ? 'Import backup' : 'Importar backup';
   String get manageCategories =>
       isEnglish ? 'Manage categories' : 'Gestionar categorías';
+  String get budgets => isEnglish ? 'Budgets' : 'Presupuestos';
+  String get manageBudgets =>
+      isEnglish ? 'Manage budgets' : 'Gestionar presupuestos';
+  String get newBudget => isEnglish ? 'New budget' : 'Nuevo presupuesto';
+  String get editBudget => isEnglish ? 'Edit budget' : 'Editar presupuesto';
+  String get monthlyLimit =>
+      isEnglish ? 'Monthly limit' : 'Límite mensual';
+  String get spent => isEnglish ? 'Spent' : 'Gastado';
+  String get remaining => isEnglish ? 'Remaining' : 'Disponible';
   String get lockNow => isEnglish ? 'Lock now' : 'Bloquear ahora';
   String get add => isEnglish ? 'Add' : 'Agregar';
   String get cancel => isEnglish ? 'Cancel' : 'Cancelar';
