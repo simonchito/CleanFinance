@@ -2,8 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/reports_snapshot.dart';
-import '../models/finance_overview.dart';
 
 class DonutChart extends StatelessWidget {
   const DonutChart({
