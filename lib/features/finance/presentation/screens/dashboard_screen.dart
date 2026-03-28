@@ -230,6 +230,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       value: '${overview.summary.currentMonthMovementCount}',
                       color: Theme.of(context).colorScheme.secondary,
                     ),
+                    MetricChip(
+                      icon: Icons.savings_rounded,
+                      label: 'Ahorros',
+                      value: CurrencyFormatter.format(
+                        overview.summary.savingsMonth,
+                        symbol: symbol,
+                      ),
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 22),
