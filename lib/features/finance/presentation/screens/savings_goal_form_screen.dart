@@ -72,7 +72,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
       updatedAt: now,
     );
 
-    await ref.read(financeRepositoryProvider).upsertSavingsGoal(goal);
+    await ref.read(savingsGoalsRepositoryProvider).upsertSavingsGoal(goal);
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(financeOverviewProvider);
     if (mounted) {

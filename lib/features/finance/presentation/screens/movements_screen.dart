@@ -48,7 +48,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
   }
 
   Future<void> _deleteMovement(Movement movement) async {
-    await ref.read(financeRepositoryProvider).deleteMovement(movement.id);
+    await ref.read(movementsRepositoryProvider).deleteMovement(movement.id);
     _refresh();
   }
 

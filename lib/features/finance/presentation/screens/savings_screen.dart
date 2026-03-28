@@ -197,7 +197,7 @@ class SavingsScreen extends ConsumerWidget {
                               _openContribution(context, ref, progress),
                           onDelete: () async {
                             await ref
-                                .read(financeRepositoryProvider)
+                                .read(savingsGoalsRepositoryProvider)
                                 .deleteSavingsGoal(progress.goal.id);
                             _refresh(ref);
                           },
@@ -230,7 +230,7 @@ class SavingsScreen extends ConsumerWidget {
                               _openContribution(context, ref, progress),
                           onDelete: () async {
                             await ref
-                                .read(financeRepositoryProvider)
+                                .read(savingsGoalsRepositoryProvider)
                                 .deleteSavingsGoal(progress.goal.id);
                             _refresh(ref);
                           },

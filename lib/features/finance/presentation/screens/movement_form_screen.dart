@@ -106,7 +106,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
       updatedAt: now,
     );
 
-    await ref.read(financeRepositoryProvider).upsertMovement(movement);
+    await ref.read(movementsRepositoryProvider).upsertMovement(movement);
     ref.invalidate(financeOverviewProvider);
     ref.invalidate(dashboardSummaryProvider);
     ref.invalidate(recentMovementsProvider);

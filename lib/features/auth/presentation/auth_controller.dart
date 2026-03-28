@@ -1,20 +1,20 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
-import '../../finance/domain/repositories/finance_repository.dart';
+import '../../finance/domain/repositories/categories_repository.dart';
 import '../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
 
 class AuthController extends StateNotifier<AuthState> {
   AuthController({
     required AuthRepository authRepository,
-    required FinanceRepository financeRepository,
+    required CategoriesRepository categoriesRepository,
   })  : _authRepository = authRepository,
-        _financeRepository = financeRepository,
+        _categoriesRepository = categoriesRepository,
         super(const AuthState.initial());
 
   final AuthRepository _authRepository;
-  final FinanceRepository _financeRepository;
+  final CategoriesRepository _categoriesRepository;
   DateTime? _pausedAt;
 
   Future<void> bootstrap() async {
@@ -54,7 +54,7 @@ class AuthController extends StateNotifier<AuthState> {
     if (enableBiometrics) {
       await _authRepository.setBiometricEnabled(true);
     }
-    await _financeRepository.ensureSeedData();
+    await _categoriesRepository.ensureSeedData();
 
     state = state.copyWith(
       status: AuthStatus.unlocked,

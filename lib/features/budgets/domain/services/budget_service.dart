@@ -1,7 +1,8 @@
 import '../../../finance/domain/entities/category.dart';
 import '../../../finance/domain/entities/movement.dart';
 import '../../../finance/domain/entities/movement_filter.dart';
-import '../../../finance/domain/repositories/finance_repository.dart';
+import '../../../finance/domain/repositories/categories_repository.dart';
+import '../../../finance/domain/repositories/movements_repository.dart';
 import '../models/budget.dart';
 import '../models/category_budget_status.dart';
 import '../repositories/budget_repository.dart';
@@ -9,12 +10,15 @@ import '../repositories/budget_repository.dart';
 class BudgetService {
   const BudgetService({
     required BudgetRepository budgetRepository,
-    required FinanceRepository financeRepository,
+    required CategoriesRepository categoriesRepository,
+    required MovementsRepository movementsRepository,
   }) : _budgetRepository = budgetRepository,
-       _financeRepository = financeRepository;
+       _categoriesRepository = categoriesRepository,
+       _movementsRepository = movementsRepository;
 
   final BudgetRepository _budgetRepository;
-  final FinanceRepository _financeRepository;
+  final CategoriesRepository _categoriesRepository;
+  final MovementsRepository _movementsRepository;
 
   Future<List<CategoryBudgetStatus>> getCategoryBudgetStatuses({
     DateTime? referenceDate,
@@ -27,10 +31,10 @@ class BudgetService {
       return const [];
     }
 
-    final categories = await _financeRepository.getCategories(
+    final categories = await _categoriesRepository.getCategories(
       scope: CategoryScope.expense,
     );
-    final movements = await _financeRepository.getMovements(
+    final movements = await _movementsRepository.getMovements(
       filter: MovementFilter(
         startDate: _monthStart(targetDate),
         endDate: _monthEndInclusive(targetDate),

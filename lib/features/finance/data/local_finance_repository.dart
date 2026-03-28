@@ -14,9 +14,21 @@ import '../domain/entities/movement.dart';
 import '../domain/entities/movement_filter.dart';
 import '../domain/entities/reports_snapshot.dart';
 import '../domain/entities/savings_goal.dart';
+import '../domain/repositories/backup_repository.dart';
+import '../domain/repositories/categories_repository.dart';
 import '../domain/repositories/finance_repository.dart';
+import '../domain/repositories/movements_repository.dart';
+import '../domain/repositories/savings_goals_repository.dart';
+import '../domain/repositories/settings_repository.dart';
 
-class LocalFinanceRepository implements FinanceRepository {
+class LocalFinanceRepository
+    implements
+        FinanceRepository,
+        MovementsRepository,
+        CategoriesRepository,
+        SavingsGoalsRepository,
+        SettingsRepository,
+        BackupRepository {
   LocalFinanceRepository(
     this._appDatabase, {
     SecureStorageService? secureStorage,

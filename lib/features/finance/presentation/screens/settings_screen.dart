@@ -21,7 +21,7 @@ class SettingsScreen extends ConsumerWidget {
 
   Future<void> _exportData(BuildContext context, WidgetRef ref) async {
     final strings = AppStrings.of(context);
-    final payload = await ref.read(financeRepositoryProvider).exportData();
+    final payload = await ref.read(backupRepositoryProvider).exportData();
     final directory = await getApplicationDocumentsDirectory();
     final file = File(
       '${directory.path}/clean_finance_backup_${DateTime.now().millisecondsSinceEpoch}.json',
@@ -82,7 +82,7 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     final payload = await File(path).readAsString();
-    await ref.read(financeRepositoryProvider).importData(payload);
+    await ref.read(backupRepositoryProvider).importData(payload);
     ref.invalidate(settingsControllerProvider);
     ref.invalidate(financeOverviewProvider);
     ref.invalidate(dashboardSummaryProvider);
@@ -136,7 +136,7 @@ class SettingsScreen extends ConsumerWidget {
       return;
     }
 
-    await ref.read(financeRepositoryProvider).clearAllData();
+    await ref.read(backupRepositoryProvider).clearAllData();
     ref.invalidate(settingsControllerProvider);
     ref.invalidate(financeOverviewProvider);
     ref.invalidate(dashboardSummaryProvider);

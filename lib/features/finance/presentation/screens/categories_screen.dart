@@ -131,7 +131,7 @@ class _CategoryTab extends ConsumerWidget {
     String categoryId,
   ) async {
     try {
-      await ref.read(financeRepositoryProvider).deleteCategory(categoryId);
+      await ref.read(categoriesRepositoryProvider).deleteCategory(categoryId);
       ref.invalidate(categoriesProvider(scope));
       ref.invalidate(categoryBudgetStatusProvider);
     } catch (error) {
@@ -222,7 +222,9 @@ class _CategoryTab extends ConsumerWidget {
                   createdAt: initial?.createdAt ?? now,
                   updatedAt: now,
                 );
-                await ref.read(financeRepositoryProvider).upsertCategory(category);
+                await ref
+                    .read(categoriesRepositoryProvider)
+                    .upsertCategory(category);
                 ref.invalidate(categoriesProvider(scope));
                 ref.invalidate(categoryBudgetStatusProvider);
                 if (dialogContext.mounted) {

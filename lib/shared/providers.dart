@@ -24,7 +24,12 @@ import '../features/finance/domain/entities/movement.dart';
 import '../features/finance/domain/entities/movement_filter.dart';
 import '../features/finance/domain/entities/reports_snapshot.dart';
 import '../features/finance/domain/entities/savings_goal.dart';
+import '../features/finance/domain/repositories/backup_repository.dart';
+import '../features/finance/domain/repositories/categories_repository.dart';
 import '../features/finance/domain/repositories/finance_repository.dart';
+import '../features/finance/domain/repositories/movements_repository.dart';
+import '../features/finance/domain/repositories/savings_goals_repository.dart';
+import '../features/finance/domain/repositories/settings_repository.dart';
 import '../features/finance/domain/services/cashflow_snapshot_service.dart';
 import '../features/finance/domain/services/category_comparison_service.dart';
 import '../features/finance/domain/services/end_of_month_projection_service.dart';
@@ -62,6 +67,21 @@ final financeRepositoryProvider = Provider<FinanceRepository>(
     secureStorage: ref.watch(secureStorageProvider),
   ),
 );
+final movementsRepositoryProvider = Provider<MovementsRepository>(
+  (ref) => ref.watch(financeRepositoryProvider),
+);
+final categoriesRepositoryProvider = Provider<CategoriesRepository>(
+  (ref) => ref.watch(financeRepositoryProvider),
+);
+final savingsGoalsRepositoryProvider = Provider<SavingsGoalsRepository>(
+  (ref) => ref.watch(financeRepositoryProvider),
+);
+final settingsRepositoryProvider = Provider<SettingsRepository>(
+  (ref) => ref.watch(financeRepositoryProvider),
+);
+final backupRepositoryProvider = Provider<BackupRepository>(
+  (ref) => ref.watch(financeRepositoryProvider),
+);
 final budgetRepositoryProvider = Provider<BudgetRepository>(
   (ref) => LocalBudgetRepository(ref.watch(appDatabaseProvider)),
 );
@@ -95,7 +115,8 @@ final financialHealthScoreServiceProvider =
 final budgetServiceProvider = Provider<BudgetService>(
   (ref) => BudgetService(
     budgetRepository: ref.watch(budgetRepositoryProvider),
-    financeRepository: ref.watch(financeRepositoryProvider),
+    categoriesRepository: ref.watch(categoriesRepositoryProvider),
+    movementsRepository: ref.watch(movementsRepositoryProvider),
   ),
 );
 
@@ -103,7 +124,7 @@ final authControllerProvider =
     StateNotifierProvider<AuthController, AuthState>((ref) {
   final controller = AuthController(
     authRepository: ref.watch(authRepositoryProvider),
-    financeRepository: ref.watch(financeRepositoryProvider),
+    categoriesRepository: ref.watch(categoriesRepositoryProvider),
   );
   Future.microtask(controller.bootstrap);
   return controller;
@@ -112,36 +133,36 @@ final authControllerProvider =
 final settingsControllerProvider = StateNotifierProvider<SettingsController,
     AsyncValue<AppSettings>>((ref) {
   final controller = SettingsController(
-    financeRepository: ref.watch(financeRepositoryProvider),
+    settingsRepository: ref.watch(settingsRepositoryProvider),
   );
   Future.microtask(controller.load);
   return controller;
 });
 
 final dashboardSummaryProvider = FutureProvider<DashboardSummary>((ref) async {
-  final repo = ref.watch(financeRepositoryProvider);
+  final repo = ref.watch(movementsRepositoryProvider);
   return repo.getDashboardSummary(DateTime.now());
 });
 
 final recentMovementsProvider = FutureProvider<List<Movement>>((ref) async {
-  final repo = ref.watch(financeRepositoryProvider);
+  final repo = ref.watch(movementsRepositoryProvider);
   return repo.getMovements(filter: const MovementFilter(limit: 10));
 });
 
 final categoriesProvider =
     FutureProvider.family<List<Category>, CategoryScope?>((ref, scope) async {
-  final repo = ref.watch(financeRepositoryProvider);
+  final repo = ref.watch(categoriesRepositoryProvider);
   return repo.getCategories(scope: scope);
 });
 
 final movementsProvider =
     FutureProvider.family<List<Movement>, MovementFilter>((ref, filter) async {
-  final repo = ref.watch(financeRepositoryProvider);
+  final repo = ref.watch(movementsRepositoryProvider);
   return repo.getMovements(filter: filter);
 });
 
 final savingsGoalsProvider = FutureProvider<List<SavingsGoalProgress>>((ref) async {
-  final repo = ref.watch(financeRepositoryProvider);
+  final repo = ref.watch(savingsGoalsRepositoryProvider);
   return repo.getSavingsGoals();
 });
 
@@ -163,7 +184,8 @@ final endOfMonthProjectionProvider =
 });
 
 final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
-  final repo = ref.watch(financeRepositoryProvider);
+  final movementsRepo = ref.watch(movementsRepositoryProvider);
+  final savingsGoalsRepo = ref.watch(savingsGoalsRepositoryProvider);
   final insightService = ref.watch(financeInsightsServiceProvider);
   final monthlyTrendService = ref.watch(monthlyTrendServiceProvider);
   final categoryComparisonService = ref.watch(categoryComparisonServiceProvider);
@@ -177,14 +199,14 @@ final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
 
   final now = DateTime.now();
   final firstVisibleMonth = DateTime(now.year, now.month - 5, 1);
-  final periodMovements = await repo.getMovements(
+  final periodMovements = await movementsRepo.getMovements(
     filter: MovementFilter(startDate: firstVisibleMonth),
   );
-  final savingMovements = await repo.getMovements(
+  final savingMovements = await movementsRepo.getMovements(
     filter: const MovementFilter(type: MovementType.saving),
   );
-  final savingsGoals = await repo.getSavingsGoals();
-  final summary = await repo.getDashboardSummary(now);
+  final savingsGoals = await savingsGoalsRepo.getSavingsGoals();
+  final summary = await movementsRepo.getDashboardSummary(now);
 
   final recentMovements = periodMovements.take(5).toList();
   final cashflow = cashflowSnapshotService.build(

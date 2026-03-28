@@ -2,15 +2,13 @@ import 'package:clean_finance/features/budgets/domain/models/budget.dart';
 import 'package:clean_finance/features/budgets/domain/models/category_budget_status.dart';
 import 'package:clean_finance/features/budgets/domain/repositories/budget_repository.dart';
 import 'package:clean_finance/features/budgets/domain/services/budget_service.dart';
-import 'package:clean_finance/features/finance/domain/entities/app_settings.dart';
 import 'package:clean_finance/features/finance/domain/entities/category.dart';
 import 'package:clean_finance/features/finance/domain/entities/dashboard_summary.dart';
 import 'package:clean_finance/features/finance/domain/entities/movement.dart';
 import 'package:clean_finance/features/finance/domain/entities/movement_filter.dart';
 import 'package:clean_finance/features/finance/domain/entities/reports_snapshot.dart';
-import 'package:clean_finance/features/finance/domain/entities/savings_goal.dart';
-import 'package:clean_finance/features/finance/domain/repositories/finance_repository.dart';
-import 'package:flutter/material.dart';
+import 'package:clean_finance/features/finance/domain/repositories/categories_repository.dart';
+import 'package:clean_finance/features/finance/domain/repositories/movements_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -31,11 +29,13 @@ void main() {
             month: '2026-03',
           ),
         ]),
-        financeRepository: _FakeFinanceRepository(
+        categoriesRepository: _FakeCategoriesRepository(
           categories: [
             _category('food', 'Comida'),
             _category('transport', 'Transporte'),
           ],
+        ),
+        movementsRepository: _FakeMovementsRepository(
           movements: [
             _movement(
               id: '1',
@@ -90,7 +90,8 @@ void main() {
     test('marca warning desde 80 por ciento y exceeded desde 100 por ciento', () {
       const service = BudgetService(
         budgetRepository: _NoopBudgetRepository(),
-        financeRepository: _NoopFinanceRepository(),
+        categoriesRepository: _NoopCategoriesRepository(),
+        movementsRepository: _NoopMovementsRepository(),
       );
 
       expect(
@@ -116,7 +117,8 @@ void main() {
     test('maneja presupuestos de cero sin dividir por cero', () {
       const service = BudgetService(
         budgetRepository: _NoopBudgetRepository(),
-        financeRepository: _NoopFinanceRepository(),
+        categoriesRepository: _NoopCategoriesRepository(),
+        movementsRepository: _NoopMovementsRepository(),
       );
 
       expect(
@@ -191,32 +193,15 @@ class _FakeBudgetRepository implements BudgetRepository {
   Future<void> updateBudget(Budget budget) async {}
 }
 
-class _FakeFinanceRepository implements FinanceRepository {
-  _FakeFinanceRepository({
+class _FakeCategoriesRepository implements CategoriesRepository {
+  _FakeCategoriesRepository({
     required this.categories,
-    required this.movements,
   });
 
   final List<Category> categories;
-  final List<Movement> movements;
-
-  @override
-  Future<void> clearAllData() async {}
-
-  @override
-  Future<void> deleteCategory(String categoryId) async {}
-
-  @override
-  Future<void> deleteMovement(String movementId) async {}
-
-  @override
-  Future<void> deleteSavingsGoal(String goalId) async {}
 
   @override
   Future<void> ensureSeedData() async {}
-
-  @override
-  Future<String> exportData() async => '';
 
   @override
   Future<List<Category>> getCategories({CategoryScope? scope}) async {
@@ -229,6 +214,25 @@ class _FakeFinanceRepository implements FinanceRepository {
               category.scope == scope || category.scope == CategoryScope.all,
         )
         .toList();
+  }
+
+  @override
+  Future<void> upsertCategory(Category category) async {}
+
+  @override
+  Future<void> deleteCategory(String categoryId) async {}
+}
+
+class _FakeMovementsRepository implements MovementsRepository {
+  _FakeMovementsRepository({
+    required this.movements,
+  });
+
+  final List<Movement> movements;
+
+  @override
+  Future<ReportsSnapshot> getReportsSnapshot(DateTime month) async {
+    throw UnimplementedError();
   }
 
   @override
@@ -248,7 +252,8 @@ class _FakeFinanceRepository implements FinanceRepository {
           movement.occurredOn.isBefore(filter.startDate!)) {
         return false;
       }
-      if (filter.endDate != null && movement.occurredOn.isAfter(filter.endDate!)) {
+      if (filter.endDate != null &&
+          movement.occurredOn.isAfter(filter.endDate!)) {
         return false;
       }
       return true;
@@ -256,40 +261,10 @@ class _FakeFinanceRepository implements FinanceRepository {
   }
 
   @override
-  Future<ReportsSnapshot> getReportsSnapshot(DateTime month) async {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<SavingsGoalProgress>> getSavingsGoals() async => const [];
-
-  @override
-  Future<AppSettings> getSettings() async {
-    return const AppSettings(
-      currencyCode: 'ARS',
-      currencySymbol: r'$',
-      themeMode: ThemeMode.system,
-      biometricEnabled: false,
-      autoLockMinutes: 5,
-      localeCode: 'es',
-      paymentMethods: ['Efectivo'],
-    );
-  }
-
-  @override
-  Future<void> importData(String payload) async {}
-
-  @override
-  Future<void> saveSettings(AppSettings settings) async {}
-
-  @override
-  Future<void> upsertCategory(Category category) async {}
-
-  @override
   Future<void> upsertMovement(Movement movement) async {}
 
   @override
-  Future<void> upsertSavingsGoal(SavingsGoal goal) async {}
+  Future<void> deleteMovement(String movementId) async {}
 }
 
 class _NoopBudgetRepository implements BudgetRepository {
@@ -313,29 +288,29 @@ class _NoopBudgetRepository implements BudgetRepository {
   Future<void> updateBudget(Budget budget) async {}
 }
 
-class _NoopFinanceRepository implements FinanceRepository {
-  const _NoopFinanceRepository();
-
-  @override
-  Future<void> clearAllData() async {}
-
-  @override
-  Future<void> deleteCategory(String categoryId) async {}
-
-  @override
-  Future<void> deleteMovement(String movementId) async {}
-
-  @override
-  Future<void> deleteSavingsGoal(String goalId) async {}
+class _NoopCategoriesRepository implements CategoriesRepository {
+  const _NoopCategoriesRepository();
 
   @override
   Future<void> ensureSeedData() async {}
 
   @override
-  Future<String> exportData() async => '';
+  Future<List<Category>> getCategories({CategoryScope? scope}) async => const [];
 
   @override
-  Future<List<Category>> getCategories({CategoryScope? scope}) async => const [];
+  Future<void> upsertCategory(Category category) async {}
+
+  @override
+  Future<void> deleteCategory(String categoryId) async {}
+}
+
+class _NoopMovementsRepository implements MovementsRepository {
+  const _NoopMovementsRepository();
+
+  @override
+  Future<ReportsSnapshot> getReportsSnapshot(DateTime month) async {
+    throw UnimplementedError();
+  }
 
   @override
   Future<DashboardSummary> getDashboardSummary(DateTime month) async {
@@ -348,30 +323,8 @@ class _NoopFinanceRepository implements FinanceRepository {
   }) async => const [];
 
   @override
-  Future<ReportsSnapshot> getReportsSnapshot(DateTime month) async {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<SavingsGoalProgress>> getSavingsGoals() async => const [];
-
-  @override
-  Future<AppSettings> getSettings() async {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> importData(String payload) async {}
-
-  @override
-  Future<void> saveSettings(AppSettings settings) async {}
-
-  @override
-  Future<void> upsertCategory(Category category) async {}
-
-  @override
   Future<void> upsertMovement(Movement movement) async {}
 
   @override
-  Future<void> upsertSavingsGoal(SavingsGoal goal) async {}
+  Future<void> deleteMovement(String movementId) async {}
 }
