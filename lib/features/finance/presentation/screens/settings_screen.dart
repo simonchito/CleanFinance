@@ -398,14 +398,14 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.data,
+                      strings.isEnglish ? 'Organization' : 'Organización',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       strings.isEnglish
-                          ? 'Your data lives on your device. You can export or restore it whenever you need.'
-                          : 'Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.',
+                          ? 'Customize the lists you use every day so adding data stays quick and clear.'
+                          : 'Personalizá las listas que usás todos los días para que cargar datos siga siendo rápido y claro.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
@@ -423,18 +423,6 @@ class SettingsScreen extends ConsumerWidget {
                       label: Text(strings.managePaymentMethods),
                     ),
                     const SizedBox(height: 12),
-                    FilledButton.icon(
-                      onPressed: () => _exportData(context, ref),
-                      icon: const Icon(Icons.ios_share_rounded),
-                      label: Text(strings.exportBackup),
-                    ),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: () => _importData(context, ref),
-                      icon: const Icon(Icons.download_rounded),
-                      label: Text(strings.importBackup),
-                    ),
-                    const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () {
                         Navigator.of(context).push(
@@ -445,6 +433,39 @@ class SettingsScreen extends ConsumerWidget {
                       },
                       icon: const Icon(Icons.category_outlined),
                       label: Text(strings.manageCategories),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              SectionCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      strings.data,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      strings.isEnglish
+                          ? 'Your data lives on your device. You can export or restore it whenever you need.'
+                          : 'Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      onPressed: () => _exportData(context, ref),
+                      icon: const Icon(Icons.ios_share_rounded),
+                      label: Text(strings.exportBackup),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: () => _importData(context, ref),
+                      icon: const Icon(Icons.download_rounded),
+                      label: Text(strings.importBackup),
                     ),
                     const SizedBox(height: 12),
                     TextButton(
