@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/analytics_models.dart';
+import '../mappers/finance_text_mapper.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/insight_banner.dart';
 import '../widgets/section_card.dart';
@@ -16,6 +18,7 @@ class ReportsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final overviewState = ref.watch(financeOverviewProvider);
+    final strings = AppStrings.of(context);
     final symbol =
         ref.watch(settingsControllerProvider).valueOrNull?.currencySymbol ?? r'$';
 
@@ -23,6 +26,10 @@ class ReportsScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Reportes')),
       body: overviewState.when(
         data: (overview) {
+          final healthCopy = FinanceTextMapper.healthScore(
+            strings,
+            overview.healthScore,
+          );
           final scheme = Theme.of(context).colorScheme;
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
@@ -56,14 +63,14 @@ class ReportsScreen extends ConsumerWidget {
                           ),
                         ),
                         _StatusPill(
-                          label: overview.healthScore.label,
+                          label: healthCopy.label,
                           color: _healthColor(context, overview.healthScore.level),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      overview.healthScore.message,
+                      healthCopy.message,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),

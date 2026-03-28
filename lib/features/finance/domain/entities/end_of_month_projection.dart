@@ -1,4 +1,10 @@
 enum ProjectionRiskLevel { low, medium, high }
+enum ProjectionInterpretationType {
+  insufficientActivity,
+  positiveBalance,
+  tightMargin,
+  deficitRisk,
+}
 
 class EndOfMonthProjection {
   const EndOfMonthProjection({
@@ -11,7 +17,7 @@ class EndOfMonthProjection {
     required this.projectedExpense,
     required this.projectedNet,
     required this.riskLevel,
-    required this.interpretation,
+    required this.interpretationType,
   });
 
   final double incomeSoFar;
@@ -23,5 +29,5 @@ class EndOfMonthProjection {
   final double projectedExpense;
   final double projectedNet;
   final ProjectionRiskLevel riskLevel;
-  final String interpretation;
+  final ProjectionInterpretationType interpretationType;
 }

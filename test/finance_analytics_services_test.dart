@@ -169,6 +169,10 @@ void main() {
     expect(projection.projectedExpense, closeTo(1395, 0.001));
     expect(projection.projectedNet, closeTo(-395, 0.001));
     expect(projection.riskLevel, ProjectionRiskLevel.high);
+    expect(
+      projection.interpretationType,
+      ProjectionInterpretationType.deficitRisk,
+    );
   });
   test('MonthContext centraliza limites y contadores del mes actual', () {
     final month = MonthContext.forDate(referenceDate);
@@ -258,8 +262,6 @@ void main() {
       healthScore: const FinancialHealthScore(
         score: 28,
         level: FinancialHealthLevel.risk,
-        label: 'En riesgo',
-        message: 'El ritmo actual puede dejarte sin margen.',
       ),
       largestExpense: 350,
     );
@@ -270,7 +272,11 @@ void main() {
       isTrue,
     );
     expect(
-      insights.any((insight) => insight.message.contains('%')),
+      insights.any((insight) => insight.percentageValue != null),
+      isTrue,
+    );
+    expect(
+      insights.any((insight) => insight.type == FinanceInsightType.overcommitted),
       isTrue,
     );
   });

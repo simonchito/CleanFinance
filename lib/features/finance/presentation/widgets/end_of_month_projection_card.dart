@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/end_of_month_projection.dart';
+import '../mappers/finance_text_mapper.dart';
 import 'section_card.dart';
 
 class EndOfMonthProjectionCard extends StatelessWidget {
@@ -18,9 +19,9 @@ class EndOfMonthProjectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final localized = FinanceTextMapper.projection(strings, projection);
     final scheme = Theme.of(context).colorScheme;
     final accent = _riskColor(context, projection.riskLevel);
-    final label = _riskLabel(strings, projection.riskLevel);
 
     return SectionCard(
       child: Column(
@@ -37,12 +38,12 @@ class EndOfMonthProjectionCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              _RiskPill(label: label, color: accent),
+              _RiskPill(label: localized.riskLabel, color: accent),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            projection.interpretation,
+            localized.interpretation,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -96,14 +97,6 @@ class EndOfMonthProjectionCard extends StatelessWidget {
       ProjectionRiskLevel.low => scheme.primary,
       ProjectionRiskLevel.medium => scheme.secondary,
       ProjectionRiskLevel.high => scheme.error,
-    };
-  }
-
-  String _riskLabel(AppStrings strings, ProjectionRiskLevel riskLevel) {
-    return switch (riskLevel) {
-      ProjectionRiskLevel.low => strings.isEnglish ? 'Low' : 'Bajo',
-      ProjectionRiskLevel.medium => strings.isEnglish ? 'Medium' : 'Medio',
-      ProjectionRiskLevel.high => strings.isEnglish ? 'High' : 'Alto',
     };
   }
 }

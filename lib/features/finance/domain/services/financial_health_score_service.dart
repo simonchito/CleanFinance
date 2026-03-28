@@ -51,35 +51,24 @@ class FinancialHealthScoreService {
       return FinancialHealthScore(
         score: normalizedScore,
         level: FinancialHealthLevel.strong,
-        label: 'Muy saludable',
-        message:
-            'Tu mes viene equilibrado y con buen margen para absorber imprevistos.',
       );
     }
     if (normalizedScore >= 60) {
       return FinancialHealthScore(
         score: normalizedScore,
         level: FinancialHealthLevel.stable,
-        label: 'Estable',
-        message:
-            'Tus números están bastante controlados, con algunos puntos para seguir de cerca.',
       );
     }
     if (normalizedScore >= 40) {
       return FinancialHealthScore(
         score: normalizedScore,
         level: FinancialHealthLevel.attention,
-        label: 'Atención',
-        message:
-            'Tu flujo sigue funcionando, pero conviene ajustar antes de que el mes se ponga más justo.',
       );
     }
 
     return FinancialHealthScore(
       score: normalizedScore,
       level: FinancialHealthLevel.risk,
-      label: 'En riesgo',
-      message: 'El ritmo actual puede dejarte sin margen antes de cerrar el mes.',
     );
   }
 }

@@ -168,14 +168,10 @@ class FinancialHealthScore {
   const FinancialHealthScore({
     required this.score,
     required this.level,
-    required this.label,
-    required this.message,
   });
 
   final int score;
   final FinancialHealthLevel level;
-  final String label;
-  final String message;
 }
 
 double largestExpenseForMonth(List<Movement> movements, DateTime referenceDate) {

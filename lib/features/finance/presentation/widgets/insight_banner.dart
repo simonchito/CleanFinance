@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../domain/entities/finance_insight.dart';
+import '../mappers/finance_text_mapper.dart';
 
 class InsightBanner extends StatelessWidget {
   const InsightBanner({
@@ -12,7 +14,8 @@ class InsightBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    final strings = AppStrings.of(context);
+    final localized = FinanceTextMapper.insight(strings, insight);
     final scheme = Theme.of(context).colorScheme;
     final (icon, color) = switch (insight.tone) {
       FinanceInsightTone.positive => (Icons.trending_up_rounded, scheme.primary),
@@ -47,7 +50,7 @@ class InsightBanner extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        insight.title,
+                        localized.title,
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                     ),
@@ -62,7 +65,7 @@ class InsightBanner extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
-                        _kindLabel(insight.kind, isEnglish),
+                        localized.kindLabel,
                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
                               color: color,
                             ),
@@ -72,7 +75,7 @@ class InsightBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  insight.message,
+                  localized.message,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
@@ -83,14 +86,5 @@ class InsightBanner extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _kindLabel(FinanceInsightKind kind, bool isEnglish) {
-    return switch (kind) {
-      FinanceInsightKind.descriptive => isEnglish ? 'Overview' : 'Descriptivo',
-      FinanceInsightKind.diagnostic => isEnglish ? 'Cause' : 'Diagnóstico',
-      FinanceInsightKind.predictive => isEnglish ? 'Forecast' : 'Proyección',
-      FinanceInsightKind.actionable => isEnglish ? 'Action' : 'Acción',
-    };
   }
 }

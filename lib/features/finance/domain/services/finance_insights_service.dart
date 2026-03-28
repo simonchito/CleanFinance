@@ -17,19 +17,16 @@ class FinanceInsightsService {
     if (cashflow.isOvercommitted) {
       insights.add(
         FinanceInsight(
-          title: 'Más de lo que entra',
-          message:
-              'Tus gastos y ahorros ya consumieron ${(cashflow.committedRate * 100).round()}% de tus ingresos del mes.',
+          type: FinanceInsightType.overcommitted,
+          percentageValue: cashflow.committedRate * 100,
           tone: FinanceInsightTone.warning,
           kind: FinanceInsightKind.diagnostic,
         ),
       );
     } else if (cashflow.netBalance > 0) {
       insights.add(
-        FinanceInsight(
-          title: 'Mes con margen',
-          message:
-              'Después de gastar y ahorrar, todavía te queda un margen positivo este mes.',
+        const FinanceInsight(
+          type: FinanceInsightType.monthWithMargin,
           tone: FinanceInsightTone.positive,
           kind: FinanceInsightKind.descriptive,
         ),
@@ -40,9 +37,9 @@ class FinanceInsightsService {
     if (topCategory != null) {
       insights.add(
         FinanceInsight(
-          title: 'Categoría dominante',
-          message:
-              '${topCategory.categoryName} concentra ${(topCategory.shareOfCurrent * 100).round()}% de tus gastos del mes.',
+          type: FinanceInsightType.dominantCategory,
+          categoryName: topCategory.categoryName,
+          percentageValue: topCategory.shareOfCurrent * 100,
           tone: topCategory.shareOfCurrent >= 0.35
               ? FinanceInsightTone.warning
               : FinanceInsightTone.neutral,
@@ -57,9 +54,9 @@ class FinanceInsightsService {
       if (variableCategory.deltaAmount > 0) {
         insights.add(
           FinanceInsight(
-            title: 'Cambio brusco de gasto',
-            message:
-                '${variableCategory.categoryName} subió ${(variableCategory.deltaPercentage!.abs() * 100).round()}% frente al mes anterior.',
+            type: FinanceInsightType.expenseIncrease,
+            categoryName: variableCategory.categoryName,
+            percentageValue: variableCategory.deltaPercentage!.abs() * 100,
             tone: FinanceInsightTone.warning,
             kind: FinanceInsightKind.diagnostic,
           ),
@@ -67,9 +64,9 @@ class FinanceInsightsService {
       } else {
         insights.add(
           FinanceInsight(
-            title: 'Buen ajuste',
-            message:
-                '${variableCategory.categoryName} bajó ${(variableCategory.deltaPercentage!.abs() * 100).round()}% frente al mes anterior.',
+            type: FinanceInsightType.expenseDecrease,
+            categoryName: variableCategory.categoryName,
+            percentageValue: variableCategory.deltaPercentage!.abs() * 100,
             tone: FinanceInsightTone.positive,
             kind: FinanceInsightKind.diagnostic,
           ),
@@ -80,19 +77,16 @@ class FinanceInsightsService {
     if (spendingPace.status == SpendingPaceStatus.risk) {
       insights.add(
         FinanceInsight(
-          title: 'Riesgo de fin de mes',
-          message:
-              'Si seguís con este ritmo, podrías cerrar con un margen ${spendingPace.projectedNetBalance.abs().round()} por debajo de cero.',
+          type: FinanceInsightType.endOfMonthRisk,
+          amountValue: spendingPace.projectedNetBalance.abs(),
           tone: FinanceInsightTone.warning,
           kind: FinanceInsightKind.predictive,
         ),
       );
     } else if (spendingPace.status == SpendingPaceStatus.onTrack) {
       insights.add(
-        FinanceInsight(
-          title: 'Ritmo bajo control',
-          message:
-              'Tu proyección de gasto cierra dentro del margen disponible para este mes.',
+        const FinanceInsight(
+          type: FinanceInsightType.paceOnTrack,
           tone: FinanceInsightTone.positive,
           kind: FinanceInsightKind.predictive,
         ),
@@ -102,9 +96,8 @@ class FinanceInsightsService {
     if (cashflow.income > 0 && largestExpense / cashflow.income >= 0.3) {
       insights.add(
         FinanceInsight(
-          title: 'Gasto atípico',
-          message:
-              'Una sola compra representó ${(largestExpense / cashflow.income * 100).round()}% de tus ingresos del mes.',
+          type: FinanceInsightType.atypicalExpense,
+          percentageValue: (largestExpense / cashflow.income) * 100,
           tone: FinanceInsightTone.warning,
           kind: FinanceInsightKind.diagnostic,
         ),
@@ -114,9 +107,8 @@ class FinanceInsightsService {
     if (cashflow.savingsRate >= 0.1) {
       insights.add(
         FinanceInsight(
-          title: 'Ahorro saludable',
-          message:
-              'Ya separaste ${(cashflow.savingsRate * 100).round()}% de tus ingresos del mes.',
+          type: FinanceInsightType.healthySavings,
+          percentageValue: cashflow.savingsRate * 100,
           tone: FinanceInsightTone.positive,
           kind: FinanceInsightKind.actionable,
         ),
@@ -124,9 +116,7 @@ class FinanceInsightsService {
     } else if (cashflow.income > 0 && cashflow.savings <= 0) {
       insights.add(
         const FinanceInsight(
-          title: 'Sugerencia simple',
-          message:
-              'Reservar aunque sea un 5% al cobrar puede darte más aire para fin de mes.',
+          type: FinanceInsightType.savingSuggestion,
           tone: FinanceInsightTone.neutral,
           kind: FinanceInsightKind.actionable,
         ),
@@ -137,8 +127,7 @@ class FinanceInsightsService {
         healthScore.level != FinancialHealthLevel.risk) {
       insights.add(
         const FinanceInsight(
-          title: 'Mes en mejora',
-          message: 'Tu resultado mensual viene mejor que el del período anterior.',
+          type: FinanceInsightType.monthImproving,
           tone: FinanceInsightTone.positive,
           kind: FinanceInsightKind.descriptive,
         ),
@@ -146,8 +135,7 @@ class FinanceInsightsService {
     } else if (cashflow.netBalance < cashflow.previousNetBalance) {
       insights.add(
         const FinanceInsight(
-          title: 'Mes más exigente',
-          message: 'Tu margen bajó frente al mes anterior. Vale la pena revisar el ritmo.',
+          type: FinanceInsightType.monthGettingTighter,
           tone: FinanceInsightTone.warning,
           kind: FinanceInsightKind.descriptive,
         ),
@@ -164,9 +152,9 @@ class FinanceInsightsService {
     if (closestGoal != null && closestGoal.estimatedCompletionDate != null) {
       insights.add(
         FinanceInsight(
-          title: 'Meta encaminada',
-          message:
-              '${closestGoal.progress.goal.name} ya va en ${(closestGoal.progress.progress * 100).round()}% y mantiene buen ritmo.',
+          type: FinanceInsightType.goalOnTrack,
+          goalName: closestGoal.progress.goal.name,
+          percentageValue: closestGoal.progress.progress * 100,
           tone: FinanceInsightTone.positive,
           kind: FinanceInsightKind.actionable,
         ),

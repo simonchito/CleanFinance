@@ -30,7 +30,7 @@ class EndOfMonthProjectionService {
       projectedExpense: projectedExpense,
       projectedNet: projectedNet,
       riskLevel: riskLevel,
-      interpretation: _interpretationFor(
+      interpretationType: _interpretationFor(
         riskLevel: riskLevel,
         incomeSoFar: incomeSoFar,
         expenseSoFar: expenseSoFar,
@@ -57,22 +57,19 @@ class EndOfMonthProjectionService {
     return ProjectionRiskLevel.low;
   }
 
-  String _interpretationFor({
+  ProjectionInterpretationType _interpretationFor({
     required ProjectionRiskLevel riskLevel,
     required double incomeSoFar,
     required double expenseSoFar,
   }) {
     if (incomeSoFar <= 0 && expenseSoFar <= 0) {
-      return 'Todavia no hay suficiente actividad este mes para una proyeccion solida.';
+      return ProjectionInterpretationType.insufficientActivity;
     }
 
     return switch (riskLevel) {
-      ProjectionRiskLevel.low =>
-        'Vas en camino a cerrar el mes con saldo positivo si mantenes este ritmo.',
-      ProjectionRiskLevel.medium =>
-        'Tu ritmo actual podria dejarte con muy poco margen al cierre del mes.',
-      ProjectionRiskLevel.high =>
-        'Si el gasto sigue a este ritmo, este mes podria cerrar en deficit.',
+      ProjectionRiskLevel.low => ProjectionInterpretationType.positiveBalance,
+      ProjectionRiskLevel.medium => ProjectionInterpretationType.tightMargin,
+      ProjectionRiskLevel.high => ProjectionInterpretationType.deficitRisk,
     };
   }
 }
