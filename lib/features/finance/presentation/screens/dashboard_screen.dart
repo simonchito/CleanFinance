@@ -419,23 +419,50 @@ class _QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final shadowColor = Colors.black.withValues(alpha: 0.14);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Ink(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        height: 88,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.14),
+          color: Colors.white.withValues(alpha: 0.18),
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.28),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: shadowColor,
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: Colors.white.withValues(alpha: 0.08),
+              blurRadius: 0,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white),
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: Colors.white, size: 18),
+            ),
             const SizedBox(height: 8),
             Text(
               label,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: Colors.white,
+                    fontWeight: FontWeight.w800,
                   ),
             ),
           ],
