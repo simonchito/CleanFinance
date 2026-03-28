@@ -113,6 +113,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     ref.invalidate(reportsSnapshotProvider);
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(movementsProvider);
+    ref.invalidate(categoryBudgetStatusProvider);
     if (mounted) {
       Navigator.of(context).pop();
     }

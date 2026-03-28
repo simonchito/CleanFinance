@@ -10,6 +10,7 @@ import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/providers.dart';
+import '../../../budgets/presentation/screens/budgets_screen.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 import 'categories_screen.dart';
@@ -90,6 +91,7 @@ class SettingsScreen extends ConsumerWidget {
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(categoriesProvider);
     ref.invalidate(movementsProvider);
+    ref.invalidate(categoryBudgetStatusProvider);
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -143,6 +145,7 @@ class SettingsScreen extends ConsumerWidget {
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(categoriesProvider);
     ref.invalidate(movementsProvider);
+    ref.invalidate(categoryBudgetStatusProvider);
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -433,6 +436,18 @@ class SettingsScreen extends ConsumerWidget {
                       },
                       icon: const Icon(Icons.category_outlined),
                       label: Text(strings.manageCategories),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const BudgetsScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.account_balance_outlined),
+                      label: Text(strings.manageBudgets),
                     ),
                   ],
                 ),
