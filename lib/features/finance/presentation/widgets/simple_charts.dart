@@ -183,54 +183,72 @@ class MonthlyTrendChart extends StatelessWidget {
 
     return SizedBox(
       height: 220,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          for (final point in points)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _TrendBar(
-                              value: point.income,
-                              maxValue: maxValue,
-                              color: scheme.primary,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final slotWidth =
+              points.isEmpty ? constraints.maxWidth : constraints.maxWidth / points.length;
+          final horizontalPadding = slotWidth < 42 ? 1.0 : 2.0;
+          final spacing = slotWidth < 42 ? 2.0 : 4.0;
+          final availableBarWidth =
+              (slotWidth - (horizontalPadding * 2) - (spacing * 2)).clamp(6.0, 24.0);
+          final barWidth = (availableBarWidth / 3).clamp(2.0, 14.0);
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (final point in points)
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _TrendBar(
+                                  value: point.income,
+                                  maxValue: maxValue,
+                                  color: scheme.primary,
+                                  width: barWidth,
+                                ),
+                                SizedBox(width: spacing),
+                                _TrendBar(
+                                  value: point.expense,
+                                  maxValue: maxValue,
+                                  color: scheme.error,
+                                  width: barWidth,
+                                ),
+                                SizedBox(width: spacing),
+                                _TrendBar(
+                                  value: point.savings,
+                                  maxValue: maxValue,
+                                  color: scheme.tertiary,
+                                  width: barWidth,
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 4),
-                            _TrendBar(
-                              value: point.expense,
-                              maxValue: maxValue,
-                              color: scheme.error,
-                            ),
-                            const SizedBox(width: 4),
-                            _TrendBar(
-                              value: point.savings,
-                              maxValue: maxValue,
-                              color: scheme.tertiary,
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            point.label,
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      point.label,
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
@@ -241,11 +259,13 @@ class _TrendBar extends StatelessWidget {
     required this.value,
     required this.maxValue,
     required this.color,
+    required this.width,
   });
 
   final double value;
   final double maxValue;
   final Color color;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +273,7 @@ class _TrendBar extends StatelessWidget {
     return FractionallySizedBox(
       heightFactor: heightFactor,
       child: Container(
-        width: 14,
+        width: width,
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(999),
