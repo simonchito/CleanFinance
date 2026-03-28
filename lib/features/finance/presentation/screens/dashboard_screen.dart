@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
@@ -43,6 +44,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final overviewState = ref.watch(financeOverviewProvider);
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
+    final strings = AppStrings.of(context);
     final symbol = settings?.currencySymbol ?? r'$';
     final monthLabel =
         DateFormat.yMMMM('es').format(DateTime.now()).replaceFirstMapped(
@@ -232,15 +234,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 const SizedBox(height: 22),
                 Text(
-                  'Insights',
+                  strings.isEnglish ? 'Insights' : 'Recomendaciones',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 12),
                 if (overview.insights.isEmpty)
-                  const EmptyStateView(
+                  EmptyStateView(
                     icon: Icons.insights_outlined,
-                    title: 'Todavía no hay insights',
-                    message: 'Cargá algunos movimientos para ver alertas y recomendaciones simples.',
+                    title: strings.isEnglish
+                        ? 'There are no insights yet'
+                        : 'Todavía no hay recomendaciones',
+                    message: strings.isEnglish
+                        ? 'Add a few movements to see simple alerts and suggestions.'
+                        : 'Cargá algunos movimientos para ver alertas y recomendaciones simples.',
                   )
                 else
                   ...overview.insights.map(
