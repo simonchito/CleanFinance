@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/security/secure_storage_service.dart';
+import '../../../core/utils/month_context.dart';
 import '../domain/entities/app_settings.dart';
 import '../domain/entities/category.dart';
 import '../domain/entities/dashboard_summary.dart';
@@ -93,8 +94,7 @@ class LocalFinanceRepository
   @override
   Future<DashboardSummary> getDashboardSummary(DateTime month) async {
     final db = await _appDatabase.instance;
-    final monthStart = DateTime(month.year, month.month, 1);
-    final monthEnd = DateTime(month.year, month.month + 1, 1);
+    final monthContext = MonthContext.forDate(month);
 
     final totalRows = await db.rawQuery(
       '''
@@ -116,7 +116,10 @@ class LocalFinanceRepository
       FROM movements
       WHERE occurred_on >= ? AND occurred_on < ?
       ''',
-      [monthStart.toIso8601String(), monthEnd.toIso8601String()],
+      [
+        monthContext.startDate.toIso8601String(),
+        monthContext.endDateExclusive.toIso8601String(),
+      ],
     );
 
     final totals = totalRows.first;
@@ -391,12 +394,19 @@ class LocalFinanceRepository
   @override
   Future<ReportsSnapshot> getReportsSnapshot(DateTime month) async {
     final db = await _appDatabase.instance;
-    final currentStart = DateTime(month.year, month.month, 1);
-    final currentEnd = DateTime(month.year, month.month + 1, 1);
-    final previousStart = DateTime(month.year, month.month - 1, 1);
+    final currentMonth = MonthContext.forDate(month);
+    final previousMonth = currentMonth.previous();
 
-    final current = await _sumByRange(db, currentStart, currentEnd);
-    final previous = await _sumByRange(db, previousStart, currentStart);
+    final current = await _sumByRange(
+      db,
+      currentMonth.startDate,
+      currentMonth.endDateExclusive,
+    );
+    final previous = await _sumByRange(
+      db,
+      previousMonth.startDate,
+      currentMonth.startDate,
+    );
     final topCategories = await db.rawQuery(
       '''
       SELECT c.name AS category_name, SUM(m.amount) AS amount
@@ -407,7 +417,10 @@ class LocalFinanceRepository
       ORDER BY amount DESC
       LIMIT 5
       ''',
-      [currentStart.toIso8601String(), currentEnd.toIso8601String()],
+      [
+        currentMonth.startDate.toIso8601String(),
+        currentMonth.endDateExclusive.toIso8601String(),
+      ],
     );
 
     return ReportsSnapshot(
@@ -634,3 +647,4 @@ class LocalFinanceRepository
     }
   }
 }
+

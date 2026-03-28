@@ -1,3 +1,4 @@
+import '../../../../core/utils/month_context.dart';
 import '../../../finance/domain/entities/category.dart';
 import '../../../finance/domain/entities/movement.dart';
 import '../../../finance/domain/entities/movement_filter.dart';
@@ -24,7 +25,8 @@ class BudgetService {
     DateTime? referenceDate,
   }) async {
     final targetDate = referenceDate ?? DateTime.now();
-    final monthKey = Budget.monthKeyFor(targetDate);
+    final monthContext = MonthContext.forDate(targetDate);
+    final monthKey = monthContext.monthKey;
     final budgets = await _budgetRepository.getBudgetsForMonth(monthKey);
 
     if (budgets.isEmpty) {
@@ -36,8 +38,8 @@ class BudgetService {
     );
     final movements = await _movementsRepository.getMovements(
       filter: MovementFilter(
-        startDate: _monthStart(targetDate),
-        endDate: _monthEndInclusive(targetDate),
+        startDate: monthContext.startDate,
+        endDate: monthContext.endDateInclusive,
         type: MovementType.expense,
       ),
     );
@@ -128,15 +130,5 @@ class BudgetService {
       return BudgetStatus.warning;
     }
     return BudgetStatus.normal;
-  }
-
-  DateTime _monthStart(DateTime date) {
-    return DateTime(date.year, date.month, 1);
-  }
-
-  DateTime _monthEndInclusive(DateTime date) {
-    return DateTime(date.year, date.month + 1, 1).subtract(
-      const Duration(microseconds: 1),
-    );
   }
 }

@@ -1,3 +1,4 @@
+import '../../../../core/utils/month_context.dart';
 import '../entities/end_of_month_projection.dart';
 
 class EndOfMonthProjectionService {
@@ -10,18 +11,9 @@ class EndOfMonthProjectionService {
     required double incomeSoFar,
     required double expenseSoFar,
   }) {
-    final totalDaysInMonth = DateTime(
-      referenceDate.year,
-      referenceDate.month + 1,
-      0,
-    ).day;
-    final daysElapsed = referenceDate.day.clamp(1, totalDaysInMonth);
-    final daysRemaining = (totalDaysInMonth - daysElapsed).clamp(
-      0,
-      totalDaysInMonth,
-    );
-    final avgDailyExpense = expenseSoFar / daysElapsed;
-    final projectedExpense = avgDailyExpense * totalDaysInMonth;
+    final monthContext = MonthContext.forDate(referenceDate);
+    final avgDailyExpense = expenseSoFar / monthContext.daysElapsed;
+    final projectedExpense = avgDailyExpense * monthContext.totalDaysInMonth;
     final projectedNet = incomeSoFar - projectedExpense;
     final riskLevel = _riskLevelFor(
       projectedNet: projectedNet,
@@ -32,9 +24,9 @@ class EndOfMonthProjectionService {
       incomeSoFar: incomeSoFar,
       expenseSoFar: expenseSoFar,
       avgDailyExpense: avgDailyExpense,
-      daysElapsed: daysElapsed,
-      totalDaysInMonth: totalDaysInMonth,
-      daysRemaining: daysRemaining,
+      daysElapsed: monthContext.daysElapsed,
+      totalDaysInMonth: monthContext.totalDaysInMonth,
+      daysRemaining: monthContext.daysRemaining,
       projectedExpense: projectedExpense,
       projectedNet: projectedNet,
       riskLevel: riskLevel,

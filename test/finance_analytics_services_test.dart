@@ -1,3 +1,4 @@
+import 'package:clean_finance/core/utils/month_context.dart';
 import 'package:clean_finance/features/finance/domain/entities/analytics_models.dart';
 import 'package:clean_finance/features/finance/domain/entities/end_of_month_projection.dart';
 import 'package:clean_finance/features/finance/domain/entities/finance_insight.dart';
@@ -169,6 +170,19 @@ void main() {
     expect(projection.projectedNet, closeTo(-395, 0.001));
     expect(projection.riskLevel, ProjectionRiskLevel.high);
   });
+  test('MonthContext centraliza limites y contadores del mes actual', () {
+    final month = MonthContext.forDate(referenceDate);
+
+    expect(month.startDate, DateTime(2026, 3, 1));
+    expect(month.endDateExclusive, DateTime(2026, 4, 1));
+    expect(month.endDateInclusive, DateTime(2026, 3, 31, 23, 59, 59, 999, 999));
+    expect(month.daysElapsed, 20);
+    expect(month.totalDaysInMonth, 31);
+    expect(month.daysRemaining, 11);
+    expect(month.monthKey, '2026-03');
+    expect(month.previous().startDate, DateTime(2026, 2, 1));
+  });
+
   test('SavingsGoalReportService estima fecha de cumplimiento con ritmo de aporte', () {
     const service = SavingsGoalReportService();
     final goal = SavingsGoalProgress(
@@ -261,4 +275,5 @@ void main() {
     );
   });
 }
+
 

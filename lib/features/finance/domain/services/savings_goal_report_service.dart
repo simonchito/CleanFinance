@@ -1,3 +1,4 @@
+import '../../../../core/utils/month_context.dart';
 import '../entities/analytics_models.dart';
 import '../entities/movement.dart';
 import '../entities/savings_goal.dart';
@@ -11,9 +12,7 @@ class SavingsGoalReportService {
     required DateTime referenceDate,
   }) {
     final goalMovements = <String, List<Movement>>{};
-    final currentMonthStart = DateTime(referenceDate.year, referenceDate.month, 1);
-    final currentMonthEnd =
-        DateTime(referenceDate.year, referenceDate.month + 1, 1);
+    final currentMonth = MonthContext.forDate(referenceDate);
 
     for (final movement in savingsMovements) {
       if (movement.type != MovementType.saving || movement.goalId == null) {
@@ -25,9 +24,7 @@ class SavingsGoalReportService {
     final forecasts = goals.map((progress) {
       final movementsForGoal = goalMovements[progress.goal.id] ?? const <Movement>[];
       final activeMonths = movementsForGoal
-          .map(
-            (movement) => '${movement.occurredOn.year}-${movement.occurredOn.month}',
-          )
+          .map((movement) => MonthContext.monthKeyFor(movement.occurredOn))
           .toSet()
           .length;
       final averageMonthlyContribution = (activeMonths == 0
@@ -37,8 +34,8 @@ class SavingsGoalReportService {
       final currentMonthContribution = movementsForGoal
           .where(
             (movement) =>
-                !movement.occurredOn.isBefore(currentMonthStart) &&
-                movement.occurredOn.isBefore(currentMonthEnd),
+                !movement.occurredOn.isBefore(currentMonth.startDate) &&
+                movement.occurredOn.isBefore(currentMonth.endDateExclusive),
           )
           .fold<double>(0, (sum, movement) => sum + movement.amount);
       final remainingAmount =

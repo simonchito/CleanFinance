@@ -1,3 +1,4 @@
+import '../../../../core/utils/month_context.dart';
 import 'package:intl/intl.dart';
 
 import '../entities/analytics_models.dart';
@@ -67,8 +68,7 @@ class MonthlyTrendService {
         .toList();
   }
 
-  String _monthKey(DateTime date) =>
-      '${date.year}-${date.month.toString().padLeft(2, '0')}';
+  String _monthKey(DateTime date) => MonthContext.monthKeyFor(date);
 
   String _monthLabel(String key, String locale) {
     final parts = key.split('-');

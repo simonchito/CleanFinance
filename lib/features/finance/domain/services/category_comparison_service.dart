@@ -1,3 +1,4 @@
+import '../../../../core/utils/month_context.dart';
 import '../entities/analytics_models.dart';
 import '../entities/movement.dart';
 
@@ -9,11 +10,8 @@ class CategoryComparisonService {
     required DateTime referenceDate,
     int topItems = 5,
   }) {
-    final currentMonthStart = DateTime(referenceDate.year, referenceDate.month, 1);
-    final currentMonthEnd =
-        DateTime(referenceDate.year, referenceDate.month + 1, 1);
-    final previousMonthStart =
-        DateTime(referenceDate.year, referenceDate.month - 1, 1);
+    final currentMonth = MonthContext.forDate(referenceDate);
+    final previousMonth = currentMonth.previous();
 
     final currentTotals = <String, double>{};
     final previousTotals = <String, double>{};
@@ -27,14 +25,14 @@ class CategoryComparisonService {
       final occurredOnMonth =
           DateTime(movement.occurredOn.year, movement.occurredOn.month, 1);
 
-      if (occurredOnMonth == currentMonthStart &&
-          movement.occurredOn.isBefore(currentMonthEnd)) {
+      if (occurredOnMonth == currentMonth.startDate &&
+          movement.occurredOn.isBefore(currentMonth.endDateExclusive)) {
         currentTotals.update(
           categoryName,
           (value) => value + movement.amount,
           ifAbsent: () => movement.amount,
         );
-      } else if (occurredOnMonth == previousMonthStart) {
+      } else if (occurredOnMonth == previousMonth.startDate) {
         previousTotals.update(
           categoryName,
           (value) => value + movement.amount,
@@ -79,4 +77,3 @@ class CategoryComparisonService {
     );
   }
 }
-

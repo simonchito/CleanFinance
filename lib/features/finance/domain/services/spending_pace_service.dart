@@ -1,3 +1,4 @@
+import '../../../../core/utils/month_context.dart';
 import '../entities/analytics_models.dart';
 
 class SpendingPaceService {
@@ -7,17 +8,15 @@ class SpendingPaceService {
     required DateTime referenceDate,
     required CashflowSnapshot cashflow,
   }) {
-    final daysInMonth = DateTime(
-      referenceDate.year,
-      referenceDate.month + 1,
-      0,
-    ).day;
-    final daysElapsed = referenceDate.day.clamp(1, daysInMonth);
+    final monthContext = MonthContext.forDate(referenceDate);
     final safeSpendingCapacity =
         (cashflow.income - cashflow.savings).clamp(0, double.infinity).toDouble();
-    final expectedSpendToDate = safeSpendingCapacity * (daysElapsed / daysInMonth);
-    final averageDailySpend = cashflow.expense / daysElapsed;
-    final projectedEndOfMonth = averageDailySpend * daysInMonth;
+    final expectedSpendToDate =
+        safeSpendingCapacity *
+        (monthContext.daysElapsed / monthContext.totalDaysInMonth);
+    final averageDailySpend = cashflow.expense / monthContext.daysElapsed;
+    final projectedEndOfMonth =
+        averageDailySpend * monthContext.totalDaysInMonth;
     final projectedNetBalance =
         cashflow.income - cashflow.savings - projectedEndOfMonth;
 
@@ -34,8 +33,8 @@ class SpendingPaceService {
       expectedSpendToDate: expectedSpendToDate,
       projectedEndOfMonth: projectedEndOfMonth,
       averageDailySpend: averageDailySpend,
-      daysElapsed: daysElapsed,
-      daysInMonth: daysInMonth,
+      daysElapsed: monthContext.daysElapsed,
+      daysInMonth: monthContext.totalDaysInMonth,
       safeSpendingCapacity: safeSpendingCapacity,
       projectedNetBalance: projectedNetBalance,
       status: status,

@@ -1,3 +1,5 @@
+import '../../../../core/utils/month_context.dart';
+
 class Budget {
   const Budget({
     required this.id,
@@ -26,7 +28,7 @@ class Budget {
   }
 
   static String monthKeyFor(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}';
+    return MonthContext.monthKeyFor(date);
   }
 
   static bool isValidMonth(String value) {

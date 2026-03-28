@@ -1,3 +1,4 @@
+import '../../../../core/utils/month_context.dart';
 import 'movement.dart';
 import 'savings_goal.dart';
 
@@ -178,16 +179,15 @@ class FinancialHealthScore {
 }
 
 double largestExpenseForMonth(List<Movement> movements, DateTime referenceDate) {
-  final monthStart = DateTime(referenceDate.year, referenceDate.month, 1);
-  final monthEnd = DateTime(referenceDate.year, referenceDate.month + 1, 1);
+  final monthContext = MonthContext.forDate(referenceDate);
   var largestExpense = 0.0;
 
   for (final movement in movements) {
     if (movement.type != MovementType.expense) {
       continue;
     }
-    if (movement.occurredOn.isBefore(monthStart) ||
-        !movement.occurredOn.isBefore(monthEnd)) {
+    if (movement.occurredOn.isBefore(monthContext.startDate) ||
+        !movement.occurredOn.isBefore(monthContext.endDateExclusive)) {
       continue;
     }
     if (movement.amount > largestExpense) {

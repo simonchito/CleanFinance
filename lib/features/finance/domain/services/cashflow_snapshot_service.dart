@@ -1,3 +1,4 @@
+import '../../../../core/utils/month_context.dart';
 import '../entities/analytics_models.dart';
 import '../entities/movement.dart';
 
@@ -8,9 +9,8 @@ class CashflowSnapshotService {
     required List<Movement> movements,
     required DateTime referenceDate,
   }) {
-    final currentStart = DateTime(referenceDate.year, referenceDate.month, 1);
-    final currentEnd = DateTime(referenceDate.year, referenceDate.month + 1, 1);
-    final previousStart = DateTime(referenceDate.year, referenceDate.month - 1, 1);
+    final currentMonth = MonthContext.forDate(referenceDate);
+    final previousMonth = currentMonth.previous();
 
     var income = 0.0;
     var expense = 0.0;
@@ -18,12 +18,12 @@ class CashflowSnapshotService {
     var previousNetBalance = 0.0;
 
     for (final movement in movements) {
-      if (movement.occurredOn.isBefore(previousStart) ||
-          !movement.occurredOn.isBefore(currentEnd)) {
+      if (movement.occurredOn.isBefore(previousMonth.startDate) ||
+          !movement.occurredOn.isBefore(currentMonth.endDateExclusive)) {
         continue;
       }
 
-      final isCurrent = !movement.occurredOn.isBefore(currentStart);
+      final isCurrent = !movement.occurredOn.isBefore(currentMonth.startDate);
       final amount = movement.amount;
 
       if (isCurrent) {
