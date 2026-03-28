@@ -202,42 +202,59 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
+                Column(
                   children: [
-                    MetricChip(
-                      icon: Icons.arrow_upward_rounded,
-                      label: 'Ingresos',
-                      value: CurrencyFormatter.format(
-                        overview.summary.incomeMonth,
-                        symbol: symbol,
-                      ),
-                      color: Theme.of(context).colorScheme.primary,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: MetricChip(
+                            icon: Icons.arrow_upward_rounded,
+                            label: 'Ingresos',
+                            value: CurrencyFormatter.format(
+                              overview.summary.incomeMonth,
+                              symbol: symbol,
+                            ),
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: MetricChip(
+                            icon: Icons.arrow_downward_rounded,
+                            label: 'Gastos',
+                            value: CurrencyFormatter.format(
+                              overview.summary.expenseMonth,
+                              symbol: symbol,
+                            ),
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ],
                     ),
-                    MetricChip(
-                      icon: Icons.arrow_downward_rounded,
-                      label: 'Gastos',
-                      value: CurrencyFormatter.format(
-                        overview.summary.expenseMonth,
-                        symbol: symbol,
-                      ),
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    MetricChip(
-                      icon: Icons.auto_graph_rounded,
-                      label: 'Movimientos',
-                      value: '${overview.summary.currentMonthMovementCount}',
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    MetricChip(
-                      icon: Icons.savings_rounded,
-                      label: 'Ahorros',
-                      value: CurrencyFormatter.format(
-                        overview.summary.savingsMonth,
-                        symbol: symbol,
-                      ),
-                      color: Theme.of(context).colorScheme.tertiary,
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: MetricChip(
+                            icon: Icons.auto_graph_rounded,
+                            label: 'Movimientos',
+                            value: '${overview.summary.currentMonthMovementCount}',
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: MetricChip(
+                            icon: Icons.savings_rounded,
+                            label: 'Ahorros',
+                            value: CurrencyFormatter.format(
+                              overview.summary.savingsMonth,
+                              symbol: symbol,
+                            ),
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
