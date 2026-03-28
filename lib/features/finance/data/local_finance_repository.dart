@@ -258,10 +258,18 @@ class LocalFinanceRepository implements FinanceRepository {
         [categoryId, categoryId],
       ),
     );
+    final budgetCount = Sqflite.firstIntValue(
+      await db.rawQuery(
+        'SELECT COUNT(*) FROM budgets WHERE category_id = ?',
+        [categoryId],
+      ),
+    );
 
-    if ((childCount ?? 0) > 0 || (movementCount ?? 0) > 0) {
+    if ((childCount ?? 0) > 0 ||
+        (movementCount ?? 0) > 0 ||
+        (budgetCount ?? 0) > 0) {
       throw StateError(
-        'No se puede eliminar una categoría con movimientos o subcategorías.',
+        'No se puede eliminar una categoría con movimientos, subcategorías o presupuestos asociados.',
       );
     }
 
@@ -436,6 +444,7 @@ class LocalFinanceRepository implements FinanceRepository {
     final categories = await db.query('categories');
     final movements = await db.query('movements');
     final goals = await db.query('savings_goals');
+    final budgets = await db.query('budgets');
     final settings = await db.query('app_settings');
 
     return const JsonEncoder.withIndent('  ').convert({
@@ -444,6 +453,7 @@ class LocalFinanceRepository implements FinanceRepository {
       'categories': categories,
       'movements': movements,
       'savingsGoals': goals,
+      'budgets': budgets,
       'settings': settings,
     });
   }
@@ -455,9 +465,11 @@ class LocalFinanceRepository implements FinanceRepository {
     final categories = (data['categories'] as List<dynamic>? ?? []).cast<Map>();
     final movements = (data['movements'] as List<dynamic>? ?? []).cast<Map>();
     final goals = (data['savingsGoals'] as List<dynamic>? ?? []).cast<Map>();
+    final budgets = (data['budgets'] as List<dynamic>? ?? []).cast<Map>();
     final settings = (data['settings'] as List<dynamic>? ?? []).cast<Map>();
 
     await db.transaction((txn) async {
+      await txn.delete('budgets');
       await txn.delete('movements');
       await txn.delete('savings_goals');
       await txn.delete('categories');
@@ -471,6 +483,9 @@ class LocalFinanceRepository implements FinanceRepository {
       }
       for (final item in goals) {
         await txn.insert('savings_goals', Map<String, Object?>.from(item));
+      }
+      for (final item in budgets) {
+        await txn.insert('budgets', Map<String, Object?>.from(item));
       }
       if (settings.isNotEmpty) {
         await txn.insert(
@@ -501,6 +516,7 @@ class LocalFinanceRepository implements FinanceRepository {
   Future<void> clearAllData() async {
     final db = await _appDatabase.instance;
     await db.transaction((txn) async {
+      await txn.delete('budgets');
       await txn.delete('movements');
       await txn.delete('savings_goals');
       await txn.delete('categories');

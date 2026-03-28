@@ -10,6 +10,10 @@ import '../features/auth/data/local_auth_repository.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/presentation/auth_controller.dart';
 import '../features/auth/presentation/auth_state.dart';
+import '../features/budgets/data/repositories/local_budget_repository.dart';
+import '../features/budgets/domain/models/category_budget_status.dart';
+import '../features/budgets/domain/repositories/budget_repository.dart';
+import '../features/budgets/domain/services/budget_service.dart';
 import '../features/finance/data/local_finance_repository.dart';
 import '../features/finance/domain/entities/app_settings.dart';
 import '../features/finance/domain/entities/analytics_models.dart';
@@ -56,6 +60,9 @@ final financeRepositoryProvider = Provider<FinanceRepository>(
     secureStorage: ref.watch(secureStorageProvider),
   ),
 );
+final budgetRepositoryProvider = Provider<BudgetRepository>(
+  (ref) => LocalBudgetRepository(ref.watch(appDatabaseProvider)),
+);
 
 final financeInsightsServiceProvider =
     Provider<FinanceInsightsService>((ref) => const FinanceInsightsService());
@@ -78,6 +85,12 @@ final paymentMethodReportServiceProvider = Provider<PaymentMethodReportService>(
 final financialHealthScoreServiceProvider =
     Provider<FinancialHealthScoreService>(
   (ref) => const FinancialHealthScoreService(),
+);
+final budgetServiceProvider = Provider<BudgetService>(
+  (ref) => BudgetService(
+    budgetRepository: ref.watch(budgetRepositoryProvider),
+    financeRepository: ref.watch(financeRepositoryProvider),
+  ),
 );
 
 final authControllerProvider =
@@ -129,6 +142,12 @@ final savingsGoalsProvider = FutureProvider<List<SavingsGoalProgress>>((ref) asy
 final reportsSnapshotProvider = FutureProvider<ReportsSnapshot>((ref) async {
   final overview = await ref.watch(financeOverviewProvider.future);
   return overview.reports;
+});
+
+final categoryBudgetStatusProvider =
+    FutureProvider<List<CategoryBudgetStatus>>((ref) async {
+  final service = ref.watch(budgetServiceProvider);
+  return service.getCategoryBudgetStatuses();
 });
 
 final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
