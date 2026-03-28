@@ -6,11 +6,13 @@ class MonthlyTrendPoint {
     required this.label,
     required this.income,
     required this.expense,
+    required this.savings,
   });
 
   final String label;
   final double income;
   final double expense;
+  final double savings;
 }
 
 class CategoryComparisonItem {

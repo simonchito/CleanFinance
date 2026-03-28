@@ -12,7 +12,7 @@ class MonthlyTrendService {
     String locale = 'es',
     int months = 6,
   }) {
-    final monthlyBuckets = <String, ({double income, double expense})>{};
+    final monthlyBuckets = <String, ({double income, double expense, double savings})>{};
 
     for (var i = 0; i < months; i++) {
       final month = DateTime(
@@ -21,7 +21,7 @@ class MonthlyTrendService {
         1,
       );
       final key = _monthKey(month);
-      monthlyBuckets[key] = (income: 0, expense: 0);
+      monthlyBuckets[key] = (income: 0, expense: 0, savings: 0);
     }
 
     for (final movement in movements) {
@@ -38,14 +38,20 @@ class MonthlyTrendService {
           monthlyBuckets[key] = (
             income: bucket.income + movement.amount,
             expense: bucket.expense,
+            savings: bucket.savings,
           );
         case MovementType.expense:
           monthlyBuckets[key] = (
             income: bucket.income,
             expense: bucket.expense + movement.amount,
+            savings: bucket.savings,
           );
         case MovementType.saving:
-          break;
+          monthlyBuckets[key] = (
+            income: bucket.income,
+            expense: bucket.expense,
+            savings: bucket.savings + movement.amount,
+          );
       }
     }
 
@@ -55,6 +61,7 @@ class MonthlyTrendService {
             label: _monthLabel(entry.key, locale),
             income: entry.value.income,
             expense: entry.value.expense,
+            savings: entry.value.savings,
           ),
         )
         .toList();
