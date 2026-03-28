@@ -19,6 +19,7 @@ import '../features/finance/domain/entities/app_settings.dart';
 import '../features/finance/domain/entities/analytics_models.dart';
 import '../features/finance/domain/entities/category.dart';
 import '../features/finance/domain/entities/dashboard_summary.dart';
+import '../features/finance/domain/entities/end_of_month_projection.dart';
 import '../features/finance/domain/entities/movement.dart';
 import '../features/finance/domain/entities/movement_filter.dart';
 import '../features/finance/domain/entities/reports_snapshot.dart';
@@ -26,6 +27,7 @@ import '../features/finance/domain/entities/savings_goal.dart';
 import '../features/finance/domain/repositories/finance_repository.dart';
 import '../features/finance/domain/services/cashflow_snapshot_service.dart';
 import '../features/finance/domain/services/category_comparison_service.dart';
+import '../features/finance/domain/services/end_of_month_projection_service.dart';
 import '../features/finance/domain/services/financial_health_score_service.dart';
 import '../features/finance/domain/services/finance_insights_service.dart';
 import '../features/finance/domain/services/monthly_trend_service.dart';
@@ -76,6 +78,10 @@ final cashflowSnapshotServiceProvider = Provider<CashflowSnapshotService>(
 );
 final spendingPaceServiceProvider =
     Provider<SpendingPaceService>((ref) => const SpendingPaceService());
+final endOfMonthProjectionServiceProvider =
+    Provider<EndOfMonthProjectionService>(
+  (ref) => const EndOfMonthProjectionService(),
+);
 final savingsGoalReportServiceProvider = Provider<SavingsGoalReportService>(
   (ref) => const SavingsGoalReportService(),
 );
@@ -150,6 +156,12 @@ final categoryBudgetStatusProvider =
   return service.getCategoryBudgetStatuses();
 });
 
+final endOfMonthProjectionProvider =
+    FutureProvider<EndOfMonthProjection>((ref) async {
+  final overview = await ref.watch(financeOverviewProvider.future);
+  return overview.endOfMonthProjection;
+});
+
 final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
   final repo = ref.watch(financeRepositoryProvider);
   final insightService = ref.watch(financeInsightsServiceProvider);
@@ -157,6 +169,8 @@ final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
   final categoryComparisonService = ref.watch(categoryComparisonServiceProvider);
   final cashflowSnapshotService = ref.watch(cashflowSnapshotServiceProvider);
   final spendingPaceService = ref.watch(spendingPaceServiceProvider);
+  final endOfMonthProjectionService =
+      ref.watch(endOfMonthProjectionServiceProvider);
   final savingsGoalReportService = ref.watch(savingsGoalReportServiceProvider);
   final paymentMethodReportService = ref.watch(paymentMethodReportServiceProvider);
   final healthScoreService = ref.watch(financialHealthScoreServiceProvider);
@@ -188,6 +202,11 @@ final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
   final spendingPace = spendingPaceService.build(
     referenceDate: now,
     cashflow: cashflow,
+  );
+  final endOfMonthProjection = endOfMonthProjectionService.build(
+    referenceDate: now,
+    incomeSoFar: cashflow.income,
+    expenseSoFar: cashflow.expense,
   );
   final savingsGoalForecasts = savingsGoalReportService.build(
     goals: savingsGoals,
@@ -235,9 +254,12 @@ final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
     monthlyTrend: monthlyTrend,
     categoryComparison: categoryComparison,
     spendingPace: spendingPace,
+    endOfMonthProjection: endOfMonthProjection,
     savingsGoals: savingsGoalForecasts,
     paymentMethodReport: paymentMethodReport,
     healthScore: healthScore,
     insights: insights,
   );
 });
+
+

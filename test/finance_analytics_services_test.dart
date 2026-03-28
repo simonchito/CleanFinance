@@ -1,9 +1,11 @@
 import 'package:clean_finance/features/finance/domain/entities/analytics_models.dart';
+import 'package:clean_finance/features/finance/domain/entities/end_of_month_projection.dart';
 import 'package:clean_finance/features/finance/domain/entities/finance_insight.dart';
 import 'package:clean_finance/features/finance/domain/entities/movement.dart';
 import 'package:clean_finance/features/finance/domain/entities/savings_goal.dart';
 import 'package:clean_finance/features/finance/domain/services/cashflow_snapshot_service.dart';
 import 'package:clean_finance/features/finance/domain/services/category_comparison_service.dart';
+import 'package:clean_finance/features/finance/domain/services/end_of_month_projection_service.dart';
 import 'package:clean_finance/features/finance/domain/services/finance_insights_service.dart';
 import 'package:clean_finance/features/finance/domain/services/financial_health_score_service.dart';
 import 'package:clean_finance/features/finance/domain/services/monthly_trend_service.dart';
@@ -151,6 +153,22 @@ void main() {
     expect(health.level, FinancialHealthLevel.risk);
   });
 
+  test('EndOfMonthProjectionService proyecta gasto y clasifica riesgo', () {
+    const service = EndOfMonthProjectionService();
+    final projection = service.build(
+      referenceDate: referenceDate,
+      incomeSoFar: 1000,
+      expenseSoFar: 900,
+    );
+
+    expect(projection.daysElapsed, 20);
+    expect(projection.totalDaysInMonth, 31);
+    expect(projection.daysRemaining, 11);
+    expect(projection.avgDailyExpense, 45);
+    expect(projection.projectedExpense, closeTo(1395, 0.001));
+    expect(projection.projectedNet, closeTo(-395, 0.001));
+    expect(projection.riskLevel, ProjectionRiskLevel.high);
+  });
   test('SavingsGoalReportService estima fecha de cumplimiento con ritmo de aporte', () {
     const service = SavingsGoalReportService();
     final goal = SavingsGoalProgress(
@@ -243,3 +261,4 @@ void main() {
     );
   });
 }
+

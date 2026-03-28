@@ -1,5 +1,6 @@
 import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/dashboard_summary.dart';
+import '../../domain/entities/end_of_month_projection.dart';
 import '../../domain/entities/finance_insight.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/reports_snapshot.dart';
@@ -13,6 +14,7 @@ class FinanceOverview {
     required this.monthlyTrend,
     required this.categoryComparison,
     required this.spendingPace,
+    required this.endOfMonthProjection,
     required this.savingsGoals,
     required this.paymentMethodReport,
     required this.healthScore,
@@ -26,6 +28,7 @@ class FinanceOverview {
   final List<MonthlyTrendPoint> monthlyTrend;
   final CategoryComparisonReport categoryComparison;
   final SpendingPaceReport spendingPace;
+  final EndOfMonthProjection endOfMonthProjection;
   final List<SavingsGoalForecast> savingsGoals;
   final PaymentMethodReport paymentMethodReport;
   final FinancialHealthScore healthScore;
@@ -33,3 +36,5 @@ class FinanceOverview {
 
   double get monthRemaining => cashflow.netBalance;
 }
+
+

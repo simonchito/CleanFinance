@@ -8,6 +8,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../widgets/empty_state_view.dart';
+import '../widgets/end_of_month_projection_card.dart';
 import '../widgets/insight_banner.dart';
 import '../widgets/metric_chip.dart';
 import '../widgets/section_card.dart';
@@ -257,6 +258,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ],
                     ),
                   ],
+                ),
+                const SizedBox(height: 16),
+                EndOfMonthProjectionCard(
+                  projection: overview.endOfMonthProjection,
+                  currencySymbol: symbol,
                 ),
                 const SizedBox(height: 22),
                 Text(
@@ -526,3 +532,4 @@ class _MovementTile extends StatelessWidget {
     );
   }
 }
+
