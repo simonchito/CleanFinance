@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../domain/entities/end_of_month_projection.dart';
 import '../mappers/finance_text_mapper.dart';
 import 'section_card.dart';
@@ -10,11 +10,13 @@ class EndOfMonthProjectionCard extends StatelessWidget {
   const EndOfMonthProjectionCard({
     required this.projection,
     required this.currencySymbol,
+    required this.showAmounts,
     super.key,
   });
 
   final EndOfMonthProjection projection;
   final String currencySymbol;
+  final bool showAmounts;
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +58,10 @@ class EndOfMonthProjectionCard extends StatelessWidget {
                   label: strings.isEnglish
                       ? 'Projected expense'
                       : 'Gasto proyectado',
-                  value: CurrencyFormatter.format(
-                    projection.projectedExpense,
+                  value: AmountVisibilityFormatter.formatCurrency(
+                    amount: projection.projectedExpense,
                     symbol: currencySymbol,
+                    isVisible: showAmounts,
                   ),
                   color: scheme.error,
                 ),
@@ -67,9 +70,10 @@ class EndOfMonthProjectionCard extends StatelessWidget {
               Expanded(
                 child: _ProjectionMetric(
                   label: strings.isEnglish ? 'Projected net' : 'Neto estimado',
-                  value: CurrencyFormatter.format(
-                    projection.projectedNet,
+                  value: AmountVisibilityFormatter.formatCurrency(
+                    amount: projection.projectedNet,
                     symbol: currencySymbol,
+                    isVisible: showAmounts,
                   ),
                   color:
                       projection.projectedNet >= 0 ? scheme.primary : scheme.error,
@@ -80,8 +84,8 @@ class EndOfMonthProjectionCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             strings.isEnglish
-                ? 'Average expense pace: ${CurrencyFormatter.format(projection.avgDailyExpense, symbol: currencySymbol)}/day. ${projection.daysRemaining} days left.'
-                : 'Ritmo promedio: ${CurrencyFormatter.format(projection.avgDailyExpense, symbol: currencySymbol)}/dia. Quedan ${projection.daysRemaining} dias.',
+                ? 'Average expense pace: ${AmountVisibilityFormatter.formatCurrency(amount: projection.avgDailyExpense, symbol: currencySymbol, isVisible: showAmounts)}/day. ${projection.daysRemaining} days left.'
+                : 'Ritmo promedio: ${AmountVisibilityFormatter.formatCurrency(amount: projection.avgDailyExpense, symbol: currencySymbol, isVisible: showAmounts)}/dia. Quedan ${projection.daysRemaining} dias.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),

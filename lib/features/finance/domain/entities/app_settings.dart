@@ -4,6 +4,7 @@ class AppSettings {
   const AppSettings({
     required this.currencyCode,
     required this.currencySymbol,
+    required this.showSensitiveAmounts,
     required this.themeMode,
     required this.biometricEnabled,
     required this.autoLockMinutes,
@@ -13,6 +14,7 @@ class AppSettings {
 
   final String currencyCode;
   final String currencySymbol;
+  final bool showSensitiveAmounts;
   final ThemeMode themeMode;
   final bool biometricEnabled;
   final int autoLockMinutes;
@@ -22,6 +24,7 @@ class AppSettings {
   AppSettings copyWith({
     String? currencyCode,
     String? currencySymbol,
+    bool? showSensitiveAmounts,
     ThemeMode? themeMode,
     bool? biometricEnabled,
     int? autoLockMinutes,
@@ -31,6 +34,8 @@ class AppSettings {
     return AppSettings(
       currencyCode: currencyCode ?? this.currencyCode,
       currencySymbol: currencySymbol ?? this.currencySymbol,
+      showSensitiveAmounts:
+          showSensitiveAmounts ?? this.showSensitiveAmounts,
       themeMode: themeMode ?? this.themeMode,
       biometricEnabled: biometricEnabled ?? this.biometricEnabled,
       autoLockMinutes: autoLockMinutes ?? this.autoLockMinutes,

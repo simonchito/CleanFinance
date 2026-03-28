@@ -19,6 +19,7 @@ class AppStrings {
   String get english => isEnglish ? 'English' : 'Inglés';
   String get settings => isEnglish ? 'Settings' : 'Ajustes';
   String get appearance => isEnglish ? 'Appearance' : 'Apariencia';
+  String get privacy => isEnglish ? 'Privacy' : 'Privacidad';
   String get security => isEnglish ? 'Security' : 'Seguridad';
   String get data => isEnglish ? 'Data' : 'Datos';
   String get language => isEnglish ? 'Language' : 'Idioma';
@@ -75,6 +76,13 @@ class AppStrings {
   String get budgets => isEnglish ? 'Budgets' : 'Presupuestos';
   String get manageBudgets =>
       isEnglish ? 'Manage budgets' : 'Gestionar presupuestos';
+  String get showAmounts => isEnglish ? 'Show amounts' : 'Mostrar montos';
+  String get hideAmounts => isEnglish ? 'Hide amounts' : 'Ocultar montos';
+  String get amountPrivacy =>
+      isEnglish ? 'Amount privacy' : 'Privacidad de montos';
+  String get amountPrivacyDescription => isEnglish
+      ? 'Hide balances and summaries when using the app in public.'
+      : 'Ocultá saldos y resúmenes cuando usás la app en público.';
   String get newBudget => isEnglish ? 'New budget' : 'Nuevo presupuesto';
   String get editBudget => isEnglish ? 'Edit budget' : 'Editar presupuesto';
   String get monthlyLimit =>

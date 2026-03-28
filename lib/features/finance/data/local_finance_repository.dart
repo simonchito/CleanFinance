@@ -363,6 +363,8 @@ class LocalFinanceRepository
     return AppSettings(
       currencyCode: row['currency_code'] as String,
       currencySymbol: row['currency_symbol'] as String,
+      showSensitiveAmounts:
+          (row['show_sensitive_amounts'] as int? ?? 1) == 1,
       themeMode: _themeModeFromDb(row['theme_mode'] as String),
       biometricEnabled: (row['biometric_enabled'] as int? ?? 0) == 1,
       autoLockMinutes: (row['auto_lock_minutes'] as int?) ??
@@ -381,6 +383,7 @@ class LocalFinanceRepository
       {
         'currency_code': settings.currencyCode,
         'currency_symbol': settings.currencySymbol,
+        'show_sensitive_amounts': settings.showSensitiveAmounts ? 1 : 0,
         'theme_mode': settings.themeMode.name,
         'biometric_enabled': settings.biometricEnabled ? 1 : 0,
         'auto_lock_minutes': settings.autoLockMinutes,
@@ -522,6 +525,8 @@ class LocalFinanceRepository
           'id': 1,
           'currency_code': AppConstants.defaultCurrencyCode,
           'currency_symbol': AppConstants.defaultCurrencySymbol,
+          'show_sensitive_amounts':
+              AppConstants.defaultShowSensitiveAmounts ? 1 : 0,
           'theme_mode': 'system',
           'biometric_enabled': 0,
           'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,
@@ -550,6 +555,8 @@ class LocalFinanceRepository
         {
           'currency_code': AppConstants.defaultCurrencyCode,
           'currency_symbol': AppConstants.defaultCurrencySymbol,
+          'show_sensitive_amounts':
+              AppConstants.defaultShowSensitiveAmounts ? 1 : 0,
           'theme_mode': 'system',
           'biometric_enabled': 0,
           'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,

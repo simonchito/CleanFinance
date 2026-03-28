@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
+import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
@@ -45,6 +46,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final overviewState = ref.watch(financeOverviewProvider);
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
+    final showSensitiveAmounts = ref.watch(showSensitiveAmountsProvider);
     final strings = AppStrings.of(context);
     final symbol = settings?.currencySymbol ?? r'$';
     final monthLabel =
@@ -131,11 +133,38 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Saldo actual',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.82),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Saldo actual',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge
+                                  ?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.82),
+                                  ),
                             ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              ref
+                                  .read(settingsControllerProvider.notifier)
+                                  .setShowSensitiveAmounts(
+                                    !showSensitiveAmounts,
+                                  );
+                            },
+                            tooltip: showSensitiveAmounts
+                                ? strings.hideAmounts
+                                : strings.showAmounts,
+                            icon: Icon(
+                              showSensitiveAmounts
+                                  ? Icons.visibility_off_rounded
+                                  : Icons.visibility_rounded,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 10),
                       TweenAnimationBuilder<double>(
@@ -144,7 +173,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         curve: Curves.easeOutCubic,
                         builder: (context, value, _) {
                           return Text(
-                            CurrencyFormatter.format(value, symbol: symbol),
+                            AmountVisibilityFormatter.formatCurrency(
+                              amount: value,
+                              symbol: symbol,
+                              isVisible: showSensitiveAmounts,
+                            ),
                             style: Theme.of(context)
                                 .textTheme
                                 .headlineMedium
@@ -164,8 +197,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                         child: Text(
                           overview.monthRemaining >= 0
-                              ? 'Te quedan ${CurrencyFormatter.format(overview.monthRemaining, symbol: symbol)} este mes.'
-                              : 'Este mes vas ${CurrencyFormatter.format(overview.monthRemaining.abs(), symbol: symbol)} por encima de tu margen.',
+                              ? 'Te quedan ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining, symbol: symbol, isVisible: showSensitiveAmounts)} este mes.'
+                              : 'Este mes vas ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining.abs(), symbol: symbol, isVisible: showSensitiveAmounts)} por encima de tu margen.',
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: Colors.white,
                               ),
@@ -211,9 +244,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           child: MetricChip(
                             icon: Icons.arrow_upward_rounded,
                             label: 'Ingresos',
-                            value: CurrencyFormatter.format(
-                              overview.summary.incomeMonth,
+                            value: AmountVisibilityFormatter.formatCurrency(
+                              amount: overview.summary.incomeMonth,
                               symbol: symbol,
+                              isVisible: showSensitiveAmounts,
                             ),
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -223,9 +257,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           child: MetricChip(
                             icon: Icons.arrow_downward_rounded,
                             label: 'Gastos',
-                            value: CurrencyFormatter.format(
-                              overview.summary.expenseMonth,
+                            value: AmountVisibilityFormatter.formatCurrency(
+                              amount: overview.summary.expenseMonth,
                               symbol: symbol,
+                              isVisible: showSensitiveAmounts,
                             ),
                             color: Theme.of(context).colorScheme.error,
                           ),
@@ -248,9 +283,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           child: MetricChip(
                             icon: Icons.savings_rounded,
                             label: 'Ahorros',
-                            value: CurrencyFormatter.format(
-                              overview.summary.savingsMonth,
+                            value: AmountVisibilityFormatter.formatCurrency(
+                              amount: overview.summary.savingsMonth,
                               symbol: symbol,
+                              isVisible: showSensitiveAmounts,
                             ),
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
@@ -263,6 +299,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 EndOfMonthProjectionCard(
                   projection: overview.endOfMonthProjection,
                   currencySymbol: symbol,
+                  showAmounts: showSensitiveAmounts,
                 ),
                 const SizedBox(height: 22),
                 Text(
@@ -307,6 +344,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       IncomeExpenseComparison(
                         income: overview.summary.incomeMonth,
                         expense: overview.summary.expenseMonth,
+                        showAmounts: showSensitiveAmounts,
+                        currencySymbol: symbol,
                       ),
                     ],
                   ),

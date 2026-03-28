@@ -306,6 +306,18 @@ class SettingsScreen extends ConsumerWidget {
                             .setCurrency(code: value, symbol: symbol);
                       },
                     ),
+                    const SizedBox(height: 12),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(strings.showAmounts),
+                      subtitle: Text(strings.amountPrivacyDescription),
+                      value: settings.showSensitiveAmounts,
+                      onChanged: (value) {
+                        ref
+                            .read(settingsControllerProvider.notifier)
+                            .setShowSensitiveAmounts(value);
+                      },
+                    ),
                   ],
                 ),
               ),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/constants/app_constants.dart';
 import '../core/database/app_database.dart';
 import '../core/security/biometric_service.dart';
 import '../core/security/password_hasher.dart';
@@ -137,6 +138,12 @@ final settingsControllerProvider = StateNotifierProvider<SettingsController,
   );
   Future.microtask(controller.load);
   return controller;
+});
+
+final showSensitiveAmountsProvider = Provider<bool>((ref) {
+  final settings = ref.watch(settingsControllerProvider).valueOrNull;
+  return settings?.showSensitiveAmounts ??
+      AppConstants.defaultShowSensitiveAmounts;
 });
 
 final dashboardSummaryProvider = FutureProvider<DashboardSummary>((ref) async {

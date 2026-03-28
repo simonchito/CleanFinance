@@ -51,6 +51,13 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
     state = AsyncData(updated);
   }
 
+  Future<void> setShowSensitiveAmounts(bool visible) async {
+    final current = state.valueOrNull ?? await _settingsRepository.getSettings();
+    final updated = current.copyWith(showSensitiveAmounts: visible);
+    await _settingsRepository.saveSettings(updated);
+    state = AsyncData(updated);
+  }
+
   Future<void> setLocaleCode(String localeCode) async {
     final current = state.valueOrNull ?? await _settingsRepository.getSettings();
     final updated = current.copyWith(localeCode: localeCode);

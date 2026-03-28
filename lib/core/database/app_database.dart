@@ -79,6 +79,7 @@ class AppDatabase {
             id INTEGER PRIMARY KEY CHECK (id = 1),
             currency_code TEXT NOT NULL,
             currency_symbol TEXT NOT NULL,
+            show_sensitive_amounts INTEGER NOT NULL DEFAULT 1,
             theme_mode TEXT NOT NULL,
             biometric_enabled INTEGER NOT NULL DEFAULT 0,
             auto_lock_minutes INTEGER NOT NULL DEFAULT 5,
@@ -91,6 +92,8 @@ class AppDatabase {
           'id': 1,
           'currency_code': AppConstants.defaultCurrencyCode,
           'currency_symbol': AppConstants.defaultCurrencySymbol,
+          'show_sensitive_amounts':
+              AppConstants.defaultShowSensitiveAmounts ? 1 : 0,
           'theme_mode': 'system',
           'biometric_enabled': 0,
           'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,
@@ -135,6 +138,11 @@ class AppDatabase {
           );
           await db.execute(
             'CREATE INDEX IF NOT EXISTS idx_budgets_month ON budgets(month)',
+          );
+        }
+        if (oldVersion < 4) {
+          await db.execute(
+            'ALTER TABLE app_settings ADD COLUMN show_sensitive_amounts INTEGER NOT NULL DEFAULT 1',
           );
         }
       },

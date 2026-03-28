@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/reports_snapshot.dart';
 
@@ -104,11 +105,15 @@ class IncomeExpenseComparison extends StatelessWidget {
   const IncomeExpenseComparison({
     required this.income,
     required this.expense,
+    this.showAmounts = true,
+    this.currencySymbol = r'$',
     super.key,
   });
 
   final double income;
   final double expense;
+  final bool showAmounts;
+  final String currencySymbol;
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +129,13 @@ class IncomeExpenseComparison extends StatelessWidget {
             children: [
               Text(label, style: Theme.of(context).textTheme.labelLarge),
               const Spacer(),
-              Text(value.toStringAsFixed(0)),
+              Text(
+                AmountVisibilityFormatter.formatCurrency(
+                  amount: value,
+                  symbol: currencySymbol,
+                  isVisible: showAmounts,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
