@@ -173,6 +173,9 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size.fromHeight(56),
+          elevation: 4,
+          shadowColor: scheme.shadow.withValues(alpha: isDark ? 0.32 : 0.18),
+          surfaceTintColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22),
           ),
@@ -182,6 +185,9 @@ class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size.fromHeight(54),
+          elevation: 1.5,
+          backgroundColor: scheme.surface,
+          shadowColor: scheme.shadow.withValues(alpha: isDark ? 0.22 : 0.12),
           side: BorderSide(color: scheme.outlineVariant),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22),
@@ -219,7 +225,11 @@ class AppTheme {
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: scheme.primary,
         foregroundColor: scheme.onPrimary,
-        elevation: 0,
+        elevation: 8,
+        focusElevation: 10,
+        hoverElevation: 10,
+        highlightElevation: 12,
+        splashColor: scheme.onPrimary.withValues(alpha: 0.12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),

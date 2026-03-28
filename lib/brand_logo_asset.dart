@@ -4,11 +4,13 @@ class BrandLogo extends StatelessWidget {
   const BrandLogo({
     this.size = 52,
     this.showWordmark = false,
+    this.showTagline = true,
     super.key,
   });
 
   final double size;
   final bool showWordmark;
+  final bool showTagline;
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +57,14 @@ class BrandLogo extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
             ),
-            Text(
-              'Finanzas claras y simples',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
+            if (showTagline)
+              Text(
+                'Finanzas claras y simples',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
           ],
         ),
       ],

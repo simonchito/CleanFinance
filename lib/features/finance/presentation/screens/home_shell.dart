@@ -58,7 +58,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
     ];
 
     return Scaffold(
-      extendBody: true,
+      extendBody: false,
       body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -101,7 +101,7 @@ class _HomeShellState extends ConsumerState<HomeShell>
               NavigationDestination(
                 icon: Icon(Icons.receipt_long_outlined),
                 selectedIcon: Icon(Icons.receipt_long_rounded),
-                label: strings.movements,
+                label: strings.movementsTab,
               ),
               NavigationDestination(
                 icon: Icon(Icons.savings_outlined),

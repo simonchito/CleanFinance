@@ -78,11 +78,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ),
                     );
 
-                    if (constraints.maxWidth < 380) {
+                    if (constraints.maxWidth < 430) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const BrandLogo(showWordmark: true),
+                          const BrandLogo(
+                            size: 44,
+                            showWordmark: true,
+                            showTagline: false,
+                          ),
                           const SizedBox(height: 12),
                           Align(
                             alignment: Alignment.centerLeft,
@@ -97,7 +101,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         const Expanded(
                           child: Align(
                             alignment: Alignment.centerLeft,
-                            child: BrandLogo(showWordmark: true),
+                            child: BrandLogo(
+                              size: 44,
+                              showWordmark: true,
+                              showTagline: false,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),

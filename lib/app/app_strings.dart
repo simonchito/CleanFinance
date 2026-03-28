@@ -53,6 +53,7 @@ class AppStrings {
   String get saving => isEnglish ? 'Saving' : 'Ahorro';
   String get dashboard => isEnglish ? 'Home' : 'Inicio';
   String get movements => isEnglish ? 'Movements' : 'Movimientos';
+  String get movementsTab => isEnglish ? 'Activity' : 'Movs.';
   String get savings => isEnglish ? 'Savings' : 'Ahorros';
   String get reports => isEnglish ? 'Reports' : 'Reportes';
   String get createGoal => isEnglish ? 'Create goal' : 'Crear meta';
