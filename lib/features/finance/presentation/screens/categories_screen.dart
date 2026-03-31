@@ -76,48 +76,31 @@ class _CategoryTab extends ConsumerWidget {
                   ),
                   children: [
                     for (final child in children)
-                      ListTile(
-                        dense: true,
-                        minLeadingWidth: 20,
-                        horizontalTitleGap: 8,
-                        title: Text(
-                          child.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      _CategoryEntryRow(
+                        icon: Icons.subdirectory_arrow_right,
+                        title: child.name,
+                        onEdit: () => _showCategoryDialog(
+                          context,
+                          ref,
+                          scope: scope,
+                          initial: child,
                         ),
-                        leading: const Icon(Icons.subdirectory_arrow_right),
-                        trailing: SizedBox(
-                          width: 96,
-                          child: _ActionsRow(
-                            onEdit: () => _showCategoryDialog(
-                              context,
-                              ref,
-                              scope: scope,
-                              initial: child,
-                            ),
-                            onDelete: child.isDefault
-                                ? null
-                                : () => _deleteCategory(context, ref, child.id),
-                          ),
-                        ),
+                        onDelete: child.isDefault
+                            ? null
+                            : () => _deleteCategory(context, ref, child.id),
                       ),
-                    ListTile(
-                      title: Text(category.name),
-                      subtitle: const Text('Categoría principal'),
-                      trailing: SizedBox(
-                        width: 96,
-                        child: _ActionsRow(
-                          onEdit: () => _showCategoryDialog(
-                            context,
-                            ref,
-                            scope: scope,
-                            initial: category,
-                          ),
-                          onDelete: category.isDefault
-                              ? null
-                              : () => _deleteCategory(context, ref, category.id),
-                        ),
+                    _CategoryEntryRow(
+                      title: category.name,
+                      subtitle: 'Categoría principal',
+                      onEdit: () => _showCategoryDialog(
+                        context,
+                        ref,
+                        scope: scope,
+                        initial: category,
                       ),
+                      onDelete: category.isDefault
+                          ? null
+                          : () => _deleteCategory(context, ref, category.id),
                     ),
                     ListTile(
                       leading: const Icon(Icons.add),
@@ -309,6 +292,71 @@ class _CategoryTab extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _CategoryEntryRow extends StatelessWidget {
+  const _CategoryEntryRow({
+    required this.title,
+    required this.onEdit,
+    required this.onDelete,
+    this.subtitle,
+    this.icon,
+  });
+
+  final String title;
+  final String? subtitle;
+  final IconData? icon;
+  final VoidCallback onEdit;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final onSurfaceVariant = Theme.of(context).colorScheme.onSurfaceVariant;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 24,
+            child: icon == null ? null : Icon(icon, size: 20),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodyLarge,
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          _ActionsRow(
+            onEdit: onEdit,
+            onDelete: onDelete,
+          ),
+        ],
+      ),
     );
   }
 }
