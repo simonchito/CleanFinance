@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 
@@ -9,6 +8,7 @@ import '../../../core/database/app_database.dart';
 import '../../../core/security/secure_storage_service.dart';
 import '../../../core/utils/month_context.dart';
 import '../domain/entities/app_settings.dart';
+import '../domain/entities/app_theme_preference.dart';
 import '../domain/entities/category.dart';
 import '../domain/entities/dashboard_summary.dart';
 import '../domain/entities/movement.dart';
@@ -365,7 +365,7 @@ class LocalFinanceRepository
       currencySymbol: row['currency_symbol'] as String,
       showSensitiveAmounts:
           (row['show_sensitive_amounts'] as int? ?? 1) == 1,
-      themeMode: _themeModeFromDb(row['theme_mode'] as String),
+      themePreference: _themeModeFromDb(row['theme_mode'] as String),
       biometricEnabled: (row['biometric_enabled'] as int? ?? 0) == 1,
       autoLockMinutes: (row['auto_lock_minutes'] as int?) ??
           AppConstants.defaultAutoLockMinutes,
@@ -384,7 +384,7 @@ class LocalFinanceRepository
         'currency_code': settings.currencyCode,
         'currency_symbol': settings.currencySymbol,
         'show_sensitive_amounts': settings.showSensitiveAmounts ? 1 : 0,
-        'theme_mode': settings.themeMode.name,
+        'theme_mode': settings.themePreference.name,
         'biometric_enabled': settings.biometricEnabled ? 1 : 0,
         'auto_lock_minutes': settings.autoLockMinutes,
         'locale_code': settings.localeCode,
@@ -628,14 +628,14 @@ class LocalFinanceRepository
     return 0;
   }
 
-  ThemeMode _themeModeFromDb(String raw) {
+  AppThemePreference _themeModeFromDb(String raw) {
     switch (raw) {
       case 'light':
-        return ThemeMode.light;
+        return AppThemePreference.light;
       case 'dark':
-        return ThemeMode.dark;
+        return AppThemePreference.dark;
       default:
-        return ThemeMode.system;
+        return AppThemePreference.system;
     }
   }
 
@@ -654,4 +654,5 @@ class LocalFinanceRepository
     }
   }
 }
+
 

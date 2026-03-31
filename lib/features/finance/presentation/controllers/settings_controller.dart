@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/app_settings.dart';
+import '../../domain/entities/app_theme_preference.dart';
 import '../../domain/repositories/settings_repository.dart';
 
 class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
@@ -17,9 +17,9 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
     state = await AsyncValue.guard(_settingsRepository.getSettings);
   }
 
-  Future<void> setThemeMode(ThemeMode themeMode) async {
+  Future<void> setThemePreference(AppThemePreference themePreference) async {
     final current = state.valueOrNull ?? await _settingsRepository.getSettings();
-    final updated = current.copyWith(themeMode: themeMode);
+    final updated = current.copyWith(themePreference: themePreference);
     await _settingsRepository.saveSettings(updated);
     state = AsyncData(updated);
   }
@@ -72,3 +72,4 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
     state = AsyncData(updated);
   }
 }
+

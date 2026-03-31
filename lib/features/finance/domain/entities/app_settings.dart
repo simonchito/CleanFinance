@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+import 'app_theme_preference.dart';
 
 class AppSettings {
   const AppSettings({
     required this.currencyCode,
     required this.currencySymbol,
     required this.showSensitiveAmounts,
-    required this.themeMode,
+    required this.themePreference,
     required this.biometricEnabled,
     required this.autoLockMinutes,
     required this.localeCode,
@@ -15,7 +15,7 @@ class AppSettings {
   final String currencyCode;
   final String currencySymbol;
   final bool showSensitiveAmounts;
-  final ThemeMode themeMode;
+  final AppThemePreference themePreference;
   final bool biometricEnabled;
   final int autoLockMinutes;
   final String localeCode;
@@ -25,7 +25,7 @@ class AppSettings {
     String? currencyCode,
     String? currencySymbol,
     bool? showSensitiveAmounts,
-    ThemeMode? themeMode,
+    AppThemePreference? themePreference,
     bool? biometricEnabled,
     int? autoLockMinutes,
     String? localeCode,
@@ -36,7 +36,7 @@ class AppSettings {
       currencySymbol: currencySymbol ?? this.currencySymbol,
       showSensitiveAmounts:
           showSensitiveAmounts ?? this.showSensitiveAmounts,
-      themeMode: themeMode ?? this.themeMode,
+      themePreference: themePreference ?? this.themePreference,
       biometricEnabled: biometricEnabled ?? this.biometricEnabled,
       autoLockMinutes: autoLockMinutes ?? this.autoLockMinutes,
       localeCode: localeCode ?? this.localeCode,

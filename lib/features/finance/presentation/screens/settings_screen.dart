@@ -13,6 +13,7 @@ import '../../../../shared/providers.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../../budgets/presentation/screens/budgets_screen.dart';
+import '../../domain/entities/app_theme_preference.dart';
 import '../providers/finance_providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
@@ -252,24 +253,24 @@ class SettingsScreen extends ConsumerWidget {
                       },
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<ThemeMode>(
-                      initialValue: settings.themeMode,
+                    DropdownButtonFormField<AppThemePreference>(
+                      initialValue: settings.themePreference,
                       decoration: InputDecoration(
                         labelText: strings.isEnglish ? 'Theme' : 'Tema',
                       ),
                       items: [
                         DropdownMenuItem(
-                          value: ThemeMode.system,
+                          value: AppThemePreference.system,
                           child: Text(
                             strings.isEnglish ? 'Follow system' : 'Seguir sistema',
                           ),
                         ),
                         DropdownMenuItem(
-                          value: ThemeMode.light,
+                          value: AppThemePreference.light,
                           child: Text(strings.isEnglish ? 'Light' : 'Claro'),
                         ),
                         DropdownMenuItem(
-                          value: ThemeMode.dark,
+                          value: AppThemePreference.dark,
                           child: Text(strings.isEnglish ? 'Dark' : 'Oscuro'),
                         ),
                       ],
@@ -277,7 +278,7 @@ class SettingsScreen extends ConsumerWidget {
                         if (value != null) {
                           ref
                               .read(settingsControllerProvider.notifier)
-                              .setThemeMode(value);
+                              .setThemePreference(value);
                         }
                       },
                     ),
@@ -537,3 +538,4 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 }
+

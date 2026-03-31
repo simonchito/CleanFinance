@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/app_constants.dart';
 import '../features/auth/presentation/screens/auth_gate_screen.dart';
+import '../features/finance/domain/entities/app_theme_preference.dart';
+import '../features/finance/presentation/mappers/theme_mode_mapper.dart';
 import '../features/finance/presentation/providers/finance_providers.dart';
 import 'theme/app_theme.dart';
 
@@ -13,8 +15,9 @@ class CleanFinanceApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsState = ref.watch(settingsControllerProvider);
-    final themeMode =
-        settingsState.valueOrNull?.themeMode ?? ThemeMode.system;
+    final themeMode = ThemeModeMapper.toFlutter(
+      settingsState.valueOrNull?.themePreference ?? AppThemePreference.system,
+    );
 
     return MaterialApp(
       title: 'CleanFinance',
@@ -38,3 +41,4 @@ class CleanFinanceApp extends ConsumerWidget {
     );
   }
 }
+
