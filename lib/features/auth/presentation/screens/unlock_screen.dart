@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../brand_logo_asset.dart';
-import '../../../../shared/providers.dart';
+import '../providers/auth_providers.dart';
 import 'recover_access_screen.dart';
 
 class UnlockScreen extends ConsumerStatefulWidget {

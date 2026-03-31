@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../shared/providers.dart';
 import '../widgets/section_card.dart';
 import '../../domain/entities/savings_goal.dart';
+import '../providers/finance_providers.dart';
 
 class SavingsGoalFormScreen extends ConsumerStatefulWidget {
   const SavingsGoalFormScreen({

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../shared/providers.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
+import '../providers/finance_providers.dart';
 import 'dashboard_screen.dart';
 import 'movements_screen.dart';
 import 'reports_screen.dart';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../shared/providers.dart';
+import '../providers/finance_providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 

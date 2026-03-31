@@ -4,9 +4,9 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
-import '../../../../shared/providers.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../mappers/finance_text_mapper.dart';
+import '../providers/finance_providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/insight_banner.dart';
 import '../widgets/section_card.dart';

@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../shared/providers.dart';
+import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
+import '../providers/finance_providers.dart';
 
 class CategoriesScreen extends ConsumerWidget {
   const CategoriesScreen({super.key});

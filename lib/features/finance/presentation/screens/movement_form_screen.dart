@@ -5,8 +5,10 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../app/app_strings.dart';
 import '../../../../shared/providers.dart';
+import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/movement.dart';
+import '../providers/finance_providers.dart';
 import '../widgets/section_card.dart';
 
 class MovementFormScreen extends ConsumerStatefulWidget {

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/providers.dart';
+import '../providers/auth_providers.dart';
 
 class SetupPinScreen extends ConsumerStatefulWidget {
   const SetupPinScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../shared/providers.dart';
+import '../providers/auth_providers.dart';
 import '../../../finance/presentation/screens/home_shell.dart';
 import '../auth_state.dart';
 import 'setup_pin_screen.dart';

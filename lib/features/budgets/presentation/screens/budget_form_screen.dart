@@ -4,11 +4,12 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../shared/providers.dart';
 import '../../../finance/domain/entities/category.dart';
+import '../../../finance/presentation/providers/finance_providers.dart';
 import '../../../finance/presentation/widgets/empty_state_view.dart';
 import '../../../finance/presentation/widgets/section_card.dart';
 import '../../domain/models/budget.dart';
+import '../providers/budget_providers.dart';
 
 class BudgetFormScreen extends ConsumerStatefulWidget {
   const BudgetFormScreen({

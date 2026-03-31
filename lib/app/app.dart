@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/app_constants.dart';
 import '../features/auth/presentation/screens/auth_gate_screen.dart';
-import '../shared/providers.dart';
+import '../features/finance/presentation/providers/finance_providers.dart';
 import 'theme/app_theme.dart';
 
 class CleanFinanceApp extends ConsumerWidget {

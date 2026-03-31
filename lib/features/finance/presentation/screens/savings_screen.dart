@@ -6,6 +6,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/savings_goal.dart';
+import '../providers/finance_providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 import 'movement_form_screen.dart';

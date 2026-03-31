@@ -3,11 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../shared/providers.dart';
+import '../../../finance/presentation/providers/finance_providers.dart';
 import '../../../finance/presentation/widgets/empty_state_view.dart';
 import '../../../finance/presentation/widgets/section_card.dart';
 import '../../domain/models/budget.dart';
 import '../../domain/models/category_budget_status.dart';
+import '../providers/budget_providers.dart';
 import '../widgets/budget_status_card.dart';
 import 'budget_form_screen.dart';
 
