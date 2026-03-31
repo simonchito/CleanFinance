@@ -5,9 +5,9 @@ import 'app/app.dart';
 import 'core/errors/app_error_handler.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  AppErrorHandler.configure();
   await AppErrorHandler.run(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    AppErrorHandler.configure();
     runApp(const ProviderScope(child: CleanFinanceApp()));
   });
 }
