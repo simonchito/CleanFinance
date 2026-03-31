@@ -69,6 +69,7 @@ class SavingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Ahorros')),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'savings-fab',
         onPressed: () => _openGoalEditor(context, ref),
         icon: const Icon(Icons.add_rounded),
         label: const Text('Nueva meta'),

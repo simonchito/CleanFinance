@@ -56,6 +56,7 @@ class BudgetsScreen extends ConsumerWidget {
         title: Text(strings.budgets),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'budgets-fab',
         onPressed: () => _openForm(context, ref),
         icon: const Icon(Icons.add_rounded),
         label: Text(strings.add),

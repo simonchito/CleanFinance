@@ -232,6 +232,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'movements-fab',
         onPressed: _openEditor,
         icon: const Icon(Icons.add_rounded),
         label: const Text('Nuevo'),

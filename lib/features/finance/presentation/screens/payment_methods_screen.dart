@@ -75,6 +75,7 @@ class PaymentMethodsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(strings.managePaymentMethods)),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'payment-methods-fab',
         onPressed: () => _showMethodDialog(context, ref),
         icon: const Icon(Icons.add_rounded),
         label: Text(strings.add),

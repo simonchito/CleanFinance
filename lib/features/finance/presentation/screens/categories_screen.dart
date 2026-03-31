@@ -48,6 +48,7 @@ class _CategoryTab extends ConsumerWidget {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        heroTag: 'categories-${scope.name}-fab',
         onPressed: () => _showCategoryDialog(context, ref, scope: scope),
         child: const Icon(Icons.add),
       ),
