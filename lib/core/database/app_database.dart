@@ -63,6 +63,8 @@ class AppDatabase {
             occurred_on TEXT NOT NULL,
             note TEXT,
             payment_method TEXT,
+            monthly_reminder_enabled INTEGER NOT NULL DEFAULT 0,
+            reminder_day INTEGER,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
             FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
@@ -117,6 +119,9 @@ class AppDatabase {
           'CREATE INDEX idx_movements_goal_id ON movements(goal_id)',
         );
         await db.execute(
+          'CREATE INDEX idx_movements_monthly_reminder ON movements(type, monthly_reminder_enabled, occurred_on)',
+        );
+        await db.execute(
           'CREATE UNIQUE INDEX idx_budgets_category_month ON budgets(category_id, month)',
         );
         await db.execute('CREATE INDEX idx_budgets_month ON budgets(month)');
@@ -150,6 +155,17 @@ class AppDatabase {
         if (oldVersion < 4) {
           await db.execute(
             'ALTER TABLE app_settings ADD COLUMN show_sensitive_amounts INTEGER NOT NULL DEFAULT 1',
+          );
+        }
+        if (oldVersion < 5) {
+          await db.execute(
+            'ALTER TABLE movements ADD COLUMN monthly_reminder_enabled INTEGER NOT NULL DEFAULT 0',
+          );
+          await db.execute(
+            'ALTER TABLE movements ADD COLUMN reminder_day INTEGER',
+          );
+          await db.execute(
+            'CREATE INDEX IF NOT EXISTS idx_movements_monthly_reminder ON movements(type, monthly_reminder_enabled, occurred_on)',
           );
         }
       },

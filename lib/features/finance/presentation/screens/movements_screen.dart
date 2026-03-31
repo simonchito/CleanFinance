@@ -45,6 +45,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
     ref.invalidate(reportsSnapshotProvider);
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(movementsProvider);
+    ref.invalidate(monthlyDueRemindersProvider);
     setState(() {});
   }
 

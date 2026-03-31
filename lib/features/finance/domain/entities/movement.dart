@@ -15,6 +15,8 @@ class Movement {
     this.paymentMethod,
     this.categoryName,
     this.subcategoryName,
+    this.monthlyReminderEnabled = false,
+    this.reminderDay,
   });
 
   final String id;
@@ -30,6 +32,8 @@ class Movement {
   final DateTime updatedAt;
   final String? categoryName;
   final String? subcategoryName;
+  final bool monthlyReminderEnabled;
+  final int? reminderDay;
 
   Movement copyWith({
     String? id,
@@ -45,6 +49,8 @@ class Movement {
     DateTime? updatedAt,
     String? categoryName,
     String? subcategoryName,
+    bool? monthlyReminderEnabled,
+    int? reminderDay,
   }) {
     return Movement(
       id: id ?? this.id,
@@ -60,6 +66,9 @@ class Movement {
       updatedAt: updatedAt ?? this.updatedAt,
       categoryName: categoryName ?? this.categoryName,
       subcategoryName: subcategoryName ?? this.subcategoryName,
+      monthlyReminderEnabled:
+          monthlyReminderEnabled ?? this.monthlyReminderEnabled,
+      reminderDay: reminderDay ?? this.reminderDay,
     );
   }
 }

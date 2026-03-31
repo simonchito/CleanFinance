@@ -95,6 +95,7 @@ class SettingsScreen extends ConsumerWidget {
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(categoriesProvider);
     ref.invalidate(movementsProvider);
+    ref.invalidate(monthlyDueRemindersProvider);
     ref.invalidate(categoryBudgetStatusProvider);
 
     if (context.mounted) {
@@ -149,6 +150,7 @@ class SettingsScreen extends ConsumerWidget {
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(categoriesProvider);
     ref.invalidate(movementsProvider);
+    ref.invalidate(monthlyDueRemindersProvider);
     ref.invalidate(categoryBudgetStatusProvider);
 
     if (context.mounted) {

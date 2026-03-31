@@ -9,6 +9,7 @@ import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/dashboard_summary.dart';
 import '../../domain/entities/end_of_month_projection.dart';
+import '../../domain/entities/monthly_payment_reminder.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/movement_filter.dart';
 import '../../domain/entities/reports_snapshot.dart';
@@ -63,6 +64,19 @@ final reportsSnapshotProvider = FutureProvider<ReportsSnapshot>((ref) async {
   final overview = await ref.watch(financeOverviewProvider.future);
   return overview.reports;
 });
+
+final monthlyDueRemindersProvider =
+    FutureProvider<List<MonthlyPaymentReminder>>((ref) async {
+      final repo = ref.watch(movementsRepositoryProvider);
+      final service = ref.watch(monthlyPaymentReminderServiceProvider);
+      final expenseMovements = await repo.getMovements(
+        filter: const MovementFilter(type: MovementType.expense),
+      );
+      return service.buildDueReminders(
+        expenseMovements: expenseMovements,
+        referenceDate: DateTime.now(),
+      );
+    });
 
 final endOfMonthProjectionProvider =
     FutureProvider<EndOfMonthProjection>((ref) async {

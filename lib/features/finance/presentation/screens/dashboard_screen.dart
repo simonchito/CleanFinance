@@ -6,12 +6,14 @@ import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../domain/entities/monthly_payment_reminder.dart';
 import '../../domain/entities/movement.dart';
 import '../providers/finance_providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/end_of_month_projection_card.dart';
 import '../widgets/insight_banner.dart';
 import '../widgets/metric_chip.dart';
+import '../widgets/monthly_due_reminders_card.dart';
 import '../widgets/section_card.dart';
 import '../widgets/simple_charts.dart';
 import 'movement_form_screen.dart';
@@ -40,11 +42,38 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ref.invalidate(reportsSnapshotProvider);
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(movementsProvider);
+    ref.invalidate(monthlyDueRemindersProvider);
+  }
+
+  Future<void> _openReminderPayment(MonthlyPaymentReminder reminder) async {
+    final now = DateTime.now();
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MovementFormScreen(
+          initialMovement: Movement(
+            id: '',
+            type: MovementType.expense,
+            amount: reminder.amount,
+            categoryId: reminder.categoryId,
+            subcategoryId: reminder.subcategoryId,
+            occurredOn: now,
+            note: reminder.note ?? reminder.title,
+            paymentMethod: reminder.paymentMethod,
+            monthlyReminderEnabled: true,
+            reminderDay: reminder.reminderDay,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        ),
+      ),
+    );
+    _refresh();
   }
 
   @override
   Widget build(BuildContext context) {
     final overviewState = ref.watch(financeOverviewProvider);
+    final dueRemindersState = ref.watch(monthlyDueRemindersProvider);
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final showSensitiveAmounts = ref.watch(showSensitiveAmountsProvider);
     final strings = AppStrings.of(context);
@@ -306,6 +335,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   currencySymbol: symbol,
                   showAmounts: showSensitiveAmounts,
                   localeCode: localeCode,
+                ),
+                dueRemindersState.when(
+                  data: (reminders) => reminders.isEmpty
+                      ? const SizedBox.shrink()
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: MonthlyDueRemindersCard(
+                            reminders: reminders,
+                            currencySymbol: symbol,
+                            localeCode: localeCode,
+                            showAmounts: showSensitiveAmounts,
+                            onReminderTap: _openReminderPayment,
+                          ),
+                        ),
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, __) => const SizedBox.shrink(),
                 ),
                 const SizedBox(height: 22),
                 Text(

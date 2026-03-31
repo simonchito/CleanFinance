@@ -209,6 +209,8 @@ class LocalFinanceRepository
         'occurred_on': movement.occurredOn.toIso8601String(),
         'note': movement.note,
         'payment_method': movement.paymentMethod,
+        'monthly_reminder_enabled': movement.monthlyReminderEnabled ? 1 : 0,
+        'reminder_day': movement.reminderDay,
         'created_at': movement.createdAt.toIso8601String(),
         'updated_at': movement.updatedAt.toIso8601String(),
       },
@@ -587,6 +589,9 @@ class LocalFinanceRepository
       updatedAt: DateTime.parse(map['updated_at'] as String),
       categoryName: map['category_name'] as String?,
       subcategoryName: map['subcategory_name'] as String?,
+      monthlyReminderEnabled:
+          (map['monthly_reminder_enabled'] as int? ?? 0) == 1,
+      reminderDay: map['reminder_day'] as int?,
     );
   }
 

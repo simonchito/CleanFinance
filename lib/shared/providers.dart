@@ -18,6 +18,7 @@ import '../features/finance/domain/services/category_comparison_service.dart';
 import '../features/finance/domain/services/end_of_month_projection_service.dart';
 import '../features/finance/domain/services/financial_health_score_service.dart';
 import '../features/finance/domain/services/finance_insights_service.dart';
+import '../features/finance/domain/services/monthly_payment_reminder_service.dart';
 import '../features/finance/domain/services/monthly_trend_service.dart';
 import '../features/finance/domain/services/payment_method_report_service.dart';
 import '../features/finance/domain/services/savings_goal_report_service.dart';
@@ -66,6 +67,10 @@ final backupRepositoryProvider = Provider<BackupRepository>(
 
 final financeInsightsServiceProvider =
     Provider<FinanceInsightsService>((ref) => const FinanceInsightsService());
+final monthlyPaymentReminderServiceProvider =
+    Provider<MonthlyPaymentReminderService>(
+      (ref) => const MonthlyPaymentReminderService(),
+    );
 final monthlyTrendServiceProvider =
     Provider<MonthlyTrendService>((ref) => const MonthlyTrendService());
 final categoryComparisonServiceProvider = Provider<CategoryComparisonService>(

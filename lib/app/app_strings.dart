@@ -30,6 +30,21 @@ class AppStrings {
       isEnglish ? 'Add payment method' : 'Agregar medio de pago';
   String get movementPaymentMethod =>
       isEnglish ? 'Payment method' : 'Medio de pago';
+  String get monthlyReminder =>
+      isEnglish ? 'Monthly reminder' : 'Recordatorio mensual';
+  String get monthlyReminderDescription => isEnglish
+      ? 'Use this for recurring monthly expenses so they appear as pending until you register the payment.'
+      : 'Usalo para gastos mensuales recurrentes y verlos como pendientes hasta registrar el pago.';
+  String get reminderDay =>
+      isEnglish ? 'Reminder day' : 'Día de recordatorio';
+  String get pendingThisMonth =>
+      isEnglish ? 'Pending this month' : 'Pendientes este mes';
+  String get reminderDayPrefix =>
+      isEnglish ? 'Day' : 'Día';
+  String get reminderRegisterPayment =>
+      isEnglish ? 'Register payment' : 'Registrar pago';
+  String get reminderLastRegistered =>
+      isEnglish ? 'Last registered' : 'Último registro';
   String get noSubcategory =>
       isEnglish ? 'No subcategory' : 'Sin subcategoría';
   String get noGoal => isEnglish ? 'No goal' : 'Sin meta';
