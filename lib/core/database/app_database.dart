@@ -24,6 +24,9 @@ class AppDatabase {
     return openDatabase(
       path,
       version: AppConstants.databaseVersion,
+      onConfigure: (db) async {
+        await db.execute('PRAGMA foreign_keys = ON');
+      },
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE categories(
@@ -61,7 +64,9 @@ class AppDatabase {
             note TEXT,
             payment_method TEXT,
             created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
+            FOREIGN KEY (goal_id) REFERENCES savings_goals(id) ON DELETE SET NULL
           )
         ''');
 
@@ -70,7 +75,8 @@ class AppDatabase {
             id TEXT PRIMARY KEY,
             category_id TEXT NOT NULL,
             monthly_limit REAL NOT NULL CHECK (monthly_limit >= 0),
-            month TEXT NOT NULL
+            month TEXT NOT NULL,
+            FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT
           )
         ''');
 
@@ -130,7 +136,8 @@ class AppDatabase {
               id TEXT PRIMARY KEY,
               category_id TEXT NOT NULL,
               monthly_limit REAL NOT NULL CHECK (monthly_limit >= 0),
-              month TEXT NOT NULL
+              month TEXT NOT NULL,
+              FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT
             )
           ''');
           await db.execute(

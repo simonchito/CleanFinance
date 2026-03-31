@@ -506,11 +506,11 @@ class LocalFinanceRepository
       for (final item in categories) {
         await txn.insert('categories', Map<String, Object?>.from(item));
       }
-      for (final item in movements) {
-        await txn.insert('movements', Map<String, Object?>.from(item));
-      }
       for (final item in goals) {
         await txn.insert('savings_goals', Map<String, Object?>.from(item));
+      }
+      for (final item in movements) {
+        await txn.insert('movements', Map<String, Object?>.from(item));
       }
       for (final item in budgets) {
         await txn.insert('budgets', Map<String, Object?>.from(item));
