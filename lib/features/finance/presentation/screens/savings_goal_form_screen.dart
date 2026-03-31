@@ -31,6 +31,8 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
   final _targetController = TextEditingController();
   late final String _localeCode;
   DateTime? _targetDate;
+  bool _reminderEnabled = false;
+  int? _reminderDay;
 
   @override
   void initState() {
@@ -46,6 +48,8 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             localeCode: _localeCode,
           );
     _targetDate = widget.initialGoal?.targetDate;
+    _reminderEnabled = widget.initialGoal?.reminderEnabled ?? false;
+    _reminderDay = widget.initialGoal?.reminderDay ?? DateTime.now().day;
   }
 
   @override
@@ -72,6 +76,13 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+    if (_reminderEnabled &&
+        (_reminderDay == null || _reminderDay! < 1 || _reminderDay! > 31)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Elegí un día de recordatorio válido.')),
+      );
+      return;
+    }
 
     final now = DateTime.now();
     final goal = SavingsGoal(
@@ -83,6 +94,8 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
       )!,
       targetDate: _targetDate,
       isArchived: widget.initialGoal?.isArchived ?? false,
+      reminderEnabled: _reminderEnabled,
+      reminderDay: _reminderEnabled ? _reminderDay : null,
       createdAt: widget.initialGoal?.createdAt ?? now,
       updatedAt: now,
     );
@@ -90,6 +103,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
     await ref.read(savingsGoalsRepositoryProvider).upsertSavingsGoal(goal);
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(financeOverviewProvider);
+    ref.invalidate(monthlyDueRemindersProvider);
     if (mounted) {
       Navigator.of(context).pop();
     }
@@ -164,6 +178,38 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
                     : DateFormat('d MMMM y', 'es').format(_targetDate!),
               ),
             ),
+            const SizedBox(height: 12),
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Recordatorio mensual'),
+              subtitle: const Text(
+                'Te ayuda a no olvidarte del aporte mensual para esta meta.',
+              ),
+              value: _reminderEnabled,
+              onChanged: (value) {
+                setState(() {
+                  _reminderEnabled = value;
+                  _reminderDay ??= DateTime.now().day;
+                });
+              },
+            ),
+            if (_reminderEnabled) ...[
+              const SizedBox(height: 8),
+              DropdownButtonFormField<int>(
+                initialValue: _reminderDay,
+                decoration: const InputDecoration(
+                  labelText: 'Día de recordatorio',
+                ),
+                items: List.generate(
+                  31,
+                  (index) => DropdownMenuItem(
+                    value: index + 1,
+                    child: Text('Día ${index + 1}'),
+                  ),
+                ),
+                onChanged: (value) => setState(() => _reminderDay = value),
+              ),
+            ],
             const SizedBox(height: 20),
             FilledButton(
               onPressed: _save,

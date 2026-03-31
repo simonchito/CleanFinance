@@ -137,6 +137,9 @@ class _CategoryTab extends ConsumerWidget {
       await ref.read(categoriesRepositoryProvider).deleteCategory(categoryId);
       ref.invalidate(categoriesProvider(scope));
       ref.invalidate(categoryBudgetStatusProvider);
+      ref.invalidate(expenseReminderSubcategoriesProvider);
+      ref.invalidate(monthlyDueRemindersProvider);
+      ref.invalidate(financeOverviewProvider);
     } catch (error) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -155,6 +158,12 @@ class _CategoryTab extends ConsumerWidget {
   }) async {
     final nameController = TextEditingController(text: initial?.name ?? '');
     String? selectedParentId = initial?.parentId ?? parentId;
+    var reminderEnabled =
+        initial?.isSubcategory == true && initial?.reminderEnabled == true;
+    int? reminderDay = initial?.reminderDay ??
+        ((initial?.isSubcategory == true || parentId != null)
+            ? DateTime.now().day
+            : null);
     final categories = await ref.read(categoriesProvider(scope).future);
     final parents =
         categories.where((category) => category.parentId == null).toList();
@@ -197,8 +206,48 @@ class _CategoryTab extends ConsumerWidget {
                             ),
                           ),
                     ],
-                    onChanged: (value) => setState(() => selectedParentId = value),
+                    onChanged: (value) => setState(() {
+                      selectedParentId = value;
+                      if (selectedParentId == null) {
+                        reminderEnabled = false;
+                        reminderDay = null;
+                      } else {
+                        reminderDay ??= DateTime.now().day;
+                      }
+                    }),
                   ),
+                  if (selectedParentId != null) ...[
+                    const SizedBox(height: 12),
+                    SwitchListTile.adaptive(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Recordatorio mensual'),
+                      subtitle: const Text(
+                        'Usá esta subcategoría para servicios o gastos recurrentes.',
+                      ),
+                      value: reminderEnabled,
+                      onChanged: (value) => setState(() {
+                        reminderEnabled = value;
+                        reminderDay ??= DateTime.now().day;
+                      }),
+                    ),
+                    if (reminderEnabled) ...[
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<int>(
+                        initialValue: reminderDay,
+                        decoration: const InputDecoration(
+                          labelText: 'Día de recordatorio',
+                        ),
+                        items: List.generate(
+                          31,
+                          (index) => DropdownMenuItem(
+                            value: index + 1,
+                            child: Text('Día ${index + 1}'),
+                          ),
+                        ),
+                        onChanged: (value) => setState(() => reminderDay = value),
+                      ),
+                    ],
+                  ],
                 ],
               );
             },
@@ -222,6 +271,11 @@ class _CategoryTab extends ConsumerWidget {
                   scope: scope,
                   parentId: selectedParentId,
                   isDefault: initial?.isDefault ?? false,
+                  reminderEnabled: selectedParentId != null && reminderEnabled,
+                  reminderDay:
+                      selectedParentId != null && reminderEnabled
+                          ? reminderDay
+                          : null,
                   createdAt: initial?.createdAt ?? now,
                   updatedAt: now,
                 );
@@ -230,6 +284,9 @@ class _CategoryTab extends ConsumerWidget {
                     .upsertCategory(category);
                 ref.invalidate(categoriesProvider(scope));
                 ref.invalidate(categoryBudgetStatusProvider);
+                ref.invalidate(expenseReminderSubcategoriesProvider);
+                ref.invalidate(monthlyDueRemindersProvider);
+                ref.invalidate(financeOverviewProvider);
                 if (dialogContext.mounted) {
                   Navigator.of(dialogContext).pop();
                 }

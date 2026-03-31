@@ -9,6 +9,8 @@ class Category {
     required this.createdAt,
     required this.updatedAt,
     this.parentId,
+    this.reminderEnabled = false,
+    this.reminderDay,
   });
 
   final String id;
@@ -18,6 +20,8 @@ class Category {
   final bool isDefault;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool reminderEnabled;
+  final int? reminderDay;
 
   bool get isSubcategory => parentId != null;
 
@@ -29,6 +33,8 @@ class Category {
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? reminderEnabled,
+    int? reminderDay,
   }) {
     return Category(
       id: id ?? this.id,
@@ -38,6 +44,8 @@ class Category {
       isDefault: isDefault ?? this.isDefault,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+      reminderDay: reminderDay ?? this.reminderDay,
     );
   }
 }

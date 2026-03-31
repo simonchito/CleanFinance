@@ -7,6 +7,8 @@ class SavingsGoal {
     required this.createdAt,
     required this.updatedAt,
     this.targetDate,
+    this.reminderEnabled = false,
+    this.reminderDay,
   });
 
   final String id;
@@ -16,6 +18,8 @@ class SavingsGoal {
   final bool isArchived;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool reminderEnabled;
+  final int? reminderDay;
 
   SavingsGoal copyWith({
     String? id,
@@ -25,6 +29,8 @@ class SavingsGoal {
     bool? isArchived,
     DateTime? createdAt,
     DateTime? updatedAt,
+    bool? reminderEnabled,
+    int? reminderDay,
   }) {
     return SavingsGoal(
       id: id ?? this.id,
@@ -34,6 +40,8 @@ class SavingsGoal {
       isArchived: isArchived ?? this.isArchived,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+      reminderDay: reminderDay ?? this.reminderDay,
     );
   }
 }

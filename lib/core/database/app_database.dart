@@ -35,6 +35,8 @@ class AppDatabase {
             scope TEXT NOT NULL,
             parent_id TEXT,
             is_default INTEGER NOT NULL DEFAULT 0,
+            reminder_enabled INTEGER NOT NULL DEFAULT 0,
+            reminder_day INTEGER,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
           )
@@ -47,6 +49,8 @@ class AppDatabase {
             target_amount REAL NOT NULL,
             target_date TEXT,
             is_archived INTEGER NOT NULL DEFAULT 0,
+            reminder_enabled INTEGER NOT NULL DEFAULT 0,
+            reminder_day INTEGER,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
           )
@@ -166,6 +170,20 @@ class AppDatabase {
           );
           await db.execute(
             'CREATE INDEX IF NOT EXISTS idx_movements_monthly_reminder ON movements(type, monthly_reminder_enabled, occurred_on)',
+          );
+        }
+        if (oldVersion < 6) {
+          await db.execute(
+            'ALTER TABLE categories ADD COLUMN reminder_enabled INTEGER NOT NULL DEFAULT 0',
+          );
+          await db.execute(
+            'ALTER TABLE categories ADD COLUMN reminder_day INTEGER',
+          );
+          await db.execute(
+            'ALTER TABLE savings_goals ADD COLUMN reminder_enabled INTEGER NOT NULL DEFAULT 0',
+          );
+          await db.execute(
+            'ALTER TABLE savings_goals ADD COLUMN reminder_day INTEGER',
           );
         }
       },

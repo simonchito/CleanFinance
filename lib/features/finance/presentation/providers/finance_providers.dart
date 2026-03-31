@@ -67,15 +67,32 @@ final reportsSnapshotProvider = FutureProvider<ReportsSnapshot>((ref) async {
 
 final monthlyDueRemindersProvider =
     FutureProvider<List<MonthlyPaymentReminder>>((ref) async {
-      final repo = ref.watch(movementsRepositoryProvider);
       final service = ref.watch(monthlyPaymentReminderServiceProvider);
-      final expenseMovements = await repo.getMovements(
-        filter: const MovementFilter(type: MovementType.expense),
+      final expenseCategories = await ref.watch(
+        categoriesProvider(CategoryScope.expense).future,
       );
+      final savingsGoals = await ref.watch(savingsGoalsProvider.future);
       return service.buildDueReminders(
-        expenseMovements: expenseMovements,
+        expenseCategories: expenseCategories,
+        savingsGoals: savingsGoals,
         referenceDate: DateTime.now(),
       );
+    });
+
+final expenseReminderSubcategoriesProvider =
+    FutureProvider<List<Category>>((ref) async {
+      final categories = await ref.watch(
+        categoriesProvider(CategoryScope.expense).future,
+      );
+      return categories
+          .where((category) => category.isSubcategory && category.reminderEnabled)
+          .toList();
+    });
+
+final savingsGoalRemindersProvider =
+    FutureProvider<List<SavingsGoalProgress>>((ref) async {
+      final goals = await ref.watch(savingsGoalsProvider.future);
+      return goals.where((progress) => progress.goal.reminderEnabled).toList();
     });
 
 final endOfMonthProjectionProvider =

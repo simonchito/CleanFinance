@@ -1,7 +1,7 @@
 class AppConstants {
   static const appName = 'CleanFinance';
   static const databaseName = 'clean_finance.db';
-  static const databaseVersion = 5;
+  static const databaseVersion = 6;
   static const defaultCurrencyCode = 'ARS';
   static const defaultCurrencySymbol = r'$';
   static const defaultShowSensitiveAmounts = true;

@@ -1,25 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../domain/entities/monthly_payment_reminder.dart';
 import 'section_card.dart';
 
 class MonthlyDueRemindersCard extends StatelessWidget {
   const MonthlyDueRemindersCard({
     required this.reminders,
-    required this.currencySymbol,
-    required this.localeCode,
-    required this.showAmounts,
     required this.onReminderTap,
     super.key,
   });
 
   final List<MonthlyPaymentReminder> reminders;
-  final String currencySymbol;
-  final String localeCode;
-  final bool showAmounts;
   final ValueChanged<MonthlyPaymentReminder> onReminderTap;
 
   @override
@@ -38,8 +30,8 @@ class MonthlyDueRemindersCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             strings.isEnglish
-                ? 'Recurring expenses that still look pending for this month.'
-                : 'Gastos mensuales recurrentes que todavía aparecen como pendientes este mes.',
+                ? 'You still need to pay or save for:'
+                : 'Todavía te queda pagar o ahorrar para:',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -63,12 +55,18 @@ class MonthlyDueRemindersCard extends StatelessWidget {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          color: scheme.error.withValues(alpha: 0.12),
+                          color: reminder.source == MonthlyReminderSource.savingsGoal
+                              ? scheme.tertiary.withValues(alpha: 0.14)
+                              : scheme.error.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(
-                          Icons.notifications_active_outlined,
-                          color: scheme.error,
+                          reminder.source == MonthlyReminderSource.savingsGoal
+                              ? Icons.savings_outlined
+                              : Icons.receipt_long_outlined,
+                          color: reminder.source == MonthlyReminderSource.savingsGoal
+                              ? scheme.tertiary
+                              : scheme.error,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -82,46 +80,22 @@ class MonthlyDueRemindersCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${strings.reminderDayPrefix} ${reminder.reminderDay} · ${strings.reminderLastRegistered}: ${DateFormat('d MMM', strings.languageCode).format(reminder.lastRecordedOn)}',
+                              reminder.source == MonthlyReminderSource.savingsGoal
+                                  ? '${strings.savingGoal} · ${strings.reminderDayPrefix} ${reminder.reminderDay}'
+                                  : '${reminder.subtitle ?? strings.expense} · ${strings.reminderDayPrefix} ${reminder.reminderDay}',
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                     color: scheme.onSurfaceVariant,
                                   ),
                             ),
-                            if (reminder.categoryName != null &&
-                                reminder.categoryName!.trim().isNotEmpty) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                reminder.categoryName!,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(color: scheme.onSurfaceVariant),
-                              ),
-                            ],
                           ],
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            AmountVisibilityFormatter.formatCurrency(
-                              amount: reminder.amount,
-                              symbol: currencySymbol,
-                              isVisible: showAmounts,
-                              localeCode: localeCode,
+                      Text(
+                        strings.add,
+                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                              color: scheme.primary,
                             ),
-                            style: Theme.of(context).textTheme.labelLarge,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            strings.reminderRegisterPayment,
-                            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                  color: scheme.primary,
-                                ),
-                          ),
-                        ],
                       ),
                     ],
                   ),

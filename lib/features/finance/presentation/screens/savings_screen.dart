@@ -58,6 +58,8 @@ class SavingsScreen extends ConsumerWidget {
     ref.invalidate(dashboardSummaryProvider);
     ref.invalidate(recentMovementsProvider);
     ref.invalidate(reportsSnapshotProvider);
+    ref.invalidate(savingsGoalRemindersProvider);
+    ref.invalidate(monthlyDueRemindersProvider);
   }
 
   @override

@@ -26,6 +26,8 @@ class AppStrings {
   String get paymentMethods => isEnglish ? 'Payment methods' : 'Medios de pago';
   String get managePaymentMethods =>
       isEnglish ? 'Manage payment methods' : 'Gestionar medios de pago';
+  String get manageReminders =>
+      isEnglish ? 'Manage reminders' : 'Gestionar recordatorios';
   String get addPaymentMethod =>
       isEnglish ? 'Add payment method' : 'Agregar medio de pago';
   String get movementPaymentMethod =>

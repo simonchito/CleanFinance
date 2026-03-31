@@ -47,23 +47,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Future<void> _openReminderPayment(MonthlyPaymentReminder reminder) async {
     final now = DateTime.now();
+    final initialMovement = switch (reminder.source) {
+      MonthlyReminderSource.expenseSubcategory => Movement(
+          id: '',
+          type: MovementType.expense,
+          amount: 0,
+          categoryId: reminder.categoryId ?? '',
+          subcategoryId: reminder.subcategoryId,
+          occurredOn: now,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      MonthlyReminderSource.savingsGoal => Movement(
+          id: '',
+          type: MovementType.saving,
+          amount: 0,
+          categoryId: '',
+          goalId: reminder.goalId,
+          occurredOn: now,
+          createdAt: now,
+          updatedAt: now,
+        ),
+    };
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => MovementFormScreen(
-          initialMovement: Movement(
-            id: '',
-            type: MovementType.expense,
-            amount: reminder.amount,
-            categoryId: reminder.categoryId,
-            subcategoryId: reminder.subcategoryId,
-            occurredOn: now,
-            note: reminder.note ?? reminder.title,
-            paymentMethod: reminder.paymentMethod,
-            monthlyReminderEnabled: true,
-            reminderDay: reminder.reminderDay,
-            createdAt: now,
-            updatedAt: now,
-          ),
+          initialMovement: initialMovement,
         ),
       ),
     );
@@ -343,9 +352,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           padding: const EdgeInsets.only(top: 16),
                           child: MonthlyDueRemindersCard(
                             reminders: reminders,
-                            currencySymbol: symbol,
-                            localeCode: localeCode,
-                            showAmounts: showSensitiveAmounts,
                             onReminderTap: _openReminderPayment,
                           ),
                         ),

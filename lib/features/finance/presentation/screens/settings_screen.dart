@@ -18,6 +18,7 @@ import '../providers/finance_providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 import 'categories_screen.dart';
+import 'manage_reminders_screen.dart';
 import 'payment_methods_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -442,6 +443,18 @@ class SettingsScreen extends ConsumerWidget {
                       },
                       icon: const Icon(Icons.account_balance_wallet_outlined),
                       label: Text(strings.managePaymentMethods),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ManageRemindersScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.notifications_active_outlined),
+                      label: Text(strings.manageReminders),
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(

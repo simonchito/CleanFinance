@@ -42,8 +42,6 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
   String? _categoryId;
   String? _subcategoryId;
   String? _goalId;
-  bool _monthlyReminderEnabled = false;
-  int? _reminderDay;
 
   @override
   void initState() {
@@ -67,11 +65,6 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
         : movement.categoryId;
     _subcategoryId = movement?.subcategoryId;
     _goalId = movement?.goalId;
-    _monthlyReminderEnabled =
-        movement?.type == MovementType.expense &&
-        movement?.monthlyReminderEnabled == true;
-    _reminderDay = movement?.reminderDay ??
-        (movement?.type == MovementType.expense ? _selectedDate.day : null);
   }
 
   @override
@@ -100,22 +93,10 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    final strings = AppStrings.of(context);
     if (_categoryId == null) {
       _showMessage('Seleccioná una categoría.');
       return;
     }
-    if (_type == MovementType.expense &&
-        _monthlyReminderEnabled &&
-        (_reminderDay == null || _reminderDay! < 1 || _reminderDay! > 31)) {
-      _showMessage(
-        strings.isEnglish
-            ? 'Choose a valid reminder day.'
-            : 'Elegí un día de recordatorio válido.',
-      );
-      return;
-    }
-
     final now = DateTime.now();
     final movement = Movement(
       id: widget.initialMovement?.id.isNotEmpty == true
@@ -136,12 +117,6 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
       paymentMethod: _paymentMethodController.text.trim().isEmpty
           ? null
           : _paymentMethodController.text.trim(),
-      monthlyReminderEnabled:
-          _type == MovementType.expense && _monthlyReminderEnabled,
-      reminderDay:
-          _type == MovementType.expense && _monthlyReminderEnabled
-              ? _reminderDay
-              : null,
       createdAt: widget.initialMovement?.createdAt ?? now,
       updatedAt: now,
     );
@@ -256,12 +231,6 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       _subcategoryId = null;
                       if (_type != MovementType.saving) {
                         _goalId = null;
-                      }
-                      if (_type == MovementType.expense) {
-                        _reminderDay ??= _selectedDate.day;
-                      } else {
-                        _monthlyReminderEnabled = false;
-                        _reminderDay = null;
                       }
                     });
                   },
@@ -384,38 +353,6 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                     _paymentMethodController.text = value ?? '';
                   },
                 ),
-                if (_type == MovementType.expense) ...[
-                  const SizedBox(height: 12),
-                  SwitchListTile.adaptive(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(strings.monthlyReminder),
-                    subtitle: Text(strings.monthlyReminderDescription),
-                    value: _monthlyReminderEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        _monthlyReminderEnabled = value;
-                        _reminderDay ??= _selectedDate.day;
-                      });
-                    },
-                  ),
-                  if (_monthlyReminderEnabled) ...[
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<int>(
-                      initialValue: _reminderDay,
-                      decoration: InputDecoration(
-                        labelText: strings.reminderDay,
-                      ),
-                      items: List.generate(
-                        31,
-                        (index) => DropdownMenuItem(
-                          value: index + 1,
-                          child: Text('${strings.reminderDayPrefix} ${index + 1}'),
-                        ),
-                      ),
-                      onChanged: (value) => setState(() => _reminderDay = value),
-                    ),
-                  ],
-                ],
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _noteController,

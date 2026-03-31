@@ -1,29 +1,27 @@
-enum MonthlyPaymentReminderStatus { due }
+enum MonthlyReminderSource { expenseSubcategory, savingsGoal }
+
+enum MonthlyReminderStatus { due }
 
 class MonthlyPaymentReminder {
   const MonthlyPaymentReminder({
-    required this.sourceMovementId,
+    required this.id,
+    required this.source,
     required this.title,
-    required this.categoryId,
-    required this.amount,
     required this.reminderDay,
     required this.status,
-    required this.lastRecordedOn,
-    this.categoryName,
-    this.note,
-    this.paymentMethod,
+    this.subtitle,
+    this.categoryId,
     this.subcategoryId,
+    this.goalId,
   });
 
-  final String sourceMovementId;
+  final String id;
+  final MonthlyReminderSource source;
   final String title;
-  final String categoryId;
-  final String? subcategoryId;
-  final String? categoryName;
-  final String? note;
-  final String? paymentMethod;
-  final double amount;
+  final String? subtitle;
   final int reminderDay;
-  final MonthlyPaymentReminderStatus status;
-  final DateTime lastRecordedOn;
+  final MonthlyReminderStatus status;
+  final String? categoryId;
+  final String? subcategoryId;
+  final String? goalId;
 }

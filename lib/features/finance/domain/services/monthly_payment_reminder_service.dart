@@ -1,122 +1,98 @@
-import '../../../../core/utils/month_context.dart';
+import '../entities/category.dart';
 import '../entities/monthly_payment_reminder.dart';
-import '../entities/movement.dart';
+import '../entities/savings_goal.dart';
 
 class MonthlyPaymentReminderService {
   const MonthlyPaymentReminderService();
 
   List<MonthlyPaymentReminder> buildDueReminders({
-    required List<Movement> expenseMovements,
+    required List<Category> expenseCategories,
+    required List<SavingsGoalProgress> savingsGoals,
     required DateTime referenceDate,
   }) {
-    final visibleExpenses = expenseMovements
-        .where(
-          (movement) =>
-              movement.type == MovementType.expense &&
-              !movement.occurredOn.isAfter(referenceDate),
-        )
-        .toList();
+    final dueExpenseReminders = buildExpenseReminders(
+      categories: expenseCategories,
+      referenceDate: referenceDate,
+    );
+    final dueSavingsReminders = buildSavingsGoalReminders(
+      goals: savingsGoals,
+      referenceDate: referenceDate,
+    );
 
-    final groupedByRecurringKey = <String, List<Movement>>{};
-    for (final movement in visibleExpenses) {
-      groupedByRecurringKey
-          .putIfAbsent(_recurringKeyFor(movement), () => [])
-          .add(movement);
-    }
-
-    final currentMonth = MonthContext.forDate(referenceDate);
-    final reminders = <MonthlyPaymentReminder>[];
-
-    for (final group in groupedByRecurringKey.values) {
-      group.sort((a, b) {
-        final occurredComparison = b.occurredOn.compareTo(a.occurredOn);
-        if (occurredComparison != 0) {
-          return occurredComparison;
+    final reminders = [...dueExpenseReminders, ...dueSavingsReminders]
+      ..sort((a, b) {
+        final dayComparison = a.reminderDay.compareTo(b.reminderDay);
+        if (dayComparison != 0) {
+          return dayComparison;
         }
-
-        return b.updatedAt.compareTo(a.updatedAt);
+        return a.title.toLowerCase().compareTo(b.title.toLowerCase());
       });
-
-      final latest = group.first;
-      final reminderDay = latest.reminderDay;
-      if (!latest.monthlyReminderEnabled ||
-          reminderDay == null ||
-          reminderDay < 1 ||
-          reminderDay > 31 ||
-          referenceDate.day < reminderDay) {
-        continue;
-      }
-
-      final hasPaymentThisMonth = group.any(
-        (movement) =>
-            !movement.occurredOn.isBefore(currentMonth.startDate) &&
-            !movement.occurredOn.isAfter(referenceDate),
-      );
-      if (hasPaymentThisMonth) {
-        continue;
-      }
-
-      reminders.add(
-        MonthlyPaymentReminder(
-          sourceMovementId: latest.id,
-          title: _titleFor(latest),
-          categoryId: latest.categoryId,
-          subcategoryId: latest.subcategoryId,
-          categoryName: latest.categoryName,
-          note: latest.note,
-          paymentMethod: latest.paymentMethod,
-          amount: latest.amount,
-          reminderDay: reminderDay,
-          status: MonthlyPaymentReminderStatus.due,
-          lastRecordedOn: latest.occurredOn,
-        ),
-      );
-    }
-
-    reminders.sort((a, b) {
-      final dayComparison = a.reminderDay.compareTo(b.reminderDay);
-      if (dayComparison != 0) {
-        return dayComparison;
-      }
-
-      return a.title.toLowerCase().compareTo(b.title.toLowerCase());
-    });
 
     return reminders;
   }
 
-  String _recurringKeyFor(Movement movement) {
-    final normalizedNote = _normalize(movement.note);
-    final normalizedPaymentMethod = _normalize(movement.paymentMethod);
-    final normalizedCategory = movement.categoryId.trim().toLowerCase();
-    final normalizedSubcategory =
-        movement.subcategoryId?.trim().toLowerCase() ?? '';
-    final normalizedAmount = movement.amount.truncate();
+  List<MonthlyPaymentReminder> buildExpenseReminders({
+    required List<Category> categories,
+    required DateTime referenceDate,
+  }) {
+    final parentNames = {
+      for (final category in categories.where((item) => item.parentId == null))
+        category.id: category.name,
+    };
 
-    return [
-      normalizedCategory,
-      normalizedSubcategory,
-      normalizedNote,
-      normalizedPaymentMethod,
-      normalizedAmount,
-    ].join('|');
+    return categories
+        .where(
+          (category) =>
+              category.scope == CategoryScope.expense &&
+              category.isSubcategory &&
+              category.reminderEnabled &&
+              _isDue(category.reminderDay, referenceDate),
+        )
+        .map(
+          (category) => MonthlyPaymentReminder(
+            id: category.id,
+            source: MonthlyReminderSource.expenseSubcategory,
+            title: category.name,
+            subtitle: parentNames[category.parentId],
+            reminderDay: category.reminderDay!,
+            status: MonthlyReminderStatus.due,
+            categoryId: category.parentId,
+            subcategoryId: category.id,
+          ),
+        )
+        .toList();
   }
 
-  String _titleFor(Movement movement) {
-    final note = movement.note?.trim();
-    if (note != null && note.isNotEmpty) {
-      return note;
-    }
-
-    final categoryName = movement.categoryName?.trim();
-    if (categoryName != null && categoryName.isNotEmpty) {
-      return categoryName;
-    }
-
-    return 'Pago recurrente';
+  List<MonthlyPaymentReminder> buildSavingsGoalReminders({
+    required List<SavingsGoalProgress> goals,
+    required DateTime referenceDate,
+  }) {
+    return goals
+        .where(
+          (progress) =>
+              !progress.goal.isArchived &&
+              !progress.completed &&
+              progress.goal.reminderEnabled &&
+              _isDue(progress.goal.reminderDay, referenceDate),
+        )
+        .map(
+          (progress) => MonthlyPaymentReminder(
+            id: progress.goal.id,
+            source: MonthlyReminderSource.savingsGoal,
+            title: progress.goal.name,
+            subtitle: null,
+            reminderDay: progress.goal.reminderDay!,
+            status: MonthlyReminderStatus.due,
+            goalId: progress.goal.id,
+          ),
+        )
+        .toList();
   }
 
-  String _normalize(String? value) {
-    return value?.trim().toLowerCase() ?? '';
+  bool _isDue(int? reminderDay, DateTime referenceDate) {
+    return reminderDay != null &&
+        reminderDay >= 1 &&
+        reminderDay <= 31 &&
+        referenceDate.day >= reminderDay;
   }
 }
