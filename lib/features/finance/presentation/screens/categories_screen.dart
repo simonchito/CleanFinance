@@ -77,33 +77,46 @@ class _CategoryTab extends ConsumerWidget {
                   children: [
                     for (final child in children)
                       ListTile(
-                        title: Text(child.name),
+                        dense: true,
+                        minLeadingWidth: 20,
+                        horizontalTitleGap: 8,
+                        title: Text(
+                          child.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         leading: const Icon(Icons.subdirectory_arrow_right),
-                        trailing: _ActionsRow(
-                          onEdit: () => _showCategoryDialog(
-                            context,
-                            ref,
-                            scope: scope,
-                            initial: child,
+                        trailing: SizedBox(
+                          width: 96,
+                          child: _ActionsRow(
+                            onEdit: () => _showCategoryDialog(
+                              context,
+                              ref,
+                              scope: scope,
+                              initial: child,
+                            ),
+                            onDelete: child.isDefault
+                                ? null
+                                : () => _deleteCategory(context, ref, child.id),
                           ),
-                          onDelete: child.isDefault
-                              ? null
-                              : () => _deleteCategory(context, ref, child.id),
                         ),
                       ),
                     ListTile(
                       title: Text(category.name),
                       subtitle: const Text('Categoría principal'),
-                      trailing: _ActionsRow(
-                        onEdit: () => _showCategoryDialog(
-                          context,
-                          ref,
-                          scope: scope,
-                          initial: category,
+                      trailing: SizedBox(
+                        width: 96,
+                        child: _ActionsRow(
+                          onEdit: () => _showCategoryDialog(
+                            context,
+                            ref,
+                            scope: scope,
+                            initial: category,
+                          ),
+                          onDelete: category.isDefault
+                              ? null
+                              : () => _deleteCategory(context, ref, category.id),
                         ),
-                        onDelete: category.isDefault
-                            ? null
-                            : () => _deleteCategory(context, ref, category.id),
                       ),
                     ),
                     ListTile(
@@ -315,10 +328,16 @@ class _ActionsRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           onPressed: onEdit,
           icon: const Icon(Icons.edit_outlined),
         ),
         IconButton(
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
           onPressed: onDelete,
           icon: const Icon(Icons.delete_outline),
         ),
