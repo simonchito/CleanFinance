@@ -49,6 +49,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final showSensitiveAmounts = ref.watch(showSensitiveAmountsProvider);
     final strings = AppStrings.of(context);
     final symbol = settings?.currencySymbol ?? r'$';
+    final localeCode = settings?.localeCode ?? 'es';
     final monthLabel =
         DateFormat.yMMMM('es').format(DateTime.now()).replaceFirstMapped(
               RegExp(r'^[a-z]'),
@@ -177,6 +178,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               amount: value,
                               symbol: symbol,
                               isVisible: showSensitiveAmounts,
+                              localeCode: localeCode,
                             ),
                             style: Theme.of(context)
                                 .textTheme
@@ -197,8 +199,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                         child: Text(
                           overview.monthRemaining >= 0
-                              ? 'Te quedan ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining, symbol: symbol, isVisible: showSensitiveAmounts)} este mes.'
-                              : 'Este mes vas ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining.abs(), symbol: symbol, isVisible: showSensitiveAmounts)} por encima de tu margen.',
+                              ? 'Te quedan ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining, symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} este mes.'
+                              : 'Este mes vas ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining.abs(), symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} por encima de tu margen.',
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 color: Colors.white,
                               ),
@@ -248,6 +250,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               amount: overview.summary.incomeMonth,
                               symbol: symbol,
                               isVisible: showSensitiveAmounts,
+                              localeCode: localeCode,
                             ),
                             color: Theme.of(context).colorScheme.primary,
                           ),
@@ -261,6 +264,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               amount: overview.summary.expenseMonth,
                               symbol: symbol,
                               isVisible: showSensitiveAmounts,
+                              localeCode: localeCode,
                             ),
                             color: Theme.of(context).colorScheme.error,
                           ),
@@ -287,6 +291,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               amount: overview.summary.savingsMonth,
                               symbol: symbol,
                               isVisible: showSensitiveAmounts,
+                              localeCode: localeCode,
                             ),
                             color: Theme.of(context).colorScheme.tertiary,
                           ),
@@ -300,6 +305,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   projection: overview.endOfMonthProjection,
                   currencySymbol: symbol,
                   showAmounts: showSensitiveAmounts,
+                  localeCode: localeCode,
                 ),
                 const SizedBox(height: 22),
                 Text(
@@ -346,6 +352,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         expense: overview.summary.expenseMonth,
                         showAmounts: showSensitiveAmounts,
                         currencySymbol: symbol,
+                        localeCode: localeCode,
                       ),
                     ],
                   ),
@@ -397,7 +404,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           onAction: () => _openForm(MovementType.expense),
                         )
                       else
-                        DonutChart(items: overview.reports.topExpenseCategories),
+                        DonutChart(
+                          items: overview.reports.topExpenseCategories,
+                          localeCode: localeCode,
+                        ),
                     ],
                   ),
                 ),
@@ -424,6 +434,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             (movement) => _MovementTile(
                               movement: movement,
                               symbol: symbol,
+                              localeCode: localeCode,
                             ),
                           )
                           .toList(),
@@ -523,10 +534,12 @@ class _MovementTile extends StatelessWidget {
   const _MovementTile({
     required this.movement,
     required this.symbol,
+    required this.localeCode,
   });
 
   final Movement movement;
   final String symbol;
+  final String localeCode;
 
   @override
   Widget build(BuildContext context) {
@@ -565,7 +578,7 @@ class _MovementTile extends StatelessWidget {
             (movement.note?.isNotEmpty == true ? ' · ${movement.note}' : ''),
       ),
       trailing: Text(
-        '$prefix ${CurrencyFormatter.format(movement.amount, symbol: symbol)}',
+        '$prefix ${CurrencyFormatter.format(movement.amount, symbol: symbol, localeCode: localeCode)}',
         style: Theme.of(context).textTheme.labelLarge?.copyWith(color: color),
       ),
     );

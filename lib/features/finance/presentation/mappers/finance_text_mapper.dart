@@ -1,4 +1,5 @@
 import '../../../../app/app_strings.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/end_of_month_projection.dart';
 import '../../domain/entities/finance_insight.dart';
@@ -102,7 +103,12 @@ class FinanceTextMapper {
     FinanceInsight insight,
   ) {
     final percentage = insight.percentageValue?.round();
-    final amount = insight.amountValue?.round();
+    final amount = insight.amountValue == null
+        ? null
+        : CurrencyFormatter.formatWholeNumber(
+            insight.amountValue!,
+            localeCode: strings.languageCode,
+          );
 
     return LocalizedFinanceInsightText(
       title: switch (insight.type) {
@@ -150,8 +156,8 @@ class FinanceTextMapper {
             ? "${insight.categoryName ?? 'This category'} went down ${percentage ?? 0}% versus last month."
             : '${insight.categoryName ?? 'Esta categoría'} bajó ${percentage ?? 0}% frente al mes anterior.',
         FinanceInsightType.endOfMonthRisk => strings.isEnglish
-            ? 'If you keep this pace, you could finish about ${amount ?? 0} below zero.'
-            : 'Si seguís con este ritmo, podrías cerrar con un margen ${amount ?? 0} por debajo de cero.',
+            ? 'If you keep this pace, you could finish about ${amount ?? '0'} below zero.'
+            : 'Si seguís con este ritmo, podrías cerrar con un margen ${amount ?? '0'} por debajo de cero.',
         FinanceInsightType.paceOnTrack => strings.isEnglish
             ? 'Your spending projection still closes within the margin available for this month.'
             : 'Tu proyección de gasto cierra dentro del margen disponible para este mes.',

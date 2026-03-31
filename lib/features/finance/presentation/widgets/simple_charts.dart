@@ -3,16 +3,19 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/amount_visibility_formatter.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/reports_snapshot.dart';
 
 class DonutChart extends StatelessWidget {
   const DonutChart({
     required this.items,
+    this.localeCode = 'es',
     super.key,
   });
 
   final List<CategorySpend> items;
+  final String localeCode;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +41,12 @@ class DonutChart extends StatelessWidget {
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                   Text(
-                    total == 0 ? '-' : total.toStringAsFixed(0),
+                    total == 0
+                        ? '-'
+                        : CurrencyFormatter.formatWholeNumber(
+                            total,
+                            localeCode: localeCode,
+                          ),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ],
@@ -107,6 +115,7 @@ class IncomeExpenseComparison extends StatelessWidget {
     required this.expense,
     this.showAmounts = true,
     this.currencySymbol = r'$',
+    this.localeCode = 'es',
     super.key,
   });
 
@@ -114,6 +123,7 @@ class IncomeExpenseComparison extends StatelessWidget {
   final double expense;
   final bool showAmounts;
   final String currencySymbol;
+  final String localeCode;
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +144,7 @@ class IncomeExpenseComparison extends StatelessWidget {
                   amount: value,
                   symbol: currencySymbol,
                   isVisible: showAmounts,
+                  localeCode: localeCode,
                 ),
               ),
             ],

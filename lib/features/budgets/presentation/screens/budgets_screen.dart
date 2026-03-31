@@ -49,6 +49,7 @@ class BudgetsScreen extends ConsumerWidget {
     final budgetState = ref.watch(categoryBudgetStatusProvider);
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final symbol = settings?.currencySymbol ?? r'$';
+    final localeCode = settings?.localeCode ?? 'es';
     final monthLabel = DateFormat.yMMMM(strings.languageCode).format(DateTime.now());
 
     return Scaffold(
@@ -134,6 +135,7 @@ class BudgetsScreen extends ConsumerWidget {
                       child: BudgetStatusCard(
                         item: item,
                         currencySymbol: symbol,
+                        localeCode: localeCode,
                         onTap: () async {
                           final budget = await _findBudget(ref, item);
                           if (!context.mounted) {

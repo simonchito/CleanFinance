@@ -210,8 +210,9 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
   @override
   Widget build(BuildContext context) {
     final movementsState = ref.watch(movementsProvider(_filter));
-    final symbol =
-        ref.watch(settingsControllerProvider).valueOrNull?.currencySymbol ?? r'$';
+    final settings = ref.watch(settingsControllerProvider).valueOrNull;
+    final symbol = settings?.currencySymbol ?? r'$';
+    final localeCode = settings?.localeCode ?? 'es';
 
     return Scaffold(
       appBar: AppBar(
@@ -379,7 +380,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '$prefix ${CurrencyFormatter.format(movement.amount, symbol: symbol)}',
+                                '$prefix ${CurrencyFormatter.format(movement.amount, symbol: symbol, localeCode: localeCode)}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelLarge

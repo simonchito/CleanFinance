@@ -9,9 +9,14 @@ class AmountVisibilityFormatter {
     required double amount,
     required String symbol,
     required bool isVisible,
+    String localeCode = 'es',
   }) {
     if (isVisible) {
-      return CurrencyFormatter.format(amount, symbol: symbol);
+      return CurrencyFormatter.format(
+        amount,
+        symbol: symbol,
+        localeCode: localeCode,
+      );
     }
     return '$symbol $maskedAmount';
   }

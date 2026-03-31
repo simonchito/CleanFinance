@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../app/app_strings.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
@@ -33,6 +37,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
   final _uuid = const Uuid();
 
   late MovementType _type;
+  late final String _localeCode;
   DateTime _selectedDate = DateTime.now();
   String? _categoryId;
   String? _subcategoryId;
@@ -43,9 +48,15 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     super.initState();
     final movement = widget.initialMovement;
     _type = movement?.type ?? widget.initialType ?? MovementType.expense;
+    _localeCode =
+        ref.read(settingsControllerProvider).valueOrNull?.localeCode ??
+            AppConstants.defaultLocaleCode;
     _selectedDate = movement?.occurredOn ?? DateTime.now();
     _amountController.text = movement != null && movement.amount > 0
-        ? movement.amount.toStringAsFixed(2)
+        ? CurrencyFormatter.formatWholeNumber(
+            movement.amount,
+            localeCode: _localeCode,
+          )
         : '';
     _noteController.text = movement?.note ?? '';
     _paymentMethodController.text = movement?.paymentMethod ?? '';
@@ -93,7 +104,10 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
           ? widget.initialMovement!.id
           : _uuid.v4(),
       type: _type,
-      amount: double.parse(_amountController.text.replaceAll(',', '.')),
+      amount: CurrencyFormatter.tryParseWholeAmount(
+        _amountController.text,
+        localeCode: _localeCode,
+      )!,
       categoryId: _categoryId!,
       subcategoryId: _subcategoryId,
       goalId: _type == MovementType.saving ? _goalId : null,
@@ -224,13 +238,16 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    WholeAmountInputFormatter(localeCode: _localeCode),
+                  ],
                   decoration: InputDecoration(labelText: strings.amount),
                   validator: (value) {
-                    final parsed =
-                        double.tryParse((value ?? '').replaceAll(',', '.'));
+                    final parsed = CurrencyFormatter.tryParseWholeAmount(
+                      value ?? '',
+                      localeCode: _localeCode,
+                    );
                     if (parsed == null || parsed <= 0) {
                       return 'Ingresá un monto válido.';
                     }

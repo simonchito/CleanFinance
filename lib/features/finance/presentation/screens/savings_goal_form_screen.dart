@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../widgets/section_card.dart';
 import '../../domain/entities/savings_goal.dart';
@@ -25,15 +29,22 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _targetController = TextEditingController();
+  late final String _localeCode;
   DateTime? _targetDate;
 
   @override
   void initState() {
     super.initState();
+    _localeCode =
+        ref.read(settingsControllerProvider).valueOrNull?.localeCode ??
+            AppConstants.defaultLocaleCode;
     _nameController.text = widget.initialGoal?.name ?? '';
     _targetController.text = widget.initialGoal == null
         ? ''
-        : widget.initialGoal!.targetAmount.toStringAsFixed(2);
+        : CurrencyFormatter.formatWholeNumber(
+            widget.initialGoal!.targetAmount,
+            localeCode: _localeCode,
+          );
     _targetDate = widget.initialGoal?.targetDate;
   }
 
@@ -66,7 +77,10 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
     final goal = SavingsGoal(
       id: widget.initialGoal?.id ?? const Uuid().v4(),
       name: _nameController.text.trim(),
-      targetAmount: double.parse(_targetController.text.replaceAll(',', '.')),
+      targetAmount: CurrencyFormatter.tryParseWholeAmount(
+        _targetController.text,
+        localeCode: _localeCode,
+      )!,
       targetDate: _targetDate,
       isArchived: widget.initialGoal?.isArchived ?? false,
       createdAt: widget.initialGoal?.createdAt ?? now,
@@ -124,11 +138,16 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _targetController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                WholeAmountInputFormatter(localeCode: _localeCode),
+              ],
               decoration: const InputDecoration(labelText: 'Monto objetivo'),
               validator: (value) {
-                final parsed =
-                    double.tryParse((value ?? '').replaceAll(',', '.'));
+                final parsed = CurrencyFormatter.tryParseWholeAmount(
+                  value ?? '',
+                  localeCode: _localeCode,
+                );
                 if (parsed == null || parsed <= 0) {
                   return 'Ingresá un monto válido.';
                 }

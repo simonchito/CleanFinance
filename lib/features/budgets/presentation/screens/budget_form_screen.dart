@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../app/app_strings.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../finance/domain/entities/category.dart';
 import '../../../finance/presentation/providers/finance_providers.dart';
 import '../../../finance/presentation/widgets/empty_state_view.dart';
@@ -27,6 +31,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _limitController = TextEditingController();
   final _uuid = const Uuid();
+  late final String _localeCode;
   bool _isSaving = false;
   String? _categoryId;
 
@@ -36,9 +41,15 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
   @override
   void initState() {
     super.initState();
+    _localeCode =
+        ref.read(settingsControllerProvider).valueOrNull?.localeCode ??
+            AppConstants.defaultLocaleCode;
     _limitController.text = widget.initialBudget == null
         ? ''
-        : widget.initialBudget!.monthlyLimit.toStringAsFixed(2);
+        : CurrencyFormatter.formatWholeNumber(
+            widget.initialBudget!.monthlyLimit,
+            localeCode: _localeCode,
+          );
     _categoryId = widget.initialBudget?.categoryId;
   }
 
@@ -61,7 +72,10 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
       return;
     }
 
-    final limit = double.parse(_limitController.text.replaceAll(',', '.'));
+    final limit = CurrencyFormatter.tryParseWholeAmount(
+      _limitController.text,
+      localeCode: _localeCode,
+    )!;
     final repo = ref.read(budgetRepositoryProvider);
 
     setState(() => _isSaving = true);
@@ -202,15 +216,18 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _limitController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    WholeAmountInputFormatter(localeCode: _localeCode),
+                  ],
                   decoration: InputDecoration(
                     labelText: strings.monthlyLimit,
                   ),
                   validator: (value) {
-                    final parsed =
-                        double.tryParse((value ?? '').replaceAll(',', '.'));
+                    final parsed = CurrencyFormatter.tryParseWholeAmount(
+                      value ?? '',
+                      localeCode: _localeCode,
+                    );
                     if (parsed == null || parsed <= 0) {
                       return strings.isEnglish
                           ? 'Enter a valid monthly limit.'

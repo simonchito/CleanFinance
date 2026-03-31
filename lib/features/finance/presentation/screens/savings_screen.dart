@@ -63,8 +63,9 @@ class SavingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final goalsState = ref.watch(savingsGoalsProvider);
-    final symbol =
-        ref.watch(settingsControllerProvider).valueOrNull?.currencySymbol ?? r'$';
+    final settings = ref.watch(settingsControllerProvider).valueOrNull;
+    final symbol = settings?.currencySymbol ?? r'$';
+    final localeCode = settings?.localeCode ?? 'es';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Ahorros')),
@@ -154,13 +155,21 @@ class SavingsScreen extends ConsumerWidget {
                             Expanded(
                               child: _SummaryStat(
                                 label: 'Ahorrado',
-                                value: CurrencyFormatter.format(savedTotal, symbol: symbol),
+                                value: CurrencyFormatter.format(
+                                  savedTotal,
+                                  symbol: symbol,
+                                  localeCode: localeCode,
+                                ),
                               ),
                             ),
                             Expanded(
                               child: _SummaryStat(
                                 label: 'Objetivo',
-                                value: CurrencyFormatter.format(targetTotal, symbol: symbol),
+                                value: CurrencyFormatter.format(
+                                  targetTotal,
+                                  symbol: symbol,
+                                  localeCode: localeCode,
+                                ),
                               ),
                             ),
                             Expanded(
@@ -190,6 +199,7 @@ class SavingsScreen extends ConsumerWidget {
                         child: _GoalCard(
                           progress: progress,
                           symbol: symbol,
+                          localeCode: localeCode,
                           onEdit: () => _openGoalEditor(
                             context,
                             ref,
@@ -223,6 +233,7 @@ class SavingsScreen extends ConsumerWidget {
                         child: _GoalCard(
                           progress: progress,
                           symbol: symbol,
+                          localeCode: localeCode,
                           onEdit: () => _openGoalEditor(
                             context,
                             ref,
@@ -263,6 +274,7 @@ class _GoalCard extends StatelessWidget {
   const _GoalCard({
     required this.progress,
     required this.symbol,
+    required this.localeCode,
     required this.onEdit,
     required this.onContribute,
     required this.onDelete,
@@ -270,6 +282,7 @@ class _GoalCard extends StatelessWidget {
 
   final SavingsGoalProgress progress;
   final String symbol;
+  final String localeCode;
   final VoidCallback onEdit;
   final VoidCallback onContribute;
   final VoidCallback onDelete;
@@ -312,7 +325,7 @@ class _GoalCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${CurrencyFormatter.format(progress.savedAmount, symbol: symbol)} de ${CurrencyFormatter.format(goal.targetAmount, symbol: symbol)}',
+            '${CurrencyFormatter.format(progress.savedAmount, symbol: symbol, localeCode: localeCode)} de ${CurrencyFormatter.format(goal.targetAmount, symbol: symbol, localeCode: localeCode)}',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 4),
@@ -335,7 +348,7 @@ class _GoalCard extends StatelessWidget {
           Text(
             progress.completed
                 ? 'Excelente. Ya alcanzaste esta meta.'
-                : 'Te falta ${CurrencyFormatter.format((goal.targetAmount - progress.savedAmount).clamp(0, goal.targetAmount), symbol: symbol)} para llegar.',
+                : 'Te falta ${CurrencyFormatter.format((goal.targetAmount - progress.savedAmount).clamp(0, goal.targetAmount), symbol: symbol, localeCode: localeCode)} para llegar.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),

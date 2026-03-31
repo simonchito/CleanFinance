@@ -9,12 +9,14 @@ class BudgetStatusCard extends StatelessWidget {
   const BudgetStatusCard({
     required this.item,
     required this.currencySymbol,
+    required this.localeCode,
     this.onTap,
     super.key,
   });
 
   final CategoryBudgetStatus item;
   final String currencySymbol;
+  final String localeCode;
   final VoidCallback? onTap;
 
   @override
@@ -42,7 +44,7 @@ class BudgetStatusCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${strings.monthlyLimit}: ${CurrencyFormatter.format(item.monthlyLimit, symbol: currencySymbol)}',
+                      '${strings.monthlyLimit}: ${CurrencyFormatter.format(item.monthlyLimit, symbol: currencySymbol, localeCode: localeCode)}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -107,6 +109,7 @@ class BudgetStatusCard extends StatelessWidget {
                   value: CurrencyFormatter.format(
                     item.spent,
                     symbol: currencySymbol,
+                    localeCode: localeCode,
                   ),
                 ),
               ),
@@ -117,6 +120,7 @@ class BudgetStatusCard extends StatelessWidget {
                   value: CurrencyFormatter.format(
                     item.remaining,
                     symbol: currencySymbol,
+                    localeCode: localeCode,
                   ),
                   valueColor: item.remaining < 0 ? scheme.error : scheme.primary,
                 ),

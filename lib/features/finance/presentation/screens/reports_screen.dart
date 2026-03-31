@@ -19,8 +19,9 @@ class ReportsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final overviewState = ref.watch(financeOverviewProvider);
     final strings = AppStrings.of(context);
-    final symbol =
-        ref.watch(settingsControllerProvider).valueOrNull?.currencySymbol ?? r'$';
+    final settings = ref.watch(settingsControllerProvider).valueOrNull;
+    final symbol = settings?.currencySymbol ?? r'$';
+    final localeCode = settings?.localeCode ?? 'es';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Reportes')),
@@ -103,6 +104,7 @@ class ReportsScreen extends ConsumerWidget {
                             value: CurrencyFormatter.format(
                               overview.cashflow.income,
                               symbol: symbol,
+                              localeCode: localeCode,
                             ),
                             color: scheme.primary,
                           ),
@@ -114,6 +116,7 @@ class ReportsScreen extends ConsumerWidget {
                             value: CurrencyFormatter.format(
                               overview.cashflow.expense,
                               symbol: symbol,
+                              localeCode: localeCode,
                             ),
                             color: scheme.error,
                           ),
@@ -129,6 +132,7 @@ class ReportsScreen extends ConsumerWidget {
                             value: CurrencyFormatter.format(
                               overview.cashflow.savings,
                               symbol: symbol,
+                              localeCode: localeCode,
                             ),
                             color: scheme.tertiary,
                           ),
@@ -140,6 +144,7 @@ class ReportsScreen extends ConsumerWidget {
                             value: CurrencyFormatter.format(
                               overview.cashflow.netBalance,
                               symbol: symbol,
+                              localeCode: localeCode,
                             ),
                             color: overview.cashflow.netBalance >= 0
                                 ? scheme.primary
@@ -152,6 +157,8 @@ class ReportsScreen extends ConsumerWidget {
                     IncomeExpenseComparison(
                       income: overview.cashflow.income,
                       expense: overview.cashflow.expense,
+                      currencySymbol: symbol,
+                      localeCode: localeCode,
                     ),
                   ],
                 ),
@@ -201,7 +208,10 @@ class ReportsScreen extends ConsumerWidget {
                         message: 'Cuando registres gastos, vas a ver acá en qué categorías se fue más dinero.',
                       )
                     else ...[
-                      DonutChart(items: overview.reports.topExpenseCategories),
+                      DonutChart(
+                        items: overview.reports.topExpenseCategories,
+                        localeCode: localeCode,
+                      ),
                       const SizedBox(height: 18),
                       ...overview.categoryComparison.items.map(
                         (item) => Padding(
@@ -209,6 +219,7 @@ class ReportsScreen extends ConsumerWidget {
                           child: _CategoryComparisonTile(
                             item: item,
                             symbol: symbol,
+                            localeCode: localeCode,
                           ),
                         ),
                       ),
@@ -241,6 +252,7 @@ class ReportsScreen extends ConsumerWidget {
                             value: CurrencyFormatter.format(
                               overview.spendingPace.spentSoFar,
                               symbol: symbol,
+                              localeCode: localeCode,
                             ),
                             color: scheme.error,
                           ),
@@ -252,6 +264,7 @@ class ReportsScreen extends ConsumerWidget {
                             value: CurrencyFormatter.format(
                               overview.spendingPace.expectedSpendToDate,
                               symbol: symbol,
+                              localeCode: localeCode,
                             ),
                             color: scheme.secondary,
                           ),
@@ -267,6 +280,7 @@ class ReportsScreen extends ConsumerWidget {
                             value: CurrencyFormatter.format(
                               overview.spendingPace.projectedEndOfMonth,
                               symbol: symbol,
+                              localeCode: localeCode,
                             ),
                             color: scheme.tertiary,
                           ),
@@ -340,6 +354,7 @@ class ReportsScreen extends ConsumerWidget {
                           child: _GoalForecastTile(
                             goal: goal,
                             symbol: symbol,
+                            localeCode: localeCode,
                           ),
                         ),
                       ),
@@ -370,6 +385,7 @@ class ReportsScreen extends ConsumerWidget {
                           child: _PaymentMethodTile(
                             item: item,
                             symbol: symbol,
+                            localeCode: localeCode,
                           ),
                         ),
                       ),
@@ -507,10 +523,12 @@ class _CategoryComparisonTile extends StatelessWidget {
   const _CategoryComparisonTile({
     required this.item,
     required this.symbol,
+    required this.localeCode,
   });
 
   final CategoryComparisonItem item;
   final String symbol;
+  final String localeCode;
 
   @override
   Widget build(BuildContext context) {
@@ -546,7 +564,11 @@ class _CategoryComparisonTile extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  CurrencyFormatter.format(item.currentAmount, symbol: symbol),
+                  CurrencyFormatter.format(
+                    item.currentAmount,
+                    symbol: symbol,
+                    localeCode: localeCode,
+                  ),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
@@ -561,7 +583,7 @@ class _CategoryComparisonTile extends StatelessWidget {
           if (item.previousAmount > 0) ...[
             const SizedBox(height: 4),
             Text(
-              'Mes anterior: ${CurrencyFormatter.format(item.previousAmount, symbol: symbol)}',
+              'Mes anterior: ${CurrencyFormatter.format(item.previousAmount, symbol: symbol, localeCode: localeCode)}',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
@@ -577,10 +599,12 @@ class _GoalForecastTile extends StatelessWidget {
   const _GoalForecastTile({
     required this.goal,
     required this.symbol,
+    required this.localeCode,
   });
 
   final SavingsGoalForecast goal;
   final String symbol;
+  final String localeCode;
 
   @override
   Widget build(BuildContext context) {
@@ -604,7 +628,7 @@ class _GoalForecastTile extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${CurrencyFormatter.format(goal.progress.savedAmount, symbol: symbol)} de ${CurrencyFormatter.format(goal.progress.goal.targetAmount, symbol: symbol)}',
+            '${CurrencyFormatter.format(goal.progress.savedAmount, symbol: symbol, localeCode: localeCode)} de ${CurrencyFormatter.format(goal.progress.goal.targetAmount, symbol: symbol, localeCode: localeCode)}',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 10),
@@ -619,14 +643,14 @@ class _GoalForecastTile extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Aporte promedio: ${CurrencyFormatter.format(goal.averageMonthlyContribution, symbol: symbol)} por mes',
+            'Aporte promedio: ${CurrencyFormatter.format(goal.averageMonthlyContribution, symbol: symbol, localeCode: localeCode)} por mes',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: 4),
           Text(
-            'Aporte este mes: ${CurrencyFormatter.format(goal.currentMonthContribution, symbol: symbol)}',
+            'Aporte este mes: ${CurrencyFormatter.format(goal.currentMonthContribution, symbol: symbol, localeCode: localeCode)}',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -648,10 +672,12 @@ class _PaymentMethodTile extends StatelessWidget {
   const _PaymentMethodTile({
     required this.item,
     required this.symbol,
+    required this.localeCode,
   });
 
   final PaymentMethodSpend item;
   final String symbol;
+  final String localeCode;
 
   @override
   Widget build(BuildContext context) {
@@ -680,7 +706,11 @@ class _PaymentMethodTile extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            CurrencyFormatter.format(item.amount, symbol: symbol),
+            CurrencyFormatter.format(
+              item.amount,
+              symbol: symbol,
+              localeCode: localeCode,
+            ),
             style: Theme.of(context).textTheme.labelLarge,
           ),
         ],

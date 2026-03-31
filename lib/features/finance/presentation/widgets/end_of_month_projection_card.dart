@@ -11,12 +11,14 @@ class EndOfMonthProjectionCard extends StatelessWidget {
     required this.projection,
     required this.currencySymbol,
     required this.showAmounts,
+    required this.localeCode,
     super.key,
   });
 
   final EndOfMonthProjection projection;
   final String currencySymbol;
   final bool showAmounts;
+  final String localeCode;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +64,7 @@ class EndOfMonthProjectionCard extends StatelessWidget {
                     amount: projection.projectedExpense,
                     symbol: currencySymbol,
                     isVisible: showAmounts,
+                    localeCode: localeCode,
                   ),
                   color: scheme.error,
                 ),
@@ -74,6 +77,7 @@ class EndOfMonthProjectionCard extends StatelessWidget {
                     amount: projection.projectedNet,
                     symbol: currencySymbol,
                     isVisible: showAmounts,
+                    localeCode: localeCode,
                   ),
                   color:
                       projection.projectedNet >= 0 ? scheme.primary : scheme.error,
@@ -84,8 +88,8 @@ class EndOfMonthProjectionCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             strings.isEnglish
-                ? 'Average expense pace: ${AmountVisibilityFormatter.formatCurrency(amount: projection.avgDailyExpense, symbol: currencySymbol, isVisible: showAmounts)}/day. ${projection.daysRemaining} days left.'
-                : 'Ritmo promedio: ${AmountVisibilityFormatter.formatCurrency(amount: projection.avgDailyExpense, symbol: currencySymbol, isVisible: showAmounts)}/dia. Quedan ${projection.daysRemaining} dias.',
+                ? 'Average expense pace: ${AmountVisibilityFormatter.formatCurrency(amount: projection.avgDailyExpense, symbol: currencySymbol, isVisible: showAmounts, localeCode: localeCode)}/day. ${projection.daysRemaining} days left.'
+                : 'Ritmo promedio: ${AmountVisibilityFormatter.formatCurrency(amount: projection.avgDailyExpense, symbol: currencySymbol, isVisible: showAmounts, localeCode: localeCode)}/dia. Quedan ${projection.daysRemaining} dias.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
