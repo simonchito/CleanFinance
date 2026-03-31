@@ -1,5 +1,6 @@
 import '../entities/category.dart';
 import '../entities/monthly_payment_reminder.dart';
+import '../entities/movement.dart';
 import '../entities/savings_goal.dart';
 
 class MonthlyPaymentReminderService {
@@ -8,14 +9,35 @@ class MonthlyPaymentReminderService {
   List<MonthlyPaymentReminder> buildDueReminders({
     required List<Category> expenseCategories,
     required List<SavingsGoalProgress> savingsGoals,
+    required List<Movement> currentMonthMovements,
     required DateTime referenceDate,
   }) {
+    final resolvedExpenseSubcategoryIds =
+        currentMonthMovements
+            .where(
+              (movement) =>
+                  movement.type == MovementType.expense &&
+                  movement.subcategoryId != null,
+            )
+            .map((movement) => movement.subcategoryId!)
+            .toSet();
+    final resolvedSavingsGoalIds =
+        currentMonthMovements
+            .where(
+              (movement) =>
+                  movement.type == MovementType.saving && movement.goalId != null,
+            )
+            .map((movement) => movement.goalId!)
+            .toSet();
+
     final dueExpenseReminders = buildExpenseReminders(
       categories: expenseCategories,
+      resolvedSubcategoryIds: resolvedExpenseSubcategoryIds,
       referenceDate: referenceDate,
     );
     final dueSavingsReminders = buildSavingsGoalReminders(
       goals: savingsGoals,
+      resolvedGoalIds: resolvedSavingsGoalIds,
       referenceDate: referenceDate,
     );
 
@@ -33,6 +55,7 @@ class MonthlyPaymentReminderService {
 
   List<MonthlyPaymentReminder> buildExpenseReminders({
     required List<Category> categories,
+    required Set<String> resolvedSubcategoryIds,
     required DateTime referenceDate,
   }) {
     final parentNames = {
@@ -46,6 +69,7 @@ class MonthlyPaymentReminderService {
               category.scope == CategoryScope.expense &&
               category.isSubcategory &&
               category.reminderEnabled &&
+              !resolvedSubcategoryIds.contains(category.id) &&
               _isDue(category.reminderDay, referenceDate),
         )
         .map(
@@ -65,6 +89,7 @@ class MonthlyPaymentReminderService {
 
   List<MonthlyPaymentReminder> buildSavingsGoalReminders({
     required List<SavingsGoalProgress> goals,
+    required Set<String> resolvedGoalIds,
     required DateTime referenceDate,
   }) {
     return goals
@@ -73,6 +98,7 @@ class MonthlyPaymentReminderService {
               !progress.goal.isArchived &&
               !progress.completed &&
               progress.goal.reminderEnabled &&
+              !resolvedGoalIds.contains(progress.goal.id) &&
               _isDue(progress.goal.reminderDay, referenceDate),
         )
         .map(

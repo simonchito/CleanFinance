@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/utils/month_context.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/app_settings.dart';
 import '../../domain/entities/analytics_models.dart';
@@ -68,14 +69,25 @@ final reportsSnapshotProvider = FutureProvider<ReportsSnapshot>((ref) async {
 final monthlyDueRemindersProvider =
     FutureProvider<List<MonthlyPaymentReminder>>((ref) async {
       final service = ref.watch(monthlyPaymentReminderServiceProvider);
+      final movementsRepo = ref.watch(movementsRepositoryProvider);
+      final referenceDate = DateTime.now();
+      final currentMonth = MonthContext.forDate(referenceDate);
       final expenseCategories = await ref.watch(
         categoriesProvider(CategoryScope.expense).future,
       );
       final savingsGoals = await ref.watch(savingsGoalsProvider.future);
+      final currentMonthMovements = await movementsRepo.getMovements(
+        filter: MovementFilter(
+          startDate: currentMonth.startDate,
+          endDate: currentMonth.endDateInclusive,
+        ),
+      );
+
       return service.buildDueReminders(
         expenseCategories: expenseCategories,
         savingsGoals: savingsGoals,
-        referenceDate: DateTime.now(),
+        currentMonthMovements: currentMonthMovements,
+        referenceDate: referenceDate,
       );
     });
 

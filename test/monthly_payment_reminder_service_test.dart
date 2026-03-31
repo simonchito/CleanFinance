@@ -1,5 +1,6 @@
 import 'package:clean_finance/features/finance/domain/entities/category.dart';
 import 'package:clean_finance/features/finance/domain/entities/monthly_payment_reminder.dart';
+import 'package:clean_finance/features/finance/domain/entities/movement.dart';
 import 'package:clean_finance/features/finance/domain/entities/savings_goal.dart';
 import 'package:clean_finance/features/finance/domain/services/monthly_payment_reminder_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -53,6 +54,28 @@ void main() {
     );
   }
 
+  Movement movement({
+    required String id,
+    required MovementType type,
+    String categoryId = '',
+    String? subcategoryId,
+    String? goalId,
+    DateTime? occurredOn,
+  }) {
+    final now = occurredOn ?? DateTime(2026, 3, 20);
+    return Movement(
+      id: id,
+      type: type,
+      amount: 100,
+      categoryId: categoryId,
+      subcategoryId: subcategoryId,
+      goalId: goalId,
+      occurredOn: now,
+      createdAt: now,
+      updatedAt: now,
+    );
+  }
+
   test('returns due reminder for expense subcategory when day has passed', () {
     final reminders = service.buildDueReminders(
       expenseCategories: [
@@ -66,6 +89,7 @@ void main() {
         ),
       ],
       savingsGoals: const [],
+      currentMonthMovements: const [],
       referenceDate: DateTime(2026, 3, 20),
     );
 
@@ -86,6 +110,35 @@ void main() {
         ),
       ],
       savingsGoals: const [],
+      currentMonthMovements: const [],
+      referenceDate: DateTime(2026, 3, 20),
+    );
+
+    expect(reminders, isEmpty);
+  });
+
+  test('does not return expense reminder when subcategory already has a payment this month', () {
+    final reminders = service.buildDueReminders(
+      expenseCategories: [
+        expenseCategory(id: 'services', name: 'Servicios'),
+        expenseCategory(
+          id: 'netflix',
+          name: 'Netflix',
+          parentId: 'services',
+          reminderEnabled: true,
+          reminderDay: 10,
+        ),
+      ],
+      savingsGoals: const [],
+      currentMonthMovements: [
+        movement(
+          id: 'expense-1',
+          type: MovementType.expense,
+          categoryId: 'services',
+          subcategoryId: 'netflix',
+          occurredOn: DateTime(2026, 3, 12),
+        ),
+      ],
       referenceDate: DateTime(2026, 3, 20),
     );
 
@@ -103,6 +156,7 @@ void main() {
           reminderDay: 5,
         ),
       ],
+      currentMonthMovements: const [],
       referenceDate: DateTime(2026, 3, 20),
     );
 
@@ -122,6 +176,32 @@ void main() {
           reminderDay: 5,
           targetAmount: 1000,
           savedAmount: 1000,
+        ),
+      ],
+      currentMonthMovements: const [],
+      referenceDate: DateTime(2026, 3, 20),
+    );
+
+    expect(reminders, isEmpty);
+  });
+
+  test('does not return savings reminder when goal already has a contribution this month', () {
+    final reminders = service.buildDueReminders(
+      expenseCategories: const [],
+      savingsGoals: [
+        savingsGoal(
+          id: 'goal-travel',
+          name: 'Viaje',
+          reminderEnabled: true,
+          reminderDay: 5,
+        ),
+      ],
+      currentMonthMovements: [
+        movement(
+          id: 'saving-1',
+          type: MovementType.saving,
+          goalId: 'goal-travel',
+          occurredOn: DateTime(2026, 3, 8),
         ),
       ],
       referenceDate: DateTime(2026, 3, 20),
