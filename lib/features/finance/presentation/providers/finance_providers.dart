@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/month_context.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/app_settings.dart';
@@ -28,9 +27,14 @@ final settingsControllerProvider =
     });
 
 final showSensitiveAmountsProvider = Provider<bool>((ref) {
-  final settings = ref.watch(settingsControllerProvider).valueOrNull;
-  return settings?.showSensitiveAmounts ??
-      AppConstants.defaultShowSensitiveAmounts;
+  final settingsState = ref.watch(settingsControllerProvider);
+  final settings = settingsState.valueOrNull;
+  if (settings != null) {
+    return settings.showSensitiveAmounts;
+  }
+
+  // Privacy-first fallback while settings are still loading on app startup.
+  return false;
 });
 
 final dashboardSummaryProvider = FutureProvider<DashboardSummary>((ref) async {
@@ -214,3 +218,5 @@ final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
     insights: insights,
   );
 });
+
+
