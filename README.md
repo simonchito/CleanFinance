@@ -1,210 +1,163 @@
-# 💸 CleanFinance
+# CleanFinance
 
-**CleanFinance** es una aplicación de finanzas personales enfocada en la simplicidad, privacidad y control total del usuario sobre sus datos.
+CleanFinance es una app Flutter de finanzas personales enfocada en simplicidad, privacidad y funcionamiento offline-first.
 
-Diseñada para personas no expertas en finanzas, permite gestionar ingresos, gastos, ahorros y reportes de forma clara, intuitiva y completamente offline.
+El proyecto actual usa almacenamiento local, autenticación con PIN, soporte biométrico opcional, gestión de movimientos, metas de ahorro, presupuestos mensuales, recordatorios mensuales y reportes derivados desde datos locales.
 
----
+## Estado actual
 
-## 🚀 Filosofía del producto
+Stack principal:
 
-* 🔒 **Privacidad primero**: todos los datos se almacenan localmente
-* 📱 **Offline-first**: no depende de internet
-* 🧠 **Simplicidad real**: sin conceptos financieros complejos
-* ⚡ **Rápida y liviana**: optimizada para uso diario
-* 🎯 **Enfocada en hábitos**: no solo registro, sino mejora financiera
+- Flutter + Dart
+- Riverpod
+- SQLite (`sqflite`)
+- `flutter_secure_storage`
+- `local_auth`
 
----
+Arquitectura actual:
 
-## 🧩 Funcionalidades principales (MVP)
+- organización modular por features
+- separación en `data`, `domain` y `presentation`
+- providers compartidos en `lib/shared/providers.dart`
+- servicios de dominio para analítica, recordatorios y presupuestos
 
-### 🔐 Seguridads
+## Funcionalidades implementadas
 
-* Autenticación con PIN
-* Soporte para biometría (huella / face unlock)
-* Almacenamiento seguro de credenciales
+### Seguridad y acceso
 
-### 📊 Dashboard
+- configuración inicial con PIN local
+- recuperación de acceso con datos configurados por el usuario
+- desbloqueo por biometría cuando el dispositivo lo permite
+- auto-lock por inactividad al volver desde background
 
-* Resumen financiero general
-* Balance actual
-* Distribución de gastos
-* Indicadores visuales simples
+### Dashboard
 
-### 💳 Movimientos
+- saldo actual
+- resumen mensual de ingresos, gastos, ahorros y cantidad de movimientos
+- proyección de fin de mes
+- movimientos recientes
+- insights y métricas visuales
+- card de recordatorios mensuales pendientes
 
-* Registro de ingresos y gastos
-* Categorización
-* Historial de transacciones
+### Movimientos
 
-### 🏷️ Categorías
+- alta y edición de ingresos, gastos y ahorros
+- categorías y subcategorías
+- filtro por tipo, categoría, rango de fecha y búsqueda por nota
+- medios de pago configurables
+- formateo automático de montos enteros
 
-* Categorías predefinidas
-* Personalización futura
+### Categorías
 
-### 🎯 Ahorro
+- gestión de categorías de ingresos, gastos y ahorro
+- soporte de subcategorías
+- recordatorios mensuales en subcategorías de gasto
 
-* Creación de metas de ahorro
-* Seguimiento de progreso
+### Metas de ahorro
 
-### 📈 Reportes
+- alta y edición de metas
+- seguimiento de progreso
+- aportes vinculados mediante movimientos de ahorro
+- recordatorios mensuales por meta
 
-* Visualización de hábitos financieros
-* Análisis simple por categorías
+### Presupuestos
 
-### 🔄 Backup & Restore
+- creación de presupuestos mensuales por categoría de gasto
+- cálculo de estado por consumo actual
+- estados `normal`, `warning` y `exceeded`
 
-* Exportación a JSON
-* Importación manual de datos
+### Reportes
 
----
+- cashflow mensual
+- evolución mensual
+- comparación por categorías
+- ritmo de gasto
+- forecast de metas de ahorro
+- gastos por medio de pago
+- score de salud financiera
 
-## 🏗️ Arquitectura
+### Datos locales
 
-La aplicación sigue una arquitectura modular basada en features:
+- exportación de backup a JSON
+- importación manual de backup
+- limpieza de datos locales
 
-```
+## Estructura del proyecto
+
+```text
 lib/
-│
-├── app/            # Configuración global (theme, routes)
-├── core/           # Lógica base (utils, constants, services)
-├── features/       # Módulos funcionales (auth, finance, reports, etc.)
-├── shared/         # Widgets reutilizables
+├── app/
+├── core/
+├── features/
+│   ├── auth/
+│   ├── budgets/
+│   └── finance/
+├── shared/
+└── main.dart
 ```
 
-### 🧠 Principios aplicados
+Resumen por carpeta:
 
-* Separación de responsabilidades
-* Escalabilidad por módulos
-* Código reutilizable
-* Bajo acoplamiento
+- `app/`: configuración global, theme y strings
+- `core/`: constantes, base de datos, seguridad, errores y utilidades
+- `features/auth/`: acceso, PIN, biometría y recuperación
+- `features/finance/`: dashboard, movimientos, categorías, metas, recordatorios, reportes y settings
+- `features/budgets/`: presupuestos mensuales
+- `shared/`: providers de infraestructura y servicios compartidos
 
----
+## Cómo ejecutar
 
-## ⚙️ Stack tecnológico
-
-* **Framework**: Flutter
-* **Lenguaje**: Dart
-* **State Management**: Riverpod
-* **Base de datos**: SQLite (`sqflite`)
-* **Seguridad**:
-
-    * `flutter_secure_storage`
-    * `local_auth`
-* **Persistencia local**: offline-first
-
----
-
-## ▶️ Cómo ejecutar el proyecto
-
-### 1. Clonar el repositorio
-
-```bash
-git clone https://github.com/simonchito/CleanFinance.git
-cd CleanFinance
-```
-
-### 2. Instalar dependencias
+### Instalar dependencias
 
 ```bash
 flutter pub get
 ```
 
-### 3. Ejecutar la app
+### Ejecutar la app
 
 ```bash
 flutter run
 ```
 
----
+### Análisis estático
 
-## 📦 Generar APK (release)
+```bash
+flutter analyze
+```
 
-Para generar una APK lista para instalar:
+### Tests
+
+```bash
+flutter test
+```
+
+### Generar APK
 
 ```bash
 flutter build apk --release
 ```
 
-El archivo se genera en:
+## Documentación técnica
 
-```
-build/app/outputs/flutter-apk/app-release.apk
-```
+La carpeta [`docs/`](/D:/GITHUB/CleanFinance/docs) refleja el estado actual del código.
 
-### 🔧 Personalizar nombre del APK
+Documentos principales:
 
-Podés renombrarlo manualmente a:
+- [architecture.md](/D:/GITHUB/CleanFinance/docs/architecture.md)
+- [project-structure.md](/D:/GITHUB/CleanFinance/docs/project-structure.md)
+- [features.md](/D:/GITHUB/CleanFinance/docs/features.md)
+- [screens.md](/D:/GITHUB/CleanFinance/docs/screens.md)
+- [state-management.md](/D:/GITHUB/CleanFinance/docs/state-management.md)
+- [database.md](/D:/GITHUB/CleanFinance/docs/database.md)
+- [security.md](/D:/GITHUB/CleanFinance/docs/security.md)
+- [dependencies.md](/D:/GITHUB/CleanFinance/docs/dependencies.md)
+- [build-and-run.md](/D:/GITHUB/CleanFinance/docs/build-and-run.md)
+- [known-issues.md](/D:/GITHUB/CleanFinance/docs/known-issues.md)
+- [plan_maestro.md](/D:/GITHUB/CleanFinance/docs/plan_maestro.md)
 
-```
-CleanFinance.apk
-```
+## Notas importantes
 
-> ⚠️ Para distribución profesional, se recomienda firmar la APK con keystore propio.
-
----
-
-## 🎨 UI / UX (visión)
-
-La app apunta a un diseño:
-
-* Minimalista
-* Intuitivo
-* Sin ruido visual
-* Enfocado en claridad de información
-* Con uso de gráficos simples y útiles
-
----
-
-## 🛣️ Roadmap
-
-### MVP (actual)
-
-* ✔️ Registro de movimientos
-* ✔️ Seguridad local
-* ✔️ Dashboard básico
-* ✔️ Persistencia local
-
-### Próximas mejoras
-
-* 📊 Gráficos avanzados
-* 🔔 Alertas y recordatorios
-* 💡 Recomendaciones financieras
-* 🌐 Sincronización opcional (cloud)
-* 🏷️ Gestión avanzada de categorías
-* 📅 Presupuestos mensuales
-
----
-
-## 🤝 Contribución
-
-Este proyecto está en evolución. Se aceptan ideas, mejoras y sugerencias.
-
----
-
-## 📄 Licencia
-
-Definir licencia (MIT recomendada)
-
----
-
-## 👨‍💻 Autor
-
-**Facundo Simón Gastiarena**
-
-* Técnico de Software
-* Consultor SAP VIM / OpenText
-* Desarrollador
-
----
-
-## 💡 Visión a futuro
-
-CleanFinance busca convertirse en una herramienta accesible, potente y confiable para el control financiero personal, sin comprometer la privacidad del usuario.
-
----
-
-
-## Documentación
-
-- Plan maestro: `docs/plan_maestro.md`
+- el proyecto es local-first; no hay integración backend en el código actual
+- la persistencia principal es SQLite y secure storage
+- el soporte exacto de todas las plataformas incluidas en el repo debe validarse por entorno, especialmente web y desktop
+- si necesitás detalle técnico fino, tomá `/docs` como fuente principal antes que este README
