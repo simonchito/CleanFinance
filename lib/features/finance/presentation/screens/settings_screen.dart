@@ -316,13 +316,13 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(height: 12),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: Text(strings.showAmounts),
+                      title: Text(strings.hideAmounts),
                       subtitle: Text(strings.amountPrivacyDescription),
-                      value: settings.showSensitiveAmounts,
+                      value: !settings.showSensitiveAmounts,
                       onChanged: (value) {
                         ref
                             .read(settingsControllerProvider.notifier)
-                            .setShowSensitiveAmounts(value);
+                            .setShowSensitiveAmounts(!value);
                       },
                     ),
                   ],
@@ -553,4 +553,5 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 }
+
 
