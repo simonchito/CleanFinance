@@ -29,6 +29,11 @@ final settingsControllerProvider =
 final showSensitiveAmountsOverrideProvider = StateProvider<bool?>((ref) => null);
 
 final showSensitiveAmountsProvider = Provider<bool>((ref) {
+  final override = ref.watch(showSensitiveAmountsOverrideProvider);
+  if (override != null) {
+    return override;
+  }
+
   final settingsState = ref.watch(settingsControllerProvider);
   final settings = settingsState.valueOrNull;
   if (settings != null) {
@@ -220,6 +225,7 @@ final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
     insights: insights,
   );
 });
+
 
 
 
