@@ -26,6 +26,8 @@ final settingsControllerProvider =
       return controller;
     });
 
+final showSensitiveAmountsOverrideProvider = StateProvider<bool?>((ref) => null);
+
 final showSensitiveAmountsProvider = Provider<bool>((ref) {
   final settingsState = ref.watch(settingsControllerProvider);
   final settings = settingsState.valueOrNull;
@@ -218,5 +220,8 @@ final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
     insights: insights,
   );
 });
+
+
+
 
 

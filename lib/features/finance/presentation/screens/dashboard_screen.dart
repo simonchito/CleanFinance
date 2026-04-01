@@ -188,10 +188,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           IconButton(
                             onPressed: () {
                               ref
-                                  .read(settingsControllerProvider.notifier)
-                                  .setShowSensitiveAmounts(
-                                    !showSensitiveAmounts,
-                                  );
+                                  .read(showSensitiveAmountsOverrideProvider.notifier)
+                                  .state = !showSensitiveAmounts;
                             },
                             tooltip: showSensitiveAmounts
                                 ? strings.hideAmounts
@@ -635,4 +633,5 @@ class _MovementTile extends StatelessWidget {
     );
   }
 }
+
 

@@ -319,10 +319,14 @@ class SettingsScreen extends ConsumerWidget {
                       title: Text(strings.hideAmounts),
                       subtitle: Text(strings.amountPrivacyDescription),
                       value: !settings.showSensitiveAmounts,
-                      onChanged: (value) {
+                      onChanged: (value) async {
+                        final visible = !value;
                         ref
+                            .read(showSensitiveAmountsOverrideProvider.notifier)
+                            .state = visible;
+                        await ref
                             .read(settingsControllerProvider.notifier)
-                            .setShowSensitiveAmounts(!value);
+                            .setShowSensitiveAmounts(visible);
                       },
                     ),
                   ],
@@ -553,5 +557,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 }
+
 
 
