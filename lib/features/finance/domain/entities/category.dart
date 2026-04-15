@@ -4,6 +4,7 @@ class Category {
   const Category({
     required this.id,
     required this.name,
+    required this.iconKey,
     required this.scope,
     required this.isDefault,
     required this.createdAt,
@@ -15,6 +16,7 @@ class Category {
 
   final String id;
   final String name;
+  final String iconKey;
   final CategoryScope scope;
   final String? parentId;
   final bool isDefault;
@@ -28,6 +30,7 @@ class Category {
   Category copyWith({
     String? id,
     String? name,
+    String? iconKey,
     CategoryScope? scope,
     String? parentId,
     bool? isDefault,
@@ -39,6 +42,7 @@ class Category {
     return Category(
       id: id ?? this.id,
       name: name ?? this.name,
+      iconKey: iconKey ?? this.iconKey,
       scope: scope ?? this.scope,
       parentId: parentId ?? this.parentId,
       isDefault: isDefault ?? this.isDefault,

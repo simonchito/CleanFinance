@@ -5,9 +5,9 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/database/app_database.dart';
+import '../../../core/database/seed/default_categories_seed.dart';
 import '../../../core/security/secure_storage_service.dart';
 import '../../../core/utils/month_context.dart';
-import 'default_category_catalog.dart';
 import '../domain/entities/app_settings.dart';
 import '../domain/entities/app_theme_preference.dart';
 import '../domain/entities/category.dart';
@@ -39,105 +39,16 @@ class LocalFinanceRepository
   final AppDatabase _appDatabase;
   final SecureStorageService? _secureStorage;
   final Uuid _uuid = const Uuid();
+  final DefaultCategoriesSeed _defaultCategoriesSeed =
+      const DefaultCategoriesSeed();
 
   @override
   Future<void> ensureSeedData() async {
     final db = await _appDatabase.instance;
-    await db.transaction((txn) async {
-      final rows = await txn.query('categories');
-      final topLevelByKey = <String, Map<String, Object?>>{};
-      final childrenByParentId =
-          <String, Map<String, Map<String, Object?>>>{};
-
-      for (final row in rows) {
-        final scope = CategoryScope.values.byName(row['scope'] as String);
-        final categoryName = row['name'] as String;
-        final parentId = row['parent_id'] as String?;
-        if (parentId == null) {
-          topLevelByKey.putIfAbsent(
-            DefaultCategoryCatalog.topLevelKey(scope, categoryName),
-            () => row,
-          );
-          continue;
-        }
-
-        final normalizedChildName =
-            DefaultCategoryCatalog.normalizeName(categoryName);
-        childrenByParentId
-            .putIfAbsent(parentId, () => <String, Map<String, Object?>>{})
-            .putIfAbsent(normalizedChildName, () => row);
-      }
-
-      final now = DateTime.now().toIso8601String();
-      final batch = txn.batch();
-      var hasInserts = false;
-
-      for (final definition in DefaultCategoryCatalog.categories) {
-        final topLevelKey = DefaultCategoryCatalog.topLevelKey(
-          definition.scope,
-          definition.name,
-        );
-        var parent = topLevelByKey[topLevelKey];
-
-        if (parent == null) {
-          parent = _categoryMap(
-            definition.name,
-            definition.scope,
-            now,
-            id: _uuid.v4(),
-          );
-          topLevelByKey[topLevelKey] = parent;
-          batch.insert('categories', parent);
-          hasInserts = true;
-        }
-
-        final parentId = parent['id'] as String;
-        final existingChildren = childrenByParentId.putIfAbsent(
-          parentId,
-          () => <String, Map<String, Object?>>{},
-        );
-
-        for (final childName in definition.subcategories) {
-          final childKey = DefaultCategoryCatalog.normalizeName(childName);
-          if (existingChildren.containsKey(childKey)) {
-            continue;
-          }
-
-          final child = _categoryMap(
-            childName,
-            definition.scope,
-            now,
-            id: _uuid.v4(),
-            parentId: parentId,
-          );
-          existingChildren[childKey] = child;
-          batch.insert('categories', child);
-          hasInserts = true;
-        }
-      }
-
-      if (hasInserts) {
-        await batch.commit(noResult: true);
-      }
-    });
-  }
-
-  Map<String, Object?> _categoryMap(
-    String name,
-    CategoryScope scope,
-    String now, {
-    String? id,
-    String? parentId,
-  }) {
-    return {
-      'id': id ?? _uuid.v4(),
-      'name': name,
-      'scope': scope.name,
-      'parent_id': parentId,
-      'is_default': 1,
-      'created_at': now,
-      'updated_at': now,
-    };
+    await _defaultCategoriesSeed.seed(
+      db,
+      createId: _uuid.v4,
+    );
   }
 
   @override
@@ -283,18 +194,7 @@ class LocalFinanceRepository
       where: where,
       whereArgs: args,
     );
-    final categories = rows.map(_categoryFromMap).toList();
-    final categoriesById = {
-      for (final category in categories) category.id: category,
-    };
-    categories.sort(
-      (left, right) => DefaultCategoryCatalog.compare(
-        left,
-        right,
-        categoriesById,
-      ),
-    );
-    return categories;
+    return rows.map(_categoryFromMap).toList();
   }
 
   @override
@@ -305,6 +205,7 @@ class LocalFinanceRepository
       {
         'id': category.id,
         'name': category.name,
+        'icon_key': category.iconKey,
         'scope': category.scope.name,
         'parent_id': category.parentId,
         'is_default': category.isDefault ? 1 : 0,
@@ -663,6 +564,7 @@ class LocalFinanceRepository
     return Category(
       id: map['id'] as String,
       name: map['name'] as String,
+      iconKey: (map['icon_key'] as String?) ?? 'category',
       scope: CategoryScope.values.byName(map['scope'] as String),
       parentId: map['parent_id'] as String?,
       isDefault: (map['is_default'] as int? ?? 0) == 1,

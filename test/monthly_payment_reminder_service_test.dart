@@ -19,6 +19,7 @@ void main() {
     return Category(
       id: id,
       name: name,
+      iconKey: 'category',
       scope: CategoryScope.expense,
       parentId: parentId,
       isDefault: false,

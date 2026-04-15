@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/utils/icon_mapper.dart';
 import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
@@ -70,6 +71,7 @@ class _CategoryTab extends ConsumerWidget {
 
               return Card(
                 child: ExpansionTile(
+                  leading: Icon(IconMapper.getIcon(category.iconKey)),
                   title: Text(category.name),
                   subtitle: Text(
                     category.isDefault ? 'Predefinida' : 'Personalizada',
@@ -77,7 +79,7 @@ class _CategoryTab extends ConsumerWidget {
                   children: [
                     for (final child in children)
                       _CategoryEntryRow(
-                        icon: Icons.subdirectory_arrow_right,
+                        icon: IconMapper.getIcon(child.iconKey),
                         title: child.name,
                         onEdit: () => _showCategoryDialog(
                           context,
@@ -90,6 +92,7 @@ class _CategoryTab extends ConsumerWidget {
                             : () => _deleteCategory(context, ref, child.id),
                       ),
                     _CategoryEntryRow(
+                      icon: IconMapper.getIcon(category.iconKey),
                       title: category.name,
                       subtitle: 'Categoría principal',
                       onEdit: () => _showCategoryDialog(
@@ -264,6 +267,7 @@ class _CategoryTab extends ConsumerWidget {
                 final category = Category(
                   id: initial?.id ?? const Uuid().v4(),
                   name: trimmedName,
+                  iconKey: initial?.iconKey ?? 'category',
                   scope: scope,
                   parentId: selectedParentId,
                   isDefault: initial?.isDefault ?? false,
@@ -301,13 +305,13 @@ class _CategoryEntryRow extends StatelessWidget {
     required this.title,
     required this.onEdit,
     required this.onDelete,
+    required this.icon,
     this.subtitle,
-    this.icon,
   });
 
   final String title;
   final String? subtitle;
-  final IconData? icon;
+  final IconData icon;
   final VoidCallback onEdit;
   final VoidCallback? onDelete;
 
@@ -320,10 +324,7 @@ class _CategoryEntryRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Row(
         children: [
-          SizedBox(
-            width: 24,
-            child: icon == null ? null : Icon(icon, size: 20),
-          ),
+          SizedBox(width: 24, child: Icon(icon, size: 20)),
           const SizedBox(width: 8),
           Expanded(
             child: Column(

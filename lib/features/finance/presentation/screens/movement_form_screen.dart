@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/icon_mapper.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
@@ -262,7 +263,10 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       .map(
                         (category) => DropdownMenuItem(
                           value: category.id,
-                          child: Text(category.name),
+                          child: _CategoryOptionLabel(
+                            iconKey: category.iconKey,
+                            label: category.name,
+                          ),
                         ),
                       )
                       .toList(),
@@ -290,7 +294,10 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       ...subcategories.map(
                         (category) => DropdownMenuItem(
                           value: category.id,
-                          child: Text(category.name),
+                          child: _CategoryOptionLabel(
+                            iconKey: category.iconKey,
+                            label: category.name,
+                          ),
                         ),
                       ),
                     ],
@@ -383,6 +390,28 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CategoryOptionLabel extends StatelessWidget {
+  const _CategoryOptionLabel({
+    required this.iconKey,
+    required this.label,
+  });
+
+  final String iconKey;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(IconMapper.getIcon(iconKey), size: 20),
+        const SizedBox(width: 8),
+        Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
+      ],
     );
   }
 }

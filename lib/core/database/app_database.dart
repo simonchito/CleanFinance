@@ -32,6 +32,7 @@ class AppDatabase {
           CREATE TABLE categories(
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
+            icon_key TEXT NOT NULL DEFAULT 'category',
             scope TEXT NOT NULL,
             parent_id TEXT,
             is_default INTEGER NOT NULL DEFAULT 0,
@@ -184,6 +185,11 @@ class AppDatabase {
           );
           await db.execute(
             'ALTER TABLE savings_goals ADD COLUMN reminder_day INTEGER',
+          );
+        }
+        if (oldVersion < 7) {
+          await db.execute(
+            "ALTER TABLE categories ADD COLUMN icon_key TEXT NOT NULL DEFAULT 'category'",
           );
         }
       },

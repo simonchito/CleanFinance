@@ -57,7 +57,8 @@ final recentMovementsProvider = FutureProvider<List<Movement>>((ref) async {
 final categoriesProvider =
     FutureProvider.family<List<Category>, CategoryScope?>((ref, scope) async {
   final repo = ref.watch(categoriesRepositoryProvider);
-  return repo.getCategories(scope: scope);
+  final categories = await repo.getCategories(scope: scope);
+  return _sortCategoriesAlphabetically(categories);
 });
 
 final movementsProvider =
@@ -225,6 +226,48 @@ final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
     insights: insights,
   );
 });
+
+List<Category> _sortCategoriesAlphabetically(List<Category> categories) {
+  final sortedTopLevel = categories
+      .where((category) => category.parentId == null)
+      .toList()
+    ..sort(_compareByName);
+
+  final childrenByParent = <String, List<Category>>{};
+  final orphanSubcategories = <Category>[];
+
+  for (final category in categories.where((item) => item.parentId != null)) {
+    final parentId = category.parentId;
+    if (parentId == null) {
+      continue;
+    }
+    childrenByParent.putIfAbsent(parentId, () => <Category>[]).add(category);
+  }
+
+  for (final children in childrenByParent.values) {
+    children.sort(_compareByName);
+  }
+
+  for (final category in categories.where((item) => item.parentId != null)) {
+    final parentExists = sortedTopLevel.any((parent) => parent.id == category.parentId);
+    if (!parentExists) {
+      orphanSubcategories.add(category);
+    }
+  }
+  orphanSubcategories.sort(_compareByName);
+
+  return [
+    for (final category in sortedTopLevel) ...[
+      category,
+      ...childrenByParent[category.id] ?? const <Category>[],
+    ],
+    ...orphanSubcategories,
+  ];
+}
+
+int _compareByName(Category left, Category right) {
+  return left.name.toLowerCase().compareTo(right.name.toLowerCase());
+}
 
 
 

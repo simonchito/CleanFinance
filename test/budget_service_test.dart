@@ -138,6 +138,7 @@ Category _category(String id, String name) {
   return Category(
     id: id,
     name: name,
+    iconKey: 'category',
     scope: CategoryScope.expense,
     isDefault: false,
     createdAt: now,
