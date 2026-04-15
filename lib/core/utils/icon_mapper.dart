@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../constants/icon_options.dart';
+
 abstract final class IconMapper {
-  static IconData getIcon(String key) {
-    switch (key) {
+  static IconData getIcon(String? key) {
+    switch (IconOptions.normalize(key)) {
       case 'home':
         return Icons.home_outlined;
       case 'bolt':

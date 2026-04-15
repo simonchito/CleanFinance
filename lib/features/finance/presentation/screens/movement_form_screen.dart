@@ -7,13 +7,13 @@ import 'package:uuid/uuid.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/currency_formatter.dart';
-import '../../../../core/utils/icon_mapper.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/movement.dart';
 import '../providers/finance_providers.dart';
+import '../widgets/category_option_label.dart';
 import '../widgets/section_card.dart';
 
 class MovementFormScreen extends ConsumerStatefulWidget {
@@ -258,12 +258,15 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: _categoryId,
+                  isExpanded: true,
+                  menuMaxHeight: 320,
+                  borderRadius: BorderRadius.circular(20),
                   decoration: InputDecoration(labelText: strings.category),
                   items: topLevel
                       .map(
                         (category) => DropdownMenuItem(
                           value: category.id,
-                          child: _CategoryOptionLabel(
+                          child: CategoryOptionLabel(
                             iconKey: category.iconKey,
                             label: category.name,
                           ),
@@ -281,6 +284,9 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: _subcategoryId,
+                    isExpanded: true,
+                    menuMaxHeight: 320,
+                    borderRadius: BorderRadius.circular(20),
                     decoration: InputDecoration(
                       labelText: strings.isEnglish
                           ? 'Subcategory (optional)'
@@ -294,7 +300,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       ...subcategories.map(
                         (category) => DropdownMenuItem(
                           value: category.id,
-                          child: _CategoryOptionLabel(
+                          child: CategoryOptionLabel(
                             iconKey: category.iconKey,
                             label: category.name,
                           ),
@@ -390,28 +396,6 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _CategoryOptionLabel extends StatelessWidget {
-  const _CategoryOptionLabel({
-    required this.iconKey,
-    required this.label,
-  });
-
-  final String iconKey;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(IconMapper.getIcon(iconKey), size: 20),
-        const SizedBox(width: 8),
-        Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
-      ],
     );
   }
 }

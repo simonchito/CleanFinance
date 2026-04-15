@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/constants/icon_options.dart';
 import '../../../../core/utils/icon_mapper.dart';
 import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
 import '../providers/finance_providers.dart';
+import '../widgets/category_option_label.dart';
+import '../widgets/icon_picker_field.dart';
 
 class CategoriesScreen extends ConsumerWidget {
   const CategoriesScreen({super.key});
@@ -166,6 +169,18 @@ class _CategoryTab extends ConsumerWidget {
     final categories = await ref.read(categoriesProvider(scope).future);
     final parents =
         categories.where((category) => category.parentId == null).toList();
+    Category? parentCategory;
+    if (selectedParentId != null) {
+      for (final category in parents) {
+        if (category.id == selectedParentId) {
+          parentCategory = category;
+          break;
+        }
+      }
+    }
+    var selectedIconKey = IconOptions.normalize(
+      initial?.iconKey ?? parentCategory?.iconKey,
+    );
 
     if (!context.mounted) {
       return;
@@ -178,76 +193,93 @@ class _CategoryTab extends ConsumerWidget {
           title: Text(initial == null ? 'Nueva categoría' : 'Editar categoría'),
           content: StatefulBuilder(
             builder: (context, setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(labelText: 'Nombre'),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedParentId,
-                    decoration: const InputDecoration(
-                      labelText: 'Categoría padre',
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: 'Nombre'),
                     ),
-                    items: [
-                      const DropdownMenuItem<String>(
-                        value: null,
-                        child: Text('Sin categoría padre'),
-                      ),
-                      ...parents
-                          .where((item) => item.id != initial?.id)
-                          .map(
-                            (item) => DropdownMenuItem(
-                              value: item.id,
-                              child: Text(item.name),
-                            ),
-                          ),
-                    ],
-                    onChanged: (value) => setState(() {
-                      selectedParentId = value;
-                      if (selectedParentId == null) {
-                        reminderEnabled = false;
-                        reminderDay = null;
-                      } else {
-                        reminderDay ??= DateTime.now().day;
-                      }
-                    }),
-                  ),
-                  if (selectedParentId != null) ...[
                     const SizedBox(height: 12),
-                    SwitchListTile.adaptive(
-                      contentPadding: EdgeInsets.zero,
-                      title: const Text('Recordatorio mensual'),
-                      subtitle: const Text(
-                        'Usá esta subcategoría para servicios o gastos recurrentes.',
+                    IconPickerField(
+                      selectedIconKey: selectedIconKey,
+                      onChanged: (value) =>
+                          setState(() => selectedIconKey = value),
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedParentId,
+                      isExpanded: true,
+                      menuMaxHeight: 320,
+                      borderRadius: BorderRadius.circular(20),
+                      decoration: const InputDecoration(
+                        labelText: 'Categoría padre',
                       ),
-                      value: reminderEnabled,
+                      items: [
+                        const DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Sin categoría padre'),
+                        ),
+                        ...parents
+                            .where((item) => item.id != initial?.id)
+                            .map(
+                              (item) => DropdownMenuItem(
+                                value: item.id,
+                                child: CategoryOptionLabel(
+                                  iconKey: item.iconKey,
+                                  label: item.name,
+                                ),
+                              ),
+                            ),
+                      ],
                       onChanged: (value) => setState(() {
-                        reminderEnabled = value;
-                        reminderDay ??= DateTime.now().day;
+                        selectedParentId = value;
+                        if (selectedParentId == null) {
+                          reminderEnabled = false;
+                          reminderDay = null;
+                        } else {
+                          reminderDay ??= DateTime.now().day;
+                        }
                       }),
                     ),
-                    if (reminderEnabled) ...[
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<int>(
-                        initialValue: reminderDay,
-                        decoration: const InputDecoration(
-                          labelText: 'Día de recordatorio',
+                    if (selectedParentId != null) ...[
+                      const SizedBox(height: 12),
+                      SwitchListTile.adaptive(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Recordatorio mensual'),
+                        subtitle: const Text(
+                          'Usá esta subcategoría para servicios o gastos recurrentes.',
                         ),
-                        items: List.generate(
-                          31,
-                          (index) => DropdownMenuItem(
-                            value: index + 1,
-                            child: Text('Día ${index + 1}'),
-                          ),
-                        ),
-                        onChanged: (value) => setState(() => reminderDay = value),
+                        value: reminderEnabled,
+                        onChanged: (value) => setState(() {
+                          reminderEnabled = value;
+                          reminderDay ??= DateTime.now().day;
+                        }),
                       ),
+                      if (reminderEnabled) ...[
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<int>(
+                          initialValue: reminderDay,
+                          menuMaxHeight: 320,
+                          borderRadius: BorderRadius.circular(20),
+                          decoration: const InputDecoration(
+                            labelText: 'Día de recordatorio',
+                          ),
+                          items: List.generate(
+                            31,
+                            (index) => DropdownMenuItem(
+                              value: index + 1,
+                              child: Text('Día ${index + 1}'),
+                            ),
+                          ),
+                          onChanged: (value) =>
+                              setState(() => reminderDay = value),
+                        ),
+                      ],
                     ],
                   ],
-                ],
+                ),
               );
             },
           ),
@@ -267,7 +299,7 @@ class _CategoryTab extends ConsumerWidget {
                 final category = Category(
                   id: initial?.id ?? const Uuid().v4(),
                   name: trimmedName,
-                  iconKey: initial?.iconKey ?? 'category',
+                  iconKey: IconOptions.normalize(selectedIconKey),
                   scope: scope,
                   parentId: selectedParentId,
                   isDefault: initial?.isDefault ?? false,
