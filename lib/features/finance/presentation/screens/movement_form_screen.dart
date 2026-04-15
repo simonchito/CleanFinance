@@ -278,7 +278,9 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   DropdownButtonFormField<String>(
                     initialValue: _subcategoryId,
                     decoration: InputDecoration(
-                      labelText: strings.subcategory,
+                      labelText: strings.isEnglish
+                          ? 'Subcategory (optional)'
+                          : 'Subcategoría (opcional)',
                     ),
                     items: [
                       DropdownMenuItem<String>(

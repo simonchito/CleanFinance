@@ -130,10 +130,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
         data: (categories) {
           final availableCategories = categories
               .where((category) => category.parentId == null)
-              .toList()
-            ..sort(
-              (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-            );
+              .toList();
 
           if (_categoryId == null && availableCategories.isNotEmpty) {
             _categoryId = availableCategories.first.id;

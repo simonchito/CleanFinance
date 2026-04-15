@@ -54,7 +54,7 @@ class AuthController extends StateNotifier<AuthState> {
     if (enableBiometrics) {
       await _authRepository.setBiometricEnabled(true);
     }
-    await _categoriesRepository.ensureSeedData();
+    await _ensureFinanceSeed();
 
     state = state.copyWith(
       status: AuthStatus.unlocked,
@@ -72,6 +72,7 @@ class AuthController extends StateNotifier<AuthState> {
       return false;
     }
 
+    await _ensureFinanceSeed();
     state = state.copyWith(status: AuthStatus.unlocked, clearError: true);
     return true;
   }
@@ -103,6 +104,7 @@ class AuthController extends StateNotifier<AuthState> {
       return false;
     }
 
+    await _ensureFinanceSeed();
     state = state.copyWith(status: AuthStatus.unlocked, clearError: true);
     return true;
   }
@@ -154,6 +156,7 @@ class AuthController extends StateNotifier<AuthState> {
     if (enableBiometrics) {
       await _authRepository.setBiometricEnabled(true);
     }
+    await _ensureFinanceSeed();
     state = state.copyWith(
       status: AuthStatus.unlocked,
       biometricEnabled: enableBiometrics,
@@ -187,5 +190,9 @@ class AuthController extends StateNotifier<AuthState> {
       lock();
     }
     _pausedAt = null;
+  }
+
+  Future<void> _ensureFinanceSeed() {
+    return _categoriesRepository.ensureSeedData();
   }
 }

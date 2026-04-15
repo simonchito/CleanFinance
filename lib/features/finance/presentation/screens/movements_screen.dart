@@ -59,6 +59,9 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
     DateTime? endDate = _filter.endDate;
     String? selectedCategoryId = _filter.categoryId;
     final categories = await ref.read(categoriesProvider(null).future);
+    final topLevelCategories = categories
+        .where((category) => category.parentId == null)
+        .toList();
 
     if (!mounted) {
       return;
@@ -127,7 +130,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                         value: null,
                         child: Text('Todas'),
                       ),
-                      ...categories.map(
+                      ...topLevelCategories.map(
                         (category) => DropdownMenuItem(
                           value: category.id,
                           child: Text(category.name),
@@ -356,16 +359,22 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  movement.categoryName ?? 'Sin categoría',
+                                  movement.subcategoryName ??
+                                      movement.categoryName ??
+                                      'Sin categoría',
                                   style: Theme.of(context).textTheme.titleMedium,
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  DateFormat('d MMM yyyy', 'es')
-                                          .format(movement.occurredOn) +
-                                      (movement.note?.isNotEmpty == true
-                                          ? ' · ${movement.note}'
-                                          : ''),
+                                  [
+                                    if (movement.subcategoryName != null &&
+                                        movement.categoryName != null)
+                                      movement.categoryName!,
+                                    DateFormat('d MMM yyyy', 'es')
+                                        .format(movement.occurredOn),
+                                    if (movement.note?.isNotEmpty == true)
+                                      movement.note!,
+                                  ].join(' · '),
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium
