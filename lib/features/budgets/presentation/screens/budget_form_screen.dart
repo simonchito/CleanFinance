@@ -10,6 +10,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../finance/domain/entities/category.dart';
 import '../../../finance/presentation/providers/finance_providers.dart';
+import '../../../finance/presentation/widgets/selection_sheet_field.dart';
 import '../../../finance/presentation/widgets/empty_state_view.dart';
 import '../../../finance/presentation/widgets/section_card.dart';
 import '../../domain/models/budget.dart';
@@ -195,20 +196,24 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  initialValue: _categoryId,
-                  decoration: InputDecoration(labelText: strings.category),
+                SelectionSheetField<String>(
+                  label: strings.category,
+                  value: _categoryId,
+                  enabled: !isEditing,
+                  sheetTitle: strings.category,
+                  sheetDescription: strings.isEnglish
+                      ? 'Choose the expense category for this monthly budget.'
+                      : 'Elegí la categoría de gasto para este presupuesto mensual.',
                   items: availableCategories
                       .map(
-                        (category) => DropdownMenuItem(
+                        (category) => SelectionSheetItem(
                           value: category.id,
-                          child: Text(category.name),
+                          label: category.name,
+                          iconKey: category.iconKey,
                         ),
                       )
                       .toList(),
-                  onChanged: isEditing
-                      ? null
-                      : (value) => setState(() => _categoryId = value),
+                  onChanged: (value) => setState(() => _categoryId = value),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(

@@ -49,6 +49,7 @@ class LocalFinanceRepository
       db,
       createId: _uuid.v4,
     );
+    await _defaultCategoriesSeed.backfillDefaultCategoryIcons(db);
   }
 
   @override

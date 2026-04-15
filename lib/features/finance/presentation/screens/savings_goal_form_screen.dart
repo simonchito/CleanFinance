@@ -9,6 +9,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../widgets/section_card.dart';
+import '../widgets/selection_sheet_field.dart';
 import '../../domain/entities/savings_goal.dart';
 import '../providers/finance_providers.dart';
 
@@ -195,18 +196,21 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             ),
             if (_reminderEnabled) ...[
               const SizedBox(height: 8),
-              DropdownButtonFormField<int>(
-                initialValue: _reminderDay,
-                decoration: const InputDecoration(
-                  labelText: 'Día de recordatorio',
-                ),
+              SelectionSheetField<int>(
+                label: 'Día de recordatorio',
+                value: _reminderDay,
+                sheetTitle: 'Día de recordatorio',
+                sheetDescription:
+                    'Elegí el día del mes en el que querés recibir el recordatorio.',
                 items: List.generate(
                   31,
-                  (index) => DropdownMenuItem(
+                  (index) => SelectionSheetItem(
                     value: index + 1,
-                    child: Text('Día ${index + 1}'),
+                    label: 'Día ${index + 1}',
+                    iconData: Icons.calendar_month_outlined,
                   ),
                 ),
+                maxSheetHeight: 360,
                 onChanged: (value) => setState(() => _reminderDay = value),
               ),
             ],

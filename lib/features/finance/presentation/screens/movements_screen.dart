@@ -8,6 +8,7 @@ import '../../domain/entities/movement.dart';
 import '../../domain/entities/movement_filter.dart';
 import '../providers/finance_providers.dart';
 import '../widgets/empty_state_view.dart';
+import '../widgets/selection_sheet_field.dart';
 import '../widgets/section_card.dart';
 import 'categories_screen.dart';
 import 'movement_form_screen.dart';
@@ -122,18 +123,24 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                         ),
                   ),
                   const SizedBox(height: 18),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedCategoryId,
-                    decoration: const InputDecoration(labelText: 'Categoría'),
+                  SelectionSheetField<String?>(
+                    label: 'Categoría',
+                    value: selectedCategoryId,
+                    placeholder: 'Todas',
+                    sheetTitle: 'Categoría',
+                    sheetDescription:
+                        'Filtrá por una categoría principal para acotar la búsqueda.',
                     items: [
-                      const DropdownMenuItem<String>(
+                      const SelectionSheetItem<String?>(
                         value: null,
-                        child: Text('Todas'),
+                        label: 'Todas',
+                        iconData: Icons.layers_clear_outlined,
                       ),
                       ...topLevelCategories.map(
-                        (category) => DropdownMenuItem(
+                        (category) => SelectionSheetItem<String?>(
                           value: category.id,
-                          child: Text(category.name),
+                          label: category.name,
+                          iconKey: category.iconKey,
                         ),
                       ),
                     ],

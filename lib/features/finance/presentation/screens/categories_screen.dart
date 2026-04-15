@@ -8,8 +8,8 @@ import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
 import '../providers/finance_providers.dart';
-import '../widgets/category_option_label.dart';
 import '../widgets/icon_picker_field.dart';
+import '../widgets/selection_sheet_field.dart';
 
 class CategoriesScreen extends ConsumerWidget {
   const CategoriesScreen({super.key});
@@ -208,28 +208,26 @@ class _CategoryTab extends ConsumerWidget {
                           setState(() => selectedIconKey = value),
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedParentId,
-                      isExpanded: true,
-                      menuMaxHeight: 320,
-                      borderRadius: BorderRadius.circular(20),
-                      decoration: const InputDecoration(
-                        labelText: 'Categoría padre',
-                      ),
+                    SelectionSheetField<String?>(
+                      label: 'Categoría padre',
+                      value: selectedParentId,
+                      placeholder: 'Sin categoría padre',
+                      sheetTitle: 'Categoría padre',
+                      sheetDescription:
+                          'Elegí una categoría principal solo si querés crear una subcategoría.',
                       items: [
-                        const DropdownMenuItem<String>(
+                        const SelectionSheetItem<String?>(
                           value: null,
-                          child: Text('Sin categoría padre'),
+                          label: 'Sin categoría padre',
+                          iconData: Icons.account_tree_outlined,
                         ),
                         ...parents
                             .where((item) => item.id != initial?.id)
                             .map(
-                              (item) => DropdownMenuItem(
+                              (item) => SelectionSheetItem<String?>(
                                 value: item.id,
-                                child: CategoryOptionLabel(
-                                  iconKey: item.iconKey,
-                                  label: item.name,
-                                ),
+                                label: item.name,
+                                iconKey: item.iconKey,
                               ),
                             ),
                       ],
@@ -259,20 +257,19 @@ class _CategoryTab extends ConsumerWidget {
                       ),
                       if (reminderEnabled) ...[
                         const SizedBox(height: 8),
-                        DropdownButtonFormField<int>(
-                          initialValue: reminderDay,
-                          menuMaxHeight: 320,
-                          borderRadius: BorderRadius.circular(20),
-                          decoration: const InputDecoration(
-                            labelText: 'Día de recordatorio',
-                          ),
+                        SelectionSheetField<int>(
+                          label: 'Día de recordatorio',
+                          value: reminderDay,
+                          sheetTitle: 'Día de recordatorio',
                           items: List.generate(
                             31,
-                            (index) => DropdownMenuItem(
+                            (index) => SelectionSheetItem(
                               value: index + 1,
-                              child: Text('Día ${index + 1}'),
+                              label: 'Día ${index + 1}',
+                              iconData: Icons.calendar_month_outlined,
                             ),
                           ),
+                          maxSheetHeight: 360,
                           onChanged: (value) =>
                               setState(() => reminderDay = value),
                         ),

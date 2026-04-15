@@ -13,8 +13,8 @@ import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/movement.dart';
 import '../providers/finance_providers.dart';
-import '../widgets/category_option_label.dart';
 import '../widgets/section_card.dart';
+import '../widgets/selection_sheet_field.dart';
 
 class MovementFormScreen extends ConsumerStatefulWidget {
   const MovementFormScreen({
@@ -205,27 +205,31 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<MovementType>(
-                  initialValue: _type,
-                  decoration: InputDecoration(labelText: strings.type),
+                SelectionSheetField<MovementType>(
+                  label: strings.type,
+                  value: _type,
+                  sheetTitle: strings.type,
+                  sheetDescription: strings.isEnglish
+                      ? 'Choose the kind of movement you want to register.'
+                      : 'Elegí qué tipo de movimiento querés registrar.',
                   items: [
-                    DropdownMenuItem(
+                    SelectionSheetItem(
                       value: MovementType.income,
-                      child: Text(strings.income),
+                      label: strings.income,
+                      iconData: Icons.arrow_upward_rounded,
                     ),
-                    DropdownMenuItem(
+                    SelectionSheetItem(
                       value: MovementType.expense,
-                      child: Text(strings.expense),
+                      label: strings.expense,
+                      iconData: Icons.arrow_downward_rounded,
                     ),
-                    DropdownMenuItem(
+                    SelectionSheetItem(
                       value: MovementType.saving,
-                      child: Text(strings.saving),
+                      label: strings.saving,
+                      iconData: Icons.savings_rounded,
                     ),
                   ],
                   onChanged: (value) {
-                    if (value == null) {
-                      return;
-                    }
                     setState(() {
                       _type = value;
                       _categoryId = null;
@@ -256,20 +260,19 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   },
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  initialValue: _categoryId,
-                  isExpanded: true,
-                  menuMaxHeight: 320,
-                  borderRadius: BorderRadius.circular(20),
-                  decoration: InputDecoration(labelText: strings.category),
+                SelectionSheetField<String>(
+                  label: strings.category,
+                  value: _categoryId,
+                  sheetTitle: strings.category,
+                  sheetDescription: strings.isEnglish
+                      ? 'Choose the main category.'
+                      : 'Elegí la categoría principal.',
                   items: topLevel
                       .map(
-                        (category) => DropdownMenuItem(
+                        (category) => SelectionSheetItem(
                           value: category.id,
-                          child: CategoryOptionLabel(
-                            iconKey: category.iconKey,
-                            label: category.name,
-                          ),
+                          label: category.name,
+                          iconKey: category.iconKey,
                         ),
                       )
                       .toList(),
@@ -282,28 +285,27 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 ),
                 if (subcategories.isNotEmpty) ...[
                   const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: _subcategoryId,
-                    isExpanded: true,
-                    menuMaxHeight: 320,
-                    borderRadius: BorderRadius.circular(20),
-                    decoration: InputDecoration(
-                      labelText: strings.isEnglish
-                          ? 'Subcategory (optional)'
-                          : 'Subcategoría (opcional)',
-                    ),
+                  SelectionSheetField<String?>(
+                    label: strings.isEnglish
+                        ? 'Subcategory (optional)'
+                        : 'Subcategoría (opcional)',
+                    value: _subcategoryId,
+                    placeholder: strings.noSubcategory,
+                    sheetTitle: strings.subcategory,
+                    sheetDescription: strings.isEnglish
+                        ? 'If it applies, choose a more specific detail.'
+                        : 'Si aplica, elegí un detalle más específico.',
                     items: [
-                      DropdownMenuItem<String>(
+                      SelectionSheetItem<String?>(
                         value: null,
-                        child: Text(strings.noSubcategory),
+                        label: strings.noSubcategory,
+                        iconData: Icons.remove_circle_outline_rounded,
                       ),
                       ...subcategories.map(
-                        (category) => DropdownMenuItem(
+                        (category) => SelectionSheetItem<String?>(
                           value: category.id,
-                          child: CategoryOptionLabel(
-                            iconKey: category.iconKey,
-                            label: category.name,
-                          ),
+                          label: category.name,
+                          iconKey: category.iconKey,
                         ),
                       ),
                     ],
@@ -313,20 +315,25 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 if (_type == MovementType.saving) ...[
                   const SizedBox(height: 12),
                   goalsState.when(
-                    data: (goals) => DropdownButtonFormField<String>(
-                      initialValue: _goalId,
-                      decoration: InputDecoration(
-                        labelText: strings.savingGoal,
-                      ),
+                    data: (goals) => SelectionSheetField<String?>(
+                      label: strings.savingGoal,
+                      value: _goalId,
+                      placeholder: strings.noGoal,
+                      sheetTitle: strings.savingGoal,
+                      sheetDescription: strings.isEnglish
+                          ? 'Link the movement to one of your savings goals.'
+                          : 'Vinculá el movimiento con una de tus metas de ahorro.',
                       items: [
-                        DropdownMenuItem<String>(
+                        SelectionSheetItem<String?>(
                           value: null,
-                          child: Text(strings.noGoal),
+                          label: strings.noGoal,
+                          iconData: Icons.remove_circle_outline_rounded,
                         ),
                         ...goals.map(
-                          (goal) => DropdownMenuItem(
+                          (goal) => SelectionSheetItem<String?>(
                             value: goal.goal.id,
-                            child: Text(goal.goal.name),
+                            label: goal.goal.name,
+                            iconData: Icons.savings_outlined,
                           ),
                         ),
                       ],
@@ -349,18 +356,21 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  initialValue: _paymentMethodController.text.isEmpty
+                SelectionSheetField<String?>(
+                  label: strings.movementPaymentMethod,
+                  value: _paymentMethodController.text.isEmpty
                       ? null
                       : _paymentMethodController.text,
-                  decoration: InputDecoration(
-                    labelText: strings.movementPaymentMethod,
-                  ),
+                  placeholder: strings.isEnglish
+                      ? 'Choose a payment method'
+                      : 'Elegí un medio de pago',
+                  sheetTitle: strings.movementPaymentMethod,
                   items: paymentMethods
                       .map(
-                        (method) => DropdownMenuItem(
+                        (method) => SelectionSheetItem<String?>(
                           value: method,
-                          child: Text(method),
+                          label: method,
+                          iconData: Icons.wallet_outlined,
                         ),
                       )
                       .toList(),

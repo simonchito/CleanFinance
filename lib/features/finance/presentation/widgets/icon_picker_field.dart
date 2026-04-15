@@ -27,10 +27,8 @@ class IconPickerField extends StatelessWidget {
           context: context,
           isScrollControlled: true,
           showDragHandle: true,
+          backgroundColor: Colors.transparent,
           constraints: const BoxConstraints(maxWidth: 560),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-          ),
           builder: (context) => _IconPickerSheet(
             selectedIconKey: normalizedKey,
           ),
@@ -98,89 +96,113 @@ class _IconPickerSheet extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 400),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Elegí un ícono',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Usá una opción clara para reconocer más rápido la categoría.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: scheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
+        padding: EdgeInsets.zero,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            12,
+            0,
+            12,
+            MediaQuery.of(context).padding.bottom + 12,
+          ),
+          child: Material(
+            color: scheme.surface,
+            elevation: 8,
+            borderRadius: BorderRadius.circular(28),
+            clipBehavior: Clip.antiAlias,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 400),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: scheme.surface,
-                        borderRadius: BorderRadius.circular(14),
+                    const Center(
+                      child: SizedBox(
+                        width: 36,
+                        child: Divider(thickness: 4),
                       ),
-                      child: Icon(IconMapper.getIcon(selectedIconKey)),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
+                    const SizedBox(height: 10),
+                    Text(
+                      'Elegí un ícono',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Usá una opción clara para reconocer más rápido la categoría.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
                         children: [
-                          Text(
-                            selectedLabel,
-                            style: Theme.of(context).textTheme.titleSmall,
+                          Container(
+                            width: 42,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: scheme.surface,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Icon(IconMapper.getIcon(selectedIconKey)),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Ícono seleccionado',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: scheme.onSurfaceVariant,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  selectedLabel,
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Ícono seleccionado',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    Flexible(
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        itemCount: IconOptions.all.length,
+                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 132,
+                          mainAxisExtent: 98,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemBuilder: (context, index) {
+                          final option = IconOptions.all[index];
+                          final isSelected = option.key == selectedIconKey;
+
+                          return _IconOptionTile(
+                            option: option,
+                            selected: isSelected,
+                            onTap: () => Navigator.of(context).pop(option.key),
+                          );
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              Flexible(
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: IconOptions.all.length,
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 132,
-                    mainAxisExtent: 98,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  itemBuilder: (context, index) {
-                    final option = IconOptions.all[index];
-                    final isSelected = option.key == selectedIconKey;
-
-                    return _IconOptionTile(
-                      option: option,
-                      selected: isSelected,
-                      onTap: () => Navigator.of(context).pop(option.key),
-                    );
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

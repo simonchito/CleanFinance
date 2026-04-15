@@ -7,6 +7,7 @@ import '../../domain/entities/category.dart';
 import '../../domain/entities/savings_goal.dart';
 import '../providers/finance_providers.dart';
 import '../widgets/empty_state_view.dart';
+import '../widgets/selection_sheet_field.dart';
 import '../widgets/section_card.dart';
 
 class ManageRemindersScreen extends ConsumerWidget {
@@ -236,43 +237,20 @@ class ManageRemindersScreen extends ConsumerWidget {
     BuildContext context, {
     required int initialDay,
   }) async {
-    var selectedDay = initialDay;
-    return showDialog<int>(
+    return showSelectionSheet<int>(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Día de recordatorio'),
-          content: StatefulBuilder(
-            builder: (context, setState) {
-              return DropdownButtonFormField<int>(
-                initialValue: selectedDay,
-                items: List.generate(
-                  31,
-                  (index) => DropdownMenuItem(
-                    value: index + 1,
-                    child: Text('Día ${index + 1}'),
-                  ),
-                ),
-                onChanged: (value) {
-                  if (value != null) {
-                    setState(() => selectedDay = value);
-                  }
-                },
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(selectedDay),
-              child: const Text('Guardar'),
-            ),
-          ],
-        );
-      },
+      title: 'Día de recordatorio',
+      description: 'Elegí el día del mes para el recordatorio.',
+      selectedValue: initialDay,
+      maxHeight: 360,
+      items: List.generate(
+        31,
+        (index) => SelectionSheetItem(
+          value: index + 1,
+          label: 'Día ${index + 1}',
+          iconData: Icons.calendar_month_outlined,
+        ),
+      ),
     );
   }
 
