@@ -44,6 +44,12 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
       _showMessage('Completá tus dos preguntas de recuperación.');
       return;
     }
+    if (!_isValidBirthDate(birthDate) || !_isValidDocument(document)) {
+      _showMessage(
+        'Usá una fecha válida y un documento con al menos 6 caracteres.',
+      );
+      return;
+    }
 
     setState(() => _isSubmitting = true);
     final success = await ref.read(authControllerProvider.notifier).createPin(
@@ -68,6 +74,16 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
+  }
+
+  bool _isValidBirthDate(String value) {
+    return value.replaceAll(RegExp(r'[^0-9]'), '').length == 8;
+  }
+
+  bool _isValidDocument(String value) {
+    final normalized =
+        value.replaceAll(RegExp(r'[^0-9a-zA-Z]'), '').toUpperCase();
+    return normalized.length >= 6 && normalized.length <= 16;
   }
 
   @override
@@ -212,6 +228,22 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       : 'Guardamos estas respuestas solo para ayudarte a recuperar el acceso si olvidás tu PIN.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: scheme.errorContainer.withValues(alpha: 0.45),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Text(
+                  strings.isEnglish
+                      ? 'Recovery answers are weaker than your PIN. Use real values, but remember that anyone who knows them could try to reset access on this device.'
+                      : 'Las respuestas de recuperación son más débiles que tu PIN. Usá datos reales, pero tené en cuenta que alguien que los conozca podría intentar restablecer el acceso en este dispositivo.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurface,
                       ),
                 ),
               ),

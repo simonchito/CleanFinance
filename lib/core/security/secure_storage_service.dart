@@ -5,6 +5,7 @@ class SecureStorageService {
   static const _biometricEnabledKey = 'auth.biometric_enabled';
   static const _recoveryBirthDateKey = 'auth.recovery.birth_date';
   static const _recoveryDocumentKey = 'auth.recovery.document';
+  static const _pinSecurityStateKey = 'auth.pin_security_state';
 
   final FlutterSecureStorage _storage;
 
@@ -57,6 +58,18 @@ class SecureStorageService {
   Future<bool> hasRecoveryData() async {
     return (await readRecoveryBirthDate()) != null &&
         (await readRecoveryDocument()) != null;
+  }
+
+  Future<void> savePinSecurityState(String payload) {
+    return _storage.write(key: _pinSecurityStateKey, value: payload);
+  }
+
+  Future<String?> readPinSecurityState() {
+    return _storage.read(key: _pinSecurityStateKey);
+  }
+
+  Future<void> deletePinSecurityState() {
+    return _storage.delete(key: _pinSecurityStateKey);
   }
 
   Future<void> clearAll() => _storage.deleteAll();

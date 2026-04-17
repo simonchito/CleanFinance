@@ -27,7 +27,20 @@ class SettingsScreen extends ConsumerWidget {
 
   Future<void> _exportData(BuildContext context, WidgetRef ref) async {
     final strings = AppStrings.of(context);
-    final payload = await ref.read(backupRepositoryProvider).exportData();
+    final password = await _requestBackupPassword(
+      context,
+      title: strings.isEnglish ? 'Protect backup' : 'Proteger backup',
+      description: strings.isEnglish
+          ? 'Add an optional password. If you leave it empty, the backup will be exported as readable JSON.'
+          : 'Agregá una contraseña opcional. Si la dejás vacía, el backup se exportará como JSON legible.',
+      confirmLabel: strings.exportBackup,
+    );
+    if (password == null) {
+      return;
+    }
+
+    final payload =
+        await ref.read(backupRepositoryProvider).exportData(password: password);
     final directory = await getApplicationDocumentsDirectory();
     final file = File(
       '${directory.path}/clean_finance_backup_${DateTime.now().millisecondsSinceEpoch}.json',
@@ -43,7 +56,13 @@ class SettingsScreen extends ConsumerWidget {
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${strings.exportBackup}: ${file.path}')),
+        SnackBar(
+          content: Text(
+            password.trim().isEmpty
+                ? '${strings.exportBackup}: ${file.path}. Advertencia: el archivo no está cifrado.'
+                : '${strings.exportBackup}: ${file.path}',
+          ),
+        ),
       );
     }
   }
@@ -75,7 +94,27 @@ class SettingsScreen extends ConsumerWidget {
 
     try {
       final payload = await File(path).readAsString();
-      await ref.read(backupRepositoryProvider).importData(payload);
+      if (!context.mounted) {
+        return;
+      }
+      final password = await _requestBackupPassword(
+        context,
+        title: strings.isEnglish ? 'Import backup' : 'Importar backup',
+        description: strings.isEnglish
+            ? 'If this backup was protected with a password, enter it now. Leave it empty for plain JSON backups.'
+            : 'Si este backup fue protegido con contraseña, ingresala ahora. Si es un JSON plano, dejala vacía.',
+        confirmLabel: strings.importBackup,
+      );
+      if (!context.mounted) {
+        return;
+      }
+      if (password == null) {
+        return;
+      }
+
+      await ref
+          .read(backupRepositoryProvider)
+          .importData(payload, password: password);
       ref.invalidate(settingsControllerProvider);
       ref.invalidate(financeOverviewProvider);
       ref.invalidate(dashboardSummaryProvider);
@@ -100,9 +139,8 @@ class SettingsScreen extends ConsumerWidget {
       }
     } catch (error) {
       if (context.mounted) {
-        final message = error is FormatException
-            ? error.message
-            : error.toString();
+        final message =
+            error is FormatException ? error.message : error.toString();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message)),
         );
@@ -151,6 +189,69 @@ class SettingsScreen extends ConsumerWidget {
         ),
       );
     }
+  }
+
+  Future<String?> _requestBackupPassword(
+    BuildContext context, {
+    required String title,
+    required String description,
+    required String confirmLabel,
+  }) async {
+    final strings = AppStrings.of(context);
+    final controller = TextEditingController();
+    var obscureText = true;
+
+    final result = await showDialog<String?>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(title),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(description),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: controller,
+                    obscureText: obscureText,
+                    decoration: InputDecoration(
+                      labelText: strings.isEnglish
+                          ? 'Password (optional)'
+                          : 'Contraseña (opcional)',
+                      suffixIcon: IconButton(
+                        onPressed: () =>
+                            setState(() => obscureText = !obscureText),
+                        icon: Icon(
+                          obscureText
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(null),
+                  child: Text(strings.cancel),
+                ),
+                FilledButton(
+                  onPressed: () =>
+                      Navigator.of(dialogContext).pop(controller.text.trim()),
+                  child: Text(confirmLabel),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    controller.dispose();
+    return result;
   }
 
   @override
@@ -508,6 +609,27 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                     ),
                     const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest
+                            .withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Text(
+                        strings.isEnglish
+                            ? 'Security note: local backups can be exported as plain JSON. You can now add an optional password, but data stored in SQLite on the device is still not database-encrypted.'
+                            : 'Nota de seguridad: los backups locales pueden exportarse como JSON plano. Ahora podés agregar una contraseña opcional, pero los datos guardados en SQLite dentro del dispositivo siguen sin cifrado de base.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     FilledButton.icon(
                       onPressed: () => _exportData(context, ref),
                       icon: const Icon(Icons.ios_share_rounded),

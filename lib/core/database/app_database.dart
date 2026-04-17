@@ -6,6 +6,9 @@ import 'package:sqflite/sqflite.dart';
 
 import '../constants/app_constants.dart';
 
+// SQLite remains unencrypted by design to keep the app lightweight and offline-first.
+// Access is intentionally centralized behind repositories so the storage boundary
+// stays explicit and easier to harden over time.
 class AppDatabase {
   Database? _database;
 

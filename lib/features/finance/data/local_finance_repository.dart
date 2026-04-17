@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../../core/database/app_database.dart';
+import '../../../core/security/backup_cipher_service.dart';
 import '../../../core/database/seed/default_categories_seed.dart';
 import '../../../core/security/secure_storage_service.dart';
 import '../../../core/utils/month_context.dart';
@@ -35,10 +36,13 @@ class LocalFinanceRepository
   LocalFinanceRepository(
     this._appDatabase, {
     SecureStorageService? secureStorage,
-  }) : _secureStorage = secureStorage;
+    BackupCipherService backupCipherService = const BackupCipherService(),
+  })  : _secureStorage = secureStorage,
+        _backupCipherService = backupCipherService;
 
   final AppDatabase _appDatabase;
   final SecureStorageService? _secureStorage;
+  final BackupCipherService _backupCipherService;
   final Uuid _uuid = const Uuid();
   final DefaultCategoriesSeed _defaultCategoriesSeed =
       const DefaultCategoriesSeed();
@@ -447,7 +451,7 @@ class LocalFinanceRepository
   }
 
   @override
-  Future<String> exportData() async {
+  Future<String> exportData({String? password}) async {
     final db = await _appDatabase.instance;
     final categories = await db.query('categories');
     final movements = await db.query('movements');
@@ -455,7 +459,7 @@ class LocalFinanceRepository
     final budgets = await db.query('budgets');
     final settings = await db.query('app_settings');
 
-    return const JsonEncoder.withIndent('  ').convert({
+    final payload = const JsonEncoder.withIndent('  ').convert({
       'version': AppConstants.databaseVersion,
       'exportedAt': DateTime.now().toIso8601String(),
       'categories': categories,
@@ -464,12 +468,24 @@ class LocalFinanceRepository
       'budgets': budgets,
       'settings': settings,
     });
+    final trimmedPassword = password?.trim();
+    if (trimmedPassword == null || trimmedPassword.isEmpty) {
+      return payload;
+    }
+    return _backupCipherService.encryptJsonPayload(
+      payload,
+      password: trimmedPassword,
+    );
   }
 
   @override
-  Future<void> importData(String payload) async {
+  Future<void> importData(String payload, {String? password}) async {
     final db = await _appDatabase.instance;
-    final backup = _parseAndValidateBackup(payload);
+    final clearPayload = await _backupCipherService.decryptPayload(
+      payload,
+      password: password ?? '',
+    );
+    final backup = _parseAndValidateBackup(clearPayload);
 
     await db.transaction((txn) async {
       await txn.delete('budgets');
@@ -927,7 +943,8 @@ class LocalFinanceRepository
   ) {
     final value = _requiredString(row, key, path);
     if (DateTime.tryParse(value) == null) {
-      throw FormatException('El campo "$key" en "$path" no es una fecha válida.');
+      throw FormatException(
+          'El campo "$key" en "$path" no es una fecha válida.');
     }
     return value;
   }
@@ -950,7 +967,8 @@ class LocalFinanceRepository
   ) {
     final value = _readRequiredNumber(row, key, path);
     if (value <= 0) {
-      throw FormatException('El campo "$key" en "$path" debe ser mayor a cero.');
+      throw FormatException(
+          'El campo "$key" en "$path" debe ser mayor a cero.');
     }
     return value;
   }
@@ -1056,10 +1074,9 @@ class LocalFinanceRepository
           ? _readBoolAsInt(row, 'show_sensitive_amounts')
           : (AppConstants.defaultShowSensitiveAmounts ? 1 : 0),
       'theme_mode': themeMode,
-      'biometric_enabled':
-          row.containsKey('biometric_enabled')
-              ? _readBoolAsInt(row, 'biometric_enabled')
-              : 0,
+      'biometric_enabled': row.containsKey('biometric_enabled')
+          ? _readBoolAsInt(row, 'biometric_enabled')
+          : 0,
       'auto_lock_minutes': _readNullableInt(row, 'auto_lock_minutes') ??
           AppConstants.defaultAutoLockMinutes,
       'locale_code': _optionalTrimmedString(row, 'locale_code') ??

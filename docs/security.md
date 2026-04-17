@@ -7,6 +7,7 @@ La seguridad actual de CleanFinance es completamente local. No existe backend de
 Mecanismos implementados:
 
 - PIN local de 6 dígitos
+- rate limiting de PIN con contador de fallos persistido y bloqueo temporal escalable
 - biometría opcional
 - recuperación local con dos datos configurados por el usuario
 - auto-lock por lifecycle
@@ -29,6 +30,7 @@ Claves activas:
 - `auth.credential`
 - `auth.recovery.birth_date`
 - `auth.recovery.document`
+- `auth.pin_security_state`
 
 Clave legacy:
 
@@ -104,6 +106,12 @@ Si biometría falla o no está disponible:
 - la UI no se rompe
 - el fallback sigue siendo PIN
 
+Protección adicional actual:
+
+- cada PIN incorrecto incrementa un contador persistido
+- después de varios fallos consecutivos la app aplica un bloqueo temporal
+- el tiempo de espera escala en nuevos ciclos de fallo para frenar intentos repetidos incluso si la app se cierra y vuelve a abrir
+
 ### Recuperación
 
 `RecoverAccessScreen` permite:
@@ -111,6 +119,12 @@ Si biometría falla o no está disponible:
 - validar fecha de nacimiento y documento
 - definir un PIN nuevo
 - volver a decidir si biometría queda habilitada
+
+Hardening actual:
+
+- validaciones mínimas de formato antes de intentar recuperación
+- mensajes menos informativos cuando la verificación falla
+- advertencias visibles de que recuperación local tiene menos entropía que el PIN
 
 ## Fuente de verdad de biometría
 
@@ -155,7 +169,14 @@ Esto es un bloqueo de sesión, no cifrado de base de datos.
 ## Límites actuales
 
 - no hay cifrado de SQLite
+- no hay protección fuerte contra un atacante con acceso completo al archivo de base local
 - no hay cuenta remota ni recuperación server-side
 - no hay detección de root/jailbreak
 - no hay audit log de eventos de autenticación
 - soporte biométrico fuera de plataformas móviles principales requiere validación por entorno
+
+## Backups
+
+- el backup puede exportarse como JSON plano o como JSON cifrado con contraseña
+- si no se define contraseña, el archivo exportado queda legible
+- la app advierte esto en la UI antes y después de exportar

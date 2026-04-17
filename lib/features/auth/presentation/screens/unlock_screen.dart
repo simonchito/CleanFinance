@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,6 +18,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   final _pinController = TextEditingController();
   bool _loading = false;
   bool _biometricAttempted = false;
+  Timer? _lockRefreshTimer;
 
   @override
   void didChangeDependencies() {
@@ -36,6 +39,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
   @override
   void dispose() {
+    _lockRefreshTimer?.cancel();
     _pinController.dispose();
     super.dispose();
   }
@@ -53,9 +57,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
   Future<void> _unlockWithBiometrics() async {
     setState(() => _loading = true);
-    final success = await ref
-        .read(authControllerProvider.notifier)
-        .unlockWithBiometrics();
+    final success =
+        await ref.read(authControllerProvider.notifier).unlockWithBiometrics();
     setState(() => _loading = false);
     if (!success && mounted) {
       _showMessage(ref.read(authControllerProvider).errorMessage ?? 'Error.');
@@ -68,10 +71,40 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     );
   }
 
+  void _syncLockRefreshTimer(Duration remainingLock) {
+    if (remainingLock > Duration.zero) {
+      _lockRefreshTimer ??=
+          Timer.periodic(const Duration(seconds: 1), (_) async {
+        if (!mounted) {
+          return;
+        }
+        setState(() {});
+        final currentRemaining = ref
+            .read(authControllerProvider)
+            .pinSecurityState
+            .remainingLockDuration;
+        if (currentRemaining <= Duration.zero) {
+          _lockRefreshTimer?.cancel();
+          _lockRefreshTimer = null;
+          await ref
+              .read(authControllerProvider.notifier)
+              .refreshPinSecurityState();
+        }
+      });
+      return;
+    }
+
+    _lockRefreshTimer?.cancel();
+    _lockRefreshTimer = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final scheme = Theme.of(context).colorScheme;
+    final remainingLock = authState.pinSecurityState.remainingLockDuration;
+    final isPinLocked = remainingLock > Duration.zero;
+    _syncLockRefreshTimer(remainingLock);
 
     return Scaffold(
       body: DecoratedBox(
@@ -118,15 +151,27 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                       controller: _pinController,
                       keyboardType: TextInputType.number,
                       obscureText: true,
+                      enabled: !_loading && !isPinLocked,
                       decoration: const InputDecoration(
                         labelText: 'PIN',
                         prefixIcon: Icon(Icons.lock_outline_rounded),
                       ),
                       onSubmitted: (_) => _unlockWithPin(),
                     ),
+                    if (isPinLocked) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        'Esperá ${remainingLock.inSeconds.ceil()}s para volver a intentar.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: scheme.error,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                     const SizedBox(height: 16),
                     FilledButton(
-                      onPressed: _loading ? null : _unlockWithPin,
+                      onPressed:
+                          _loading || isPinLocked ? null : _unlockWithPin,
                       child: Text(_loading ? 'Validando...' : 'Desbloquear'),
                     ),
                     const SizedBox(height: 12),

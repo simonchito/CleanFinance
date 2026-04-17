@@ -15,6 +15,12 @@ Identidad actual:
 
 `AppDatabase.instance` memoiza una sola instancia de `Database`.
 
+Limitación de seguridad deliberada:
+
+- la base SQLite local no está cifrada a nivel archivo
+- el proyecto prioriza simplicidad y offline-first
+- el acceso a la base se mantiene encapsulado en repositorios para aislar la superficie de lectura/escritura
+
 ## Configuración
 
 Al abrir la base se ejecuta:
@@ -209,6 +215,11 @@ Persistencia concreta actual:
 - `LocalFinanceRepository` maneja movimientos, categorías, metas, settings, backup y reportes
 - `LocalBudgetRepository` maneja presupuestos
 
+Implicancia:
+
+- no debería accederse a SQLite desde pantallas o widgets
+- el hardening de validaciones, import/export y saneamiento se concentra en esos repositorios
+
 Patrones:
 
 - `db.insert`, `db.update`, `db.delete`, `db.query`
@@ -231,6 +242,11 @@ La importación:
 - re-inserta los datos importados
 - recrea settings default si el backup no trae `app_settings`
 - limpia el flag legacy de biometría en secure storage
+
+Seguridad actual del backup:
+
+- si no se elige contraseña, el backup sigue siendo JSON plano
+- opcionalmente puede exportarse/importarse como JSON cifrado con contraseña
 
 ## Fechas
 

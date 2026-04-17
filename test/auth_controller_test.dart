@@ -1,3 +1,4 @@
+import 'package:clean_finance/features/auth/domain/entities/pin_security_state.dart';
 import 'package:clean_finance/features/auth/domain/repositories/auth_repository.dart';
 import 'package:clean_finance/features/auth/presentation/auth_controller.dart';
 import 'package:clean_finance/features/auth/presentation/auth_state.dart';
@@ -49,6 +50,27 @@ void main() {
       expect(controller.state.status, AuthStatus.unlocked);
       expect(controller.state.biometricEnabled, isFalse);
     });
+
+    test('applies generic recovery failure messaging', () async {
+      final authRepository = _FakeAuthRepository()
+        ..recoveryVerificationResult = false;
+      final controller = AuthController(
+        authRepository: authRepository,
+        categoriesRepository: _FakeCategoriesRepository(),
+      );
+
+      final success = await controller.recoverAccess(
+        birthDate: '10/02/1996',
+        documentId: '12345678',
+        newPin: '123456',
+      );
+
+      expect(success, isFalse);
+      expect(
+        controller.state.errorMessage,
+        'No se pudo verificar la recuperación. Revisá tus datos e intentá nuevamente.',
+      );
+    });
   });
 }
 
@@ -58,6 +80,10 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<bool> authenticateWithBiometrics() async => false;
+
+  @override
+  Future<PinSecurityState> getPinSecurityState() async =>
+      const PinSecurityState.initial();
 
   @override
   Future<bool> hasCredential() async => false;
@@ -86,7 +112,11 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<bool> verifyPin(String pin) async => true;
+  Future<PinVerificationResult> verifyPin(String pin) async =>
+      const PinVerificationResult(
+        status: PinVerificationStatus.success,
+        securityState: PinSecurityState.initial(),
+      );
 
   @override
   Future<bool> verifyRecoveryData({

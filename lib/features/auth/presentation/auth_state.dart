@@ -1,3 +1,5 @@
+import '../domain/entities/pin_security_state.dart';
+
 enum AuthStatus { checking, setupRequired, locked, unlocked }
 
 class AuthState {
@@ -6,6 +8,7 @@ class AuthState {
     required this.biometricAvailable,
     required this.biometricEnabled,
     required this.recoveryConfigured,
+    required this.pinSecurityState,
     this.errorMessage,
   });
 
@@ -14,12 +17,14 @@ class AuthState {
         biometricAvailable = false,
         biometricEnabled = false,
         recoveryConfigured = false,
+        pinSecurityState = const PinSecurityState.initial(),
         errorMessage = null;
 
   final AuthStatus status;
   final bool biometricAvailable;
   final bool biometricEnabled;
   final bool recoveryConfigured;
+  final PinSecurityState pinSecurityState;
   final String? errorMessage;
 
   AuthState copyWith({
@@ -27,6 +32,7 @@ class AuthState {
     bool? biometricAvailable,
     bool? biometricEnabled,
     bool? recoveryConfigured,
+    PinSecurityState? pinSecurityState,
     String? errorMessage,
     bool clearError = false,
   }) {
@@ -35,6 +41,7 @@ class AuthState {
       biometricAvailable: biometricAvailable ?? this.biometricAvailable,
       biometricEnabled: biometricEnabled ?? this.biometricEnabled,
       recoveryConfigured: recoveryConfigured ?? this.recoveryConfigured,
+      pinSecurityState: pinSecurityState ?? this.pinSecurityState,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }

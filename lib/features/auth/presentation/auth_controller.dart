@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
 import '../../finance/domain/repositories/categories_repository.dart';
+import '../domain/entities/pin_security_state.dart';
 import '../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
 
@@ -22,12 +23,14 @@ class AuthController extends StateNotifier<AuthState> {
     final biometricAvailable = await _authRepository.isBiometricAvailable();
     final biometricEnabled = await _authRepository.isBiometricEnabled();
     final recoveryConfigured = await _authRepository.hasRecoveryData();
+    final pinSecurityState = await _authRepository.getPinSecurityState();
 
     state = state.copyWith(
       status: hasCredential ? AuthStatus.locked : AuthStatus.setupRequired,
       biometricAvailable: biometricAvailable,
       biometricEnabled: biometricEnabled,
       recoveryConfigured: recoveryConfigured,
+      pinSecurityState: pinSecurityState,
       clearError: true,
     );
   }
@@ -45,6 +48,14 @@ class AuthController extends StateNotifier<AuthState> {
       );
       return false;
     }
+    if (!_isValidRecoveryBirthDate(birthDate) ||
+        !_isValidRecoveryDocument(documentId)) {
+      state = state.copyWith(
+        errorMessage:
+            'Revisá los datos de recuperación. Usá una fecha real y un documento con al menos 6 caracteres.',
+      );
+      return false;
+    }
 
     await _authRepository.savePin(pin);
     await _authRepository.saveRecoveryData(
@@ -58,20 +69,30 @@ class AuthController extends StateNotifier<AuthState> {
       status: AuthStatus.unlocked,
       biometricEnabled: enableBiometrics,
       recoveryConfigured: true,
+      pinSecurityState: const PinSecurityState.initial(),
       clearError: true,
     );
     return true;
   }
 
   Future<bool> unlockWithPin(String pin) async {
-    final valid = await _authRepository.verifyPin(pin);
-    if (!valid) {
-      state = state.copyWith(errorMessage: 'PIN incorrecto.');
+    final result = await _authRepository.verifyPin(pin);
+    if (!result.isSuccess) {
+      state = state.copyWith(
+        pinSecurityState: result.securityState,
+        errorMessage: result.isLocked
+            ? _lockoutMessage(result.securityState)
+            : 'PIN incorrecto.',
+      );
       return false;
     }
 
     await _ensureFinanceSeed();
-    state = state.copyWith(status: AuthStatus.unlocked, clearError: true);
+    state = state.copyWith(
+      status: AuthStatus.unlocked,
+      pinSecurityState: result.securityState,
+      clearError: true,
+    );
     return true;
   }
 
@@ -138,6 +159,13 @@ class AuthController extends StateNotifier<AuthState> {
       );
       return false;
     }
+    if (!_isValidRecoveryBirthDate(birthDate) ||
+        !_isValidRecoveryDocument(documentId)) {
+      state = state.copyWith(
+        errorMessage: 'Revisá los datos de recuperación antes de continuar.',
+      );
+      return false;
+    }
 
     final valid = await _authRepository.verifyRecoveryData(
       birthDate: birthDate,
@@ -145,7 +173,8 @@ class AuthController extends StateNotifier<AuthState> {
     );
     if (!valid) {
       state = state.copyWith(
-        errorMessage: 'Las respuestas de recuperación no coinciden.',
+        errorMessage:
+            'No se pudo verificar la recuperación. Revisá tus datos e intentá nuevamente.',
       );
       return false;
     }
@@ -157,9 +186,16 @@ class AuthController extends StateNotifier<AuthState> {
       status: AuthStatus.unlocked,
       biometricEnabled: enableBiometrics,
       recoveryConfigured: true,
+      pinSecurityState: const PinSecurityState.initial(),
       clearError: true,
     );
     return true;
+  }
+
+  Future<void> refreshPinSecurityState() async {
+    final pinSecurityState = await _authRepository.getPinSecurityState();
+    state =
+        state.copyWith(pinSecurityState: pinSecurityState, clearError: true);
   }
 
   void clearError() {
@@ -190,5 +226,22 @@ class AuthController extends StateNotifier<AuthState> {
 
   Future<void> _ensureFinanceSeed() {
     return _categoriesRepository.ensureSeedData();
+  }
+
+  bool _isValidRecoveryBirthDate(String value) {
+    final normalized = value.replaceAll(RegExp(r'[^0-9]'), '');
+    return normalized.length == 8;
+  }
+
+  bool _isValidRecoveryDocument(String value) {
+    final normalized =
+        value.replaceAll(RegExp(r'[^0-9a-zA-Z]'), '').toUpperCase();
+    return normalized.length >= 6 && normalized.length <= 16;
+  }
+
+  String _lockoutMessage(PinSecurityState securityState) {
+    final seconds = securityState.remainingLockDuration.inSeconds.ceil();
+    final safeSeconds = seconds <= 0 ? 1 : seconds;
+    return 'Demasiados intentos fallidos. Esperá $safeSeconds segundos antes de volver a intentar.';
   }
 }

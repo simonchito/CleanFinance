@@ -50,6 +50,7 @@ Resumen:
 ### Seguridad
 
 - alta inicial de PIN de 6 dígitos
+- rate limiting local de PIN con bloqueo temporal escalable
 - recuperación con fecha de nacimiento y documento
 - desbloqueo por biometría cuando el dispositivo lo soporta y la preferencia está habilitada
 - auto-lock al volver desde background según el tiempo configurado
@@ -65,13 +66,21 @@ Resumen:
 - dashboard con resumen mensual, proyección, insights y recordatorios
 - reportes por cashflow, categorías, ritmo de gasto, metas y medios de pago
 - exportación e importación local en JSON
+- exportación opcional protegida con contraseña
 
 ## Flujo actual de seguridad
 
 - el PIN y los datos de recuperación viven en secure storage
+- los intentos fallidos de PIN y bloqueos temporales también viven en secure storage
 - la preferencia persistida de biometría vive en `app_settings.biometric_enabled`
 - onboarding, desbloqueo y Ajustes usan la misma preferencia persistida
 - si biometría no está disponible, la app degrada a PIN sin romper la UI
+
+## Límites de seguridad conocidos
+
+- SQLite local sigue sin cifrado a nivel base de datos para mantener bajo peso y simplicidad
+- el acceso a SQLite está encapsulado en repositorios (`LocalFinanceRepository` y `LocalBudgetRepository`) para reducir dispersión, pero no reemplaza cifrado en reposo del archivo
+- los backups sin contraseña se exportan como JSON legible y deben tratarse como archivos sensibles
 
 ## Flujo actual de movimientos
 

@@ -1,3 +1,4 @@
+import 'package:clean_finance/features/auth/domain/entities/pin_security_state.dart';
 import 'package:clean_finance/features/auth/domain/repositories/auth_repository.dart';
 import 'package:clean_finance/features/auth/presentation/providers/auth_providers.dart';
 import 'package:clean_finance/features/finance/domain/entities/app_settings.dart';
@@ -138,6 +139,10 @@ class _FakeAuthRepository implements AuthRepository {
   Future<bool> authenticateWithBiometrics() async => false;
 
   @override
+  Future<PinSecurityState> getPinSecurityState() async =>
+      const PinSecurityState.initial();
+
+  @override
   Future<bool> hasCredential() async => true;
 
   @override
@@ -165,7 +170,11 @@ class _FakeAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<bool> verifyPin(String pin) async => true;
+  Future<PinVerificationResult> verifyPin(String pin) async =>
+      const PinVerificationResult(
+        status: PinVerificationStatus.success,
+        securityState: PinSecurityState.initial(),
+      );
 
   @override
   Future<bool> verifyRecoveryData({

@@ -41,6 +41,12 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
       _showMessage('Completá ambas respuestas de recuperación.');
       return;
     }
+    if (!_isValidBirthDate(birthDate) || !_isValidDocument(document)) {
+      _showMessage(
+        'Usá una fecha válida y un documento con al menos 6 caracteres.',
+      );
+      return;
+    }
     if (newPin != confirmPin) {
       _showMessage('Los PIN no coinciden.');
       return;
@@ -74,6 +80,16 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
     );
   }
 
+  bool _isValidBirthDate(String value) {
+    return value.replaceAll(RegExp(r'[^0-9]'), '').length == 8;
+  }
+
+  bool _isValidDocument(String value) {
+    final normalized =
+        value.replaceAll(RegExp(r'[^0-9a-zA-Z]'), '').toUpperCase();
+    return normalized.length >= 6 && normalized.length <= 16;
+  }
+
   @override
   Widget build(BuildContext context) {
     final biometricAvailable =
@@ -98,6 +114,22 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
             textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .errorContainer
+                  .withValues(alpha: 0.45),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'La recuperación local es menos robusta que tu PIN. Si alguien conoce estos datos y tiene el dispositivo, podría intentar restablecer el acceso.',
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
           ),
           const SizedBox(height: 24),
           TextField(

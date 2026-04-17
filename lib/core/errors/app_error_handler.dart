@@ -9,7 +9,9 @@ class AppErrorHandler {
 
   static void configure() {
     FlutterError.onError = (details) {
-      FlutterError.presentError(details);
+      if (kDebugMode) {
+        FlutterError.presentError(details);
+      }
       report(
         details.exception,
         details.stack ?? StackTrace.current,
@@ -82,6 +84,10 @@ class AppErrorHandler {
     required String source,
     String? context,
   }) {
+    if (!kDebugMode) {
+      return;
+    }
+
     final hint = diagnosticHint(error);
     final buffer = StringBuffer()
       ..writeln('========== CleanFinance Error ==========')
