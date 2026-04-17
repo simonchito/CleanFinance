@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Política de Privacidad - CleanFinance</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --text: #10213f;
+        --muted: #51617d;
+        --accent: #122451;
+        --border: #d8e0ee;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        background: linear-gradient(180deg, #f7f9fc 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 40px 20px 56px;
+      }
+
+      header {
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 2rem;
+      }
+
+      p,
+      li {
+        line-height: 1.6;
+      }
+
+      .lead {
+        color: var(--muted);
+      }
+
+      section {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 16px;
+      }
+
+      h2 {
+        margin-top: 0;
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Política de Privacidad - CleanFinance</h1>
+        <p class="lead">
+          Texto preparado desde el código real del proyecto para su publicación
+          en Google Play. Antes del lanzamiento productivo, reemplazar el canal
+          de contacto por el correo definitivo del desarrollador publicado en la
+          ficha de Play Store.
+        </p>
+      </header>
+
+      <section>
+        <h2>1. Resumen</h2>
+        <p>
+          CleanFinance es una app de finanzas personales offline-first. No crea
+          cuentas online, no sube tus registros financieros a servidores del
+          desarrollador y no incluye SDKs de analítica, publicidad ni tracking.
+        </p>
+      </section>
+
+      <section>
+        <h2>2. Datos que se almacenan localmente</h2>
+        <ul>
+          <li>movimientos financieros, categorías, metas y presupuestos</li>
+          <li>medios de pago y preferencias de la aplicación</li>
+          <li>preferencias de biometría y bloqueo automático</li>
+          <li>PIN hasheado en secure storage</li>
+          <li>
+            respuestas de recuperación hasheadas para fecha de nacimiento y
+            documento personal
+          </li>
+          <li>estado de intentos fallidos y bloqueos temporales</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>3. Biometría</h2>
+        <p>
+          Si activás biometría, CleanFinance le pide a Android que valide tu
+          huella o rostro usando el sistema operativo. La app no almacena tu
+          plantilla biométrica.
+        </p>
+      </section>
+
+      <section>
+        <h2>4. Backups</h2>
+        <p>
+          La exportación de backup es manual y se inicia desde Ajustes. Puede
+          generarse como JSON legible o cifrado con contraseña. Si elegís
+          compartir ese archivo con otra app o servicio, esa acción depende de
+          vos y del destino que selecciones.
+        </p>
+      </section>
+
+      <section>
+        <h2>5. Compartición de datos</h2>
+        <p>
+          CleanFinance no comparte datos personales ni financieros con el
+          desarrollador ni con terceros de manera automática.
+        </p>
+      </section>
+
+      <section>
+        <h2>6. Seguridad y limitaciones</h2>
+        <p>
+          Los datos financieros se guardan localmente en SQLite, pero la base de
+          datos no está cifrada a nivel archivo. Los secretos de autenticación
+          se guardan hasheados en secure storage. La build release desactiva el
+          cloud backup de Android para reducir copias automáticas no deseadas.
+        </p>
+      </section>
+
+      <section>
+        <h2>7. Retención y borrado</h2>
+        <p>
+          Los datos permanecen en el dispositivo hasta que el usuario los borra,
+          limpia la app, desinstala la app o usa la opción interna para borrar
+          todos los datos locales.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Contacto</h2>
+        <p>
+          Canal de privacidad pendiente de completar con el correo de
+          desarrollador que se publique en la ficha de Google Play de
+          CleanFinance.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

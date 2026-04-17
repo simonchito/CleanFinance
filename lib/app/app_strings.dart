@@ -20,6 +20,8 @@ class AppStrings {
   String get settings => isEnglish ? 'Settings' : 'Ajustes';
   String get appearance => isEnglish ? 'Appearance' : 'Apariencia';
   String get privacy => isEnglish ? 'Privacy' : 'Privacidad';
+  String get privacyPolicy =>
+      isEnglish ? 'Privacy policy' : 'Política de privacidad';
   String get security => isEnglish ? 'Security' : 'Seguridad';
   String get data => isEnglish ? 'Data' : 'Datos';
   String get language => isEnglish ? 'Language' : 'Idioma';
