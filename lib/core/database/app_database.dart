@@ -137,7 +137,7 @@ class AppDatabase {
             "ALTER TABLE app_settings ADD COLUMN locale_code TEXT NOT NULL DEFAULT 'es'",
           );
           await db.execute(
-            "ALTER TABLE app_settings ADD COLUMN payment_methods TEXT NOT NULL DEFAULT '[\"Transferencia\",\"Tarjeta Debito\",\"Tarjeta Credito\",\"Efectivo\"]'",
+            "ALTER TABLE app_settings ADD COLUMN payment_methods TEXT NOT NULL DEFAULT '[\"Transferencia\",\"Tarjeta débito\",\"Tarjeta crédito\",\"Efectivo\",\"QR\"]'",
           );
         }
         if (oldVersion < 3) {

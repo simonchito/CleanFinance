@@ -7,12 +7,14 @@ import 'package:uuid/uuid.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/payment_method_utils.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/movement.dart';
 import '../providers/finance_providers.dart';
+import '../utils/payment_method_icon_resolver.dart';
 import '../widgets/section_card.dart';
 import '../widgets/selection_sheet_field.dart';
 
@@ -94,7 +96,13 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    if (_categoryId == null) {
+    final categories = ref
+            .read(categoriesProvider(_scopeFromMovementType(_type)))
+            .valueOrNull ??
+        const <Category>[];
+    final resolvedCategoryId =
+        _categoryId ?? _defaultTopLevelCategoryId(categories);
+    if (resolvedCategoryId == null) {
       _showMessage('Seleccioná una categoría.');
       return;
     }
@@ -108,7 +116,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
         _amountController.text,
         localeCode: _localeCode,
       )!,
-      categoryId: _categoryId!,
+      categoryId: resolvedCategoryId,
       subcategoryId: _subcategoryId,
       goalId: _type == MovementType.saving ? _goalId : null,
       occurredOn: _selectedDate,
@@ -159,18 +167,33 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
       ),
       body: categoriesState.when(
         data: (categories) {
-          final topLevel =
-              categories.where((category) => category.parentId == null).toList();
+          final topLevel = categories
+              .where((category) => category.parentId == null)
+              .toList();
+          final effectiveCategoryId =
+              _categoryId ?? (topLevel.isNotEmpty ? topLevel.first.id : null);
+
+          if (_categoryId == null && effectiveCategoryId != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted || _categoryId == effectiveCategoryId) {
+                return;
+              }
+              setState(() => _categoryId = effectiveCategoryId);
+            });
+          }
+
           final subcategories = categories
-              .where((category) => category.parentId == _categoryId)
+              .where((category) => category.parentId == effectiveCategoryId)
               .toList();
 
-          if (_categoryId == null && topLevel.isNotEmpty) {
-            _categoryId = topLevel.first.id;
-          }
           if (_subcategoryId != null &&
               subcategories.every((item) => item.id != _subcategoryId)) {
-            _subcategoryId = null;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) {
+                return;
+              }
+              setState(() => _subcategoryId = null);
+            });
           }
 
           return Form(
@@ -198,7 +221,9 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                             ? 'Use simple language and keep only what matters.'
                             : 'Usá lenguaje simple y dejá solo la información necesaria.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                       ),
                     ],
@@ -262,7 +287,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 const SizedBox(height: 12),
                 SelectionSheetField<String>(
                   label: strings.category,
-                  value: _categoryId,
+                  value: effectiveCategoryId,
                   sheetTitle: strings.category,
                   sheetDescription: strings.isEnglish
                       ? 'Choose the main category.'
@@ -309,7 +334,8 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                         ),
                       ),
                     ],
-                    onChanged: (value) => setState(() => _subcategoryId = value),
+                    onChanged: (value) =>
+                        setState(() => _subcategoryId = value),
                   ),
                 ],
                 if (_type == MovementType.saving) ...[
@@ -369,8 +395,8 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       .map(
                         (method) => SelectionSheetItem<String?>(
                           value: method,
-                          label: method,
-                          iconData: Icons.wallet_outlined,
+                          label: PaymentMethodUtils.canonicalizeLabel(method),
+                          iconData: PaymentMethodIconResolver.resolve(method),
                         ),
                       )
                       .toList(),
@@ -392,7 +418,8 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 const SizedBox(height: 20),
                 FilledButton(
                   onPressed: _save,
-                  child: Text(isEditing ? strings.saveChanges : strings.saveMovement),
+                  child: Text(
+                      isEditing ? strings.saveChanges : strings.saveMovement),
                 ),
               ],
             ),
@@ -419,4 +446,13 @@ CategoryScope _scopeFromMovementType(MovementType type) {
     case MovementType.saving:
       return CategoryScope.saving;
   }
+}
+
+String? _defaultTopLevelCategoryId(List<Category> categories) {
+  for (final category in categories) {
+    if (category.parentId == null) {
+      return category.id;
+    }
+  }
+  return null;
 }

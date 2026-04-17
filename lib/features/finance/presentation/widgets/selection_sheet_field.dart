@@ -90,6 +90,7 @@ class SelectionSheetField<T> extends StatelessWidget {
         isEmpty: selectedItem == null,
         decoration: InputDecoration(
           labelText: label,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
           suffixIcon: Icon(
             Icons.expand_more_rounded,
             color: enabled ? null : scheme.onSurfaceVariant,
@@ -278,9 +279,8 @@ class _SelectionTileContent<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final accent = selected ? scheme.primary : scheme.onSurface;
-    final leading = item.iconData ?? (item.iconKey != null
-        ? IconMapper.getIcon(item.iconKey)
-        : null);
+    final leading = item.iconData ??
+        (item.iconKey != null ? IconMapper.getIcon(item.iconKey) : null);
 
     return Row(
       children: [

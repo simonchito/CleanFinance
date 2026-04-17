@@ -58,8 +58,7 @@ class DefaultCategoriesSeed {
     }
 
     final topLevelByKey = <String, Map<String, Object?>>{};
-    final childrenByParentId =
-        <String, Map<String, Map<String, Object?>>>{};
+    final childrenByParentId = <String, Map<String, Map<String, Object?>>>{};
 
     for (final row in rows) {
       final scope = (row['scope'] as String?) ?? '';
@@ -71,16 +70,16 @@ class DefaultCategoriesSeed {
         continue;
       }
 
-      childrenByParentId
-          .putIfAbsent(parentId, () => <String, Map<String, Object?>>{})
-          [_normalize(name)] = row;
+      childrenByParentId.putIfAbsent(parentId,
+          () => <String, Map<String, Object?>>{})[_normalize(name)] = row;
     }
 
     final batch = db.batch();
     var hasUpdates = false;
 
     for (final definition in DefaultCategories.all) {
-      final parent = topLevelByKey[_categoryKey(definition.scope, definition.name)];
+      final parent =
+          topLevelByKey[_categoryKey(definition.scope, definition.name)];
       if (parent == null) {
         continue;
       }
@@ -129,6 +128,19 @@ class DefaultCategoriesSeed {
     if (hasUpdates) {
       await batch.commit(noResult: true);
     }
+  }
+
+  Future<void> backfillDefaultCategoryNames(Database db) async {
+    final now = DateTime.now().toIso8601String();
+    await db.update(
+      'categories',
+      {
+        'name': 'Alimentos',
+        'updated_at': now,
+      },
+      where: 'is_default = 1 AND parent_id IS NULL AND scope = ? AND name = ?',
+      whereArgs: ['expense', 'Alimentación'],
+    );
   }
 
   Map<String, Object?> _categoryMap({

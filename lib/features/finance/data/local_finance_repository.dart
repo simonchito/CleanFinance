@@ -8,6 +8,7 @@ import '../../../core/database/app_database.dart';
 import '../../../core/database/seed/default_categories_seed.dart';
 import '../../../core/security/secure_storage_service.dart';
 import '../../../core/utils/month_context.dart';
+import '../../../core/utils/payment_method_utils.dart';
 import '../domain/entities/app_settings.dart';
 import '../domain/entities/app_theme_preference.dart';
 import '../domain/entities/category.dart';
@@ -49,6 +50,7 @@ class LocalFinanceRepository
       db,
       createId: _uuid.v4,
     );
+    await _defaultCategoriesSeed.backfillDefaultCategoryNames(db);
     await _defaultCategoriesSeed.backfillDefaultCategoryIcons(db);
   }
 
@@ -330,8 +332,7 @@ class LocalFinanceRepository
     return AppSettings(
       currencyCode: row['currency_code'] as String,
       currencySymbol: row['currency_symbol'] as String,
-      showSensitiveAmounts:
-          (row['show_sensitive_amounts'] as int? ?? 1) == 1,
+      showSensitiveAmounts: (row['show_sensitive_amounts'] as int? ?? 1) == 1,
       themePreference: _themeModeFromDb(row['theme_mode'] as String),
       biometricEnabled: (row['biometric_enabled'] as int? ?? 0) == 1,
       autoLockMinutes: (row['auto_lock_minutes'] as int?) ??
@@ -406,7 +407,8 @@ class LocalFinanceRepository
       topExpenseCategories: topCategories
           .map(
             (row) => CategorySpend(
-              categoryName: (row['category_name'] as String?) ?? 'Sin categoría',
+              categoryName:
+                  (row['category_name'] as String?) ?? 'Sin categoría',
               amount: _readDouble(row['amount']),
             ),
           )
@@ -624,11 +626,9 @@ class LocalFinanceRepository
           .map((item) => item.toString().trim())
           .where((item) => item.isNotEmpty)
           .toList();
-      return decoded.isEmpty ? AppConstants.defaultPaymentMethods : decoded;
+      return PaymentMethodUtils.normalizeMethods(decoded);
     } catch (_) {
       return AppConstants.defaultPaymentMethods;
     }
   }
 }
-
-

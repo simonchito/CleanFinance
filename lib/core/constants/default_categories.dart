@@ -85,7 +85,7 @@ abstract final class DefaultCategories {
       ],
     ),
     DefaultCategoryDefinition(
-      name: 'Alimentación',
+      name: 'Alimentos',
       iconKey: 'restaurant',
       scope: 'expense',
       subcategories: [
@@ -132,7 +132,8 @@ abstract final class DefaultCategories {
           name: 'Seguro del auto',
           iconKey: 'security',
         ),
-        DefaultSubcategoryDefinition(name: 'Taxi / Remis', iconKey: 'local_taxi'),
+        DefaultSubcategoryDefinition(
+            name: 'Taxi / Remis', iconKey: 'local_taxi'),
         DefaultSubcategoryDefinition(
           name: 'Transporte público',
           iconKey: 'directions_bus',

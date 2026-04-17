@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/app_strings.dart';
+import '../../../../core/utils/payment_method_utils.dart';
 import '../providers/finance_providers.dart';
+import '../utils/payment_method_icon_resolver.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 
@@ -17,8 +19,8 @@ class PaymentMethodsScreen extends ConsumerWidget {
   }) async {
     final strings = AppStrings.of(context);
     final controller = TextEditingController(text: initialValue ?? '');
-    final currentMethods =
-        List<String>.from(ref.read(settingsControllerProvider).valueOrNull?.paymentMethods ?? []);
+    final currentMethods = List<String>.from(
+        ref.read(settingsControllerProvider).valueOrNull?.paymentMethods ?? []);
 
     await showDialog<void>(
       context: context,
@@ -27,12 +29,17 @@ class PaymentMethodsScreen extends ConsumerWidget {
           title: Text(
             initialValue == null
                 ? strings.addPaymentMethod
-                : (strings.isEnglish ? 'Edit payment method' : 'Editar medio de pago'),
+                : (strings.isEnglish
+                    ? 'Edit payment method'
+                    : 'Editar medio de pago'),
           ),
           content: TextField(
             controller: controller,
             decoration: InputDecoration(
               labelText: strings.movementPaymentMethod,
+              hintText: strings.isEnglish
+                  ? 'Example: QR, transfer or cash'
+                  : 'Ejemplo: QR, transferencia o efectivo',
             ),
           ),
           actions: [
@@ -42,7 +49,9 @@ class PaymentMethodsScreen extends ConsumerWidget {
             ),
             FilledButton(
               onPressed: () async {
-                final value = controller.text.trim();
+                final value = PaymentMethodUtils.canonicalizeLabel(
+                  controller.text,
+                );
                 if (value.isEmpty) {
                   return;
                 }
@@ -53,7 +62,9 @@ class PaymentMethodsScreen extends ConsumerWidget {
                 }
                 await ref
                     .read(settingsControllerProvider.notifier)
-                    .setPaymentMethods(currentMethods.toSet().toList());
+                    .setPaymentMethods(
+                      PaymentMethodUtils.normalizeMethods(currentMethods),
+                    );
                 if (dialogContext.mounted) {
                   Navigator.of(dialogContext).pop();
                 }
@@ -129,9 +140,23 @@ class PaymentMethodsScreen extends ConsumerWidget {
                       ),
                       child: Row(
                         children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Icon(
+                              PaymentMethodIconResolver.resolve(entry.value),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              entry.value,
+                              PaymentMethodUtils.canonicalizeLabel(entry.value),
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ),
