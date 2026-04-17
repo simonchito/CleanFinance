@@ -16,7 +16,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
         itemCount: sections.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 12),
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final section = sections[index];
           return SectionCard(
