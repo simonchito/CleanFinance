@@ -1,10 +1,10 @@
 # Screens
 
-## Navigation Overview
+## Navigation overview
 
-The app uses imperative navigation with `Navigator` and `MaterialPageRoute`.
+La app usa navegación imperativa con `Navigator` y `MaterialPageRoute`.
 
-High-level flow:
+Flujo principal:
 
 ```text
 main.dart
@@ -20,72 +20,65 @@ HomeShell tabs
   -> SettingsScreen
 ```
 
-Additional screens are pushed from those main tabs.
+Pantallas adicionales se empujan desde esas tabs.
 
-## Authentication Screens
+## Auth screens
 
 ### `AuthGateScreen`
 
-Purpose:
+Responsabilidad:
 
-- reads auth state and selects the correct startup screen
-
-Possible destinations:
-
-- `SetupPinScreen`
-- `UnlockScreen`
-- `HomeShell`
+- leer `AuthState.status`
+- decidir entre setup, unlock o shell principal
 
 ### `SetupPinScreen`
 
-Purpose:
+Responsabilidad:
 
-- first-time setup of PIN, recovery answers, and optional biometrics
+- alta inicial de seguridad
 
-Main actions:
+Inputs actuales:
 
-- enter PIN and confirmation
-- enter birth date and document as recovery data
-- optionally enable biometrics
-- start the app
+- PIN
+- confirmación
+- fecha de nacimiento
+- documento personal
+- toggle para biometría si está disponible
 
 ### `UnlockScreen`
 
-Purpose:
+Responsabilidad:
 
-- unlock access with PIN or biometrics
+- desbloquear con PIN o biometría
 
-Main actions:
+Comportamiento actual:
 
-- enter PIN
-- attempt biometric authentication automatically if enabled
-- open recovery flow when recovery data exists
-
-Navigation:
-
-- pushes `RecoverAccessScreen`
+- si biometría está disponible y habilitada, intenta usarla automáticamente una vez
+- mantiene fallback a PIN
+- ofrece ir a recuperación si hay datos configurados
 
 ### `RecoverAccessScreen`
 
-Purpose:
+Responsabilidad:
 
-- reset access using recovery answers and a new PIN
+- recuperar acceso y definir nuevo PIN
 
-Main actions:
+Inputs actuales:
 
-- enter birth date
-- enter document
-- enter and confirm new PIN
-- optionally enable biometrics again
+- fecha de nacimiento
+- documento
+- nuevo PIN
+- confirmación
+- toggle para biometría
 
-## Main Shell
+## Main shell
 
 ### `HomeShell`
 
-Purpose:
+Responsabilidad:
 
-- hosts the primary app tabs with an `IndexedStack`
-- handles app lifecycle auto-lock behavior
+- mantener las cinco tabs principales con `IndexedStack`
+- escuchar lifecycle para auto-lock
 
 Tabs:
 
@@ -95,229 +88,175 @@ Tabs:
 - Reports
 - Settings
 
-## Finance Screens
+## Finance screens
 
 ### `DashboardScreen`
 
-Purpose:
+Muestra:
 
-- show the main monthly financial summary and quick actions
-
-Main content:
-
-- current balance
-- income, expense, movement count, and savings chips
-- end-of-month projection
-- pending monthly reminders
+- saldo actual
+- resumen del mes
+- proyección de fin de mes
+- recordatorios mensuales pendientes
 - insights
-- income vs expense visual
-- monthly trend
-- top expense categories
-- recent movements
-
-Navigation:
-
-- pushes `MovementFormScreen` for quick add
-- pushes `MovementFormScreen` prefilled from a reminder card
+- visuales de ingresos vs gastos
+- tendencia mensual
+- categorías principales
+- movimientos recientes
 
 ### `MovementsScreen`
 
-Purpose:
+Muestra:
 
-- list registered movements and provide search/filter/edit/delete actions
+- listado de movimientos
+- búsqueda por nota
+- filtros por tipo, categoría y rango de fecha
+- edición y borrado
 
-Main actions:
+Visualización actual:
 
-- filter by type
-- filter by category and date range
-- search by note
-- open editor
-- delete movement
-
-Navigation:
-
-- pushes `MovementFormScreen`
-- pushes `CategoriesScreen`
+- categoría/subcategoría
+- fecha
+- nota si existe
+- monto
+- chip de medio de pago si existe
 
 ### `MovementFormScreen`
 
-Purpose:
+Permite:
 
-- create or edit a movement
+- crear o editar ingresos, gastos y ahorro
 
-Supported movement types:
+Campos actuales:
 
-- income
-- expense
-- saving
+- tipo
+- monto
+- categoría
+- subcategoría opcional
+- meta de ahorro si el tipo es `saving`
+- fecha
+- medio de pago opcional
+- nota opcional
 
-Main fields:
+UX actual:
 
-- type
-- amount
-- category
-- subcategory
-- saving goal when type is saving
-- date
-- payment method
-- note
+- usa `SelectionSheetField` para selectores
+- refleja el medio de pago elegido en tiempo real en el propio campo
 
 ### `SavingsScreen`
 
-Purpose:
+Muestra:
 
-- show savings goals, progress, totals, and quick contribution actions
-
-Main actions:
-
-- create goal
-- edit goal
-- delete goal
-- register a saving contribution for a goal
-
-Navigation:
-
-- pushes `SavingsGoalFormScreen`
-- pushes `MovementFormScreen` prefilled as a saving contribution
+- metas activas y archivadas
+- progreso
+- aportes
+- acciones rápidas para contribuir o editar
 
 ### `SavingsGoalFormScreen`
 
-Purpose:
+Campos actuales:
 
-- create or edit a savings goal
-
-Main fields:
-
-- goal name
-- target amount
-- target date
-- monthly reminder toggle
-- reminder day
+- nombre
+- monto objetivo
+- fecha objetivo opcional
+- recordatorio mensual opcional
 
 ### `ReportsScreen`
 
-Purpose:
-
-- present derived analytics and monthly reports
-
-Main sections:
+Secciones actuales:
 
 - financial health score
-- cashflow summary
-- monthly trend
-- category comparison
-- spending pace
-- savings goal forecasts
-- payment-method breakdown
-- insights list
+- cashflow del mes
+- evolución mensual
+- comparación por categorías
+- ritmo de gasto
+- forecast de metas
+- breakdown por medio de pago
+- insights
 
 ### `SettingsScreen`
 
-Purpose:
-
-- manage app preferences, security settings, organization tools, and local data operations
-
-Main sections:
+Secciones actuales:
 
 - appearance
 - security
 - organization
-- data management
+- data
 
-Navigation:
+Desde acá se navega a:
 
-- pushes `PaymentMethodsScreen`
-- pushes `ManageRemindersScreen`
-- pushes `CategoriesScreen`
-- pushes `BudgetsScreen`
+- `PaymentMethodsScreen`
+- `ManageRemindersScreen`
+- `CategoriesScreen`
+- `BudgetsScreen`
 
 ### `CategoriesScreen`
 
-Purpose:
+Responsabilidad:
 
-- manage categories and subcategories grouped by scope
+- gestionar categorías y subcategorías por scope
 
-Tabs:
+Scopes:
 
 - income
 - expense
 - saving
 
-Main actions:
+Capacidades actuales:
 
-- create category
-- edit category
-- delete category
-- create subcategory
-
-Reminder-specific behavior:
-
-- expense subcategories can enable monthly reminders and choose a reminder day
+- crear
+- editar
+- borrar categorías personalizadas
+- definir `iconKey`
+- crear subcategorías
+- habilitar recordatorio mensual en subcategorías
 
 ### `ManageRemindersScreen`
 
-Purpose:
+Responsabilidad:
 
-- centralized management of active monthly reminders
+- centralizar edición y desactivación de recordatorios activos
 
-Sections:
+Fuentes:
 
-- expense reminders from expense subcategories
-- savings reminders from savings goals
-
-Main actions:
-
-- edit reminder day
-- disable reminder
+- subcategorías de gasto
+- metas de ahorro
 
 ### `PaymentMethodsScreen`
 
-Purpose:
+Responsabilidad:
 
-- manage the list of payment methods available in movement forms
+- gestionar la lista de medios de pago disponibles en el formulario de movimientos
 
-Main actions:
+Capacidades:
 
-- add payment method
-- edit payment method
-- delete payment method
+- agregar
+- editar
+- borrar
 
-## Budget Screens
+Los labels se normalizan con `PaymentMethodUtils`.
+
+## Budget screens
 
 ### `BudgetsScreen`
 
-Purpose:
+Muestra:
 
-- show the current month’s category budget statuses
-
-Main actions:
-
-- create budget
-- refresh budget statuses
-- open existing budget for editing
-
-Navigation:
-
-- pushes `BudgetFormScreen`
+- estado del presupuesto mensual por categoría de gasto
 
 ### `BudgetFormScreen`
 
-Purpose:
+Permite:
 
-- create or update the monthly budget for one expense category
+- crear o editar un presupuesto para el mes actual
 
-Main fields:
+Campos:
 
-- current month
-- expense category
-- monthly limit
+- categoría de gasto
+- límite mensual
 
-Notes:
+## Notas de UX/UI
 
-- category cannot be changed when editing an existing budget
-
-## Navigation Notes
-
-- there is no route registry or declarative router in the current project
-- back navigation is handled with the default `Navigator.pop(...)`
-- nested dialogs and bottom sheets are used for filters and reminder day editing
+- los selectores principales usan bottom sheets consistentes
+- la navegación secundaria usa dialogs y pantallas push
+- la app mantiene tarjetas redondeadas, spacing amplio y jerarquía visual simple

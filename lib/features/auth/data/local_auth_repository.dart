@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../../../core/security/biometric_service.dart';
 import '../../../core/security/password_hasher.dart';
 import '../../../core/security/secure_storage_service.dart';
+import '../../finance/domain/repositories/settings_repository.dart';
 import '../domain/repositories/auth_repository.dart';
 
 class LocalAuthRepository implements AuthRepository {
@@ -10,13 +11,16 @@ class LocalAuthRepository implements AuthRepository {
     required SecureStorageService secureStorage,
     required PasswordHasher passwordHasher,
     required BiometricService biometricService,
+    required SettingsRepository settingsRepository,
   })  : _secureStorage = secureStorage,
         _passwordHasher = passwordHasher,
-        _biometricService = biometricService;
+        _biometricService = biometricService,
+        _settingsRepository = settingsRepository;
 
   final SecureStorageService _secureStorage;
   final PasswordHasher _passwordHasher;
   final BiometricService _biometricService;
+  final SettingsRepository _settingsRepository;
 
   @override
   Future<bool> hasCredential() {
@@ -99,13 +103,43 @@ class LocalAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<bool> isBiometricEnabled() {
-    return _secureStorage.readBiometricEnabled();
+  Future<bool> isBiometricEnabled() async {
+    final settings = await _settingsRepository.getSettings();
+    final legacyEnabled = await _secureStorage.readBiometricEnabled();
+    final available = await isBiometricAvailable();
+
+    if (!settings.biometricEnabled && legacyEnabled) {
+      final migratedEnabled = available;
+      await _settingsRepository.saveSettings(
+        settings.copyWith(biometricEnabled: migratedEnabled),
+      );
+      await _secureStorage.deleteBiometricEnabled();
+      return migratedEnabled;
+    }
+
+    if (settings.biometricEnabled && !available) {
+      await _settingsRepository.saveSettings(
+        settings.copyWith(biometricEnabled: false),
+      );
+      await _secureStorage.deleteBiometricEnabled();
+      return false;
+    }
+
+    if (legacyEnabled != settings.biometricEnabled) {
+      await _secureStorage.deleteBiometricEnabled();
+    }
+
+    return settings.biometricEnabled;
   }
 
   @override
-  Future<void> setBiometricEnabled(bool enabled) {
-    return _secureStorage.saveBiometricEnabled(enabled);
+  Future<void> setBiometricEnabled(bool enabled) async {
+    final settings = await _settingsRepository.getSettings();
+    final available = enabled ? await isBiometricAvailable() : false;
+    await _settingsRepository.saveSettings(
+      settings.copyWith(biometricEnabled: enabled && available),
+    );
+    await _secureStorage.deleteBiometricEnabled();
   }
 
   @override

@@ -643,3 +643,5 @@ Se implementa una base Flutter con:
 - `local_auth` en pub.dev: https://pub.dev/packages/local_auth
 - `flutter_secure_storage` en pub.dev: https://pub.dev/packages/flutter_secure_storage
 - React Native architecture overview: https://reactnative.dev/architecture/overview
+> Estado: documento historico de vision/producto. Puede contener decisiones o supuestos anteriores que ya no representan el codigo actual.
+> Fuente de verdad tecnica actual: el codigo del repositorio y los documentos tecnicos actualizados en `docs/`.

@@ -1,30 +1,28 @@
 # CleanFinance Database Relationships
 
-This project keeps migrations non-destructive, so foreign key enforcement is
-introduced only where it is safe to do so.
+Este archivo documenta las relaciones lógicas actuales del esquema y una limitación importante de migraciones no destructivas.
 
-## Current logical relationships
+## Relaciones lógicas actuales
 
 - `movements.category_id -> categories.id`
-  - Required relationship.
-  - Intended behavior: a movement must belong to a category.
-  - Delete policy for new installs: `ON DELETE RESTRICT`.
+  - relación requerida
+  - un movimiento siempre pertenece a una categoría principal
+  - delete policy para instalaciones nuevas: `ON DELETE RESTRICT`
 
 - `movements.goal_id -> savings_goals.id`
-  - Optional relationship.
-  - Intended behavior: a saving movement may contribute to a savings goal.
-  - Delete policy for new installs: `ON DELETE SET NULL`.
+  - relación opcional
+  - un movimiento de tipo `saving` puede vincularse a una meta
+  - delete policy para instalaciones nuevas: `ON DELETE SET NULL`
 
 - `budgets.category_id -> categories.id`
-  - Required relationship.
-  - Intended behavior: each monthly budget belongs to one category.
-  - Delete policy for new installs: `ON DELETE RESTRICT`.
+  - relación requerida
+  - cada presupuesto mensual pertenece a una categoría de gasto
+  - delete policy para instalaciones nuevas: `ON DELETE RESTRICT`
 
-## Important migration note
+## Nota importante de migraciones
 
-- Existing user databases are not recreated.
-- Because SQLite cannot add foreign key constraints to existing tables without
-  rebuilding them, older databases preserve their current schema.
-- New installs receive the reinforced schema.
-- The repository layer still keeps defensive deletion/import behavior so old and
-  new databases behave consistently.
+- las bases existentes no se reconstruyen de forma destructiva
+- SQLite no agrega foreign keys retroactivamente sin rebuild de tabla
+- instalaciones nuevas reciben el esquema reforzado más reciente
+- instalaciones antiguas pueden conservar diferencias físicas de schema
+- la capa repositorio mantiene validaciones defensivas para reducir diferencias de comportamiento

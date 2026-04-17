@@ -62,7 +62,9 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
           )
         : '';
     _noteController.text = movement?.note ?? '';
-    _paymentMethodController.text = movement?.paymentMethod ?? '';
+    _paymentMethodController.text = movement?.paymentMethod == null
+        ? ''
+        : PaymentMethodUtils.canonicalizeLabel(movement!.paymentMethod!);
     _categoryId = movement == null || movement.categoryId.isEmpty
         ? null
         : movement.categoryId;
@@ -125,7 +127,9 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
           : _noteController.text.trim(),
       paymentMethod: _paymentMethodController.text.trim().isEmpty
           ? null
-          : _paymentMethodController.text.trim(),
+          : PaymentMethodUtils.canonicalizeLabel(
+              _paymentMethodController.text.trim(),
+            ),
       createdAt: widget.initialMovement?.createdAt ?? now,
       updatedAt: now,
     );
@@ -401,7 +405,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       )
                       .toList(),
                   onChanged: (value) {
-                    _paymentMethodController.text = value ?? '';
+                    setState(() {
+                      _paymentMethodController.text = value == null
+                          ? ''
+                          : PaymentMethodUtils.canonicalizeLabel(value);
+                    });
                   },
                 ),
                 const SizedBox(height: 12),

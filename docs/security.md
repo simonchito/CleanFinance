@@ -2,185 +2,160 @@
 
 ## Overview
 
-Security in CleanFinance is local and device-oriented. The current implementation does not send credentials or financial data to a backend service.
+La seguridad actual de CleanFinance es completamente local. No existe backend de autenticación, cuenta remota ni envío de credenciales a servidores.
 
-Main mechanisms:
+Mecanismos implementados:
 
-- PIN-based authentication
-- optional biometric unlock
-- secure storage for credentials and recovery data
-- auto-lock on app lifecycle resume
+- PIN local de 6 dígitos
+- biometría opcional
+- recuperación local con dos datos configurados por el usuario
+- auto-lock por lifecycle
 
-## Core Components
+## Componentes principales
 
 ### `SecureStorageService`
 
-File:
+Archivo:
 
 - `lib/core/security/secure_storage_service.dart`
 
-Purpose:
+Responsabilidad:
 
-- wrap `FlutterSecureStorage`
-- persist auth-related secrets outside SQLite
+- encapsular `FlutterSecureStorage`
+- guardar credenciales sensibles fuera de SQLite
 
-Stored keys:
+Claves activas:
 
 - `auth.credential`
-- `auth.biometric_enabled`
 - `auth.recovery.birth_date`
 - `auth.recovery.document`
 
+Clave legacy:
+
+- `auth.biometric_enabled`
+
+La preferencia de biometría ya no es la fuente de verdad actual; esa clave puede existir solo como compatibilidad para migrar instalaciones previas.
+
 ### `PasswordHasher`
 
-File:
+Archivo:
 
 - `lib/core/security/password_hasher.dart`
 
-Purpose:
+Responsabilidad:
 
-- hash PINs and recovery secrets before storage
+- hashear PIN y respuestas de recuperación antes de persistirlas
 
-Current algorithm details from code:
+Configuración real actual:
 
 - PBKDF2
 - HMAC-SHA256
-- 120000 iterations
-- 16-byte random salt
-- 256 derived bits
-
-The implementation compares derived hashes using a custom constant-time style list equality helper.
+- 120000 iteraciones
+- salt aleatorio de 16 bytes
+- 256 bits derivados
 
 ### `BiometricService`
 
-File:
+Archivo:
 
 - `lib/core/security/biometric_service.dart`
 
-Purpose:
+Responsabilidad:
 
-- wrap `local_auth`
-- check biometric/device support
-- attempt biometric-only authentication
+- envolver `local_auth`
+- consultar disponibilidad biométrica del dispositivo
+- disparar autenticación biométrica
 
-Behavior:
+Comportamiento actual:
 
-- uses `canCheckBiometrics`
-- falls back to `isDeviceSupported()`
-- authenticates with `biometricOnly: true`
+- consulta `canCheckBiometrics`
+- si hace falta, cae a `isDeviceSupported()`
+- autentica con `biometricOnly: true`
 
-## Authentication Flow
+## Flujo real de autenticación
 
-### First-Time Setup
+### Alta inicial
 
-The user creates:
+`SetupPinScreen` solicita:
 
-- a 6-digit PIN
-- recovery answers:
-  - birth date
-  - document identifier
+- PIN
+- confirmación de PIN
+- fecha de nacimiento
+- documento personal
+- toggle opcional para habilitar biometría
 
-Optional:
+Resultado:
 
-- enable biometrics
+- PIN hasheado en secure storage
+- datos de recuperación hasheados en secure storage
+- preferencia de biometría persistida en `app_settings.biometric_enabled`
 
 ### Unlock
 
-The app supports:
+`UnlockScreen` permite:
 
-- PIN unlock
-- biometric unlock when available and enabled
+- desbloqueo por PIN
+- intento automático de biometría si:
+  - el dispositivo soporta biometría
+  - la preferencia persistida está habilitada
 
-### Recovery
+Si biometría falla o no está disponible:
 
-If recovery data exists, the user can:
+- la UI no se rompe
+- el fallback sigue siendo PIN
 
-- answer both recovery prompts
-- set a new PIN
-- optionally re-enable biometrics
+### Recuperación
 
-## Auto-Lock
+`RecoverAccessScreen` permite:
 
-`HomeShell` listens to app lifecycle changes:
+- validar fecha de nacimiento y documento
+- definir un PIN nuevo
+- volver a decidir si biometría queda habilitada
 
-- on pause, the current timestamp is stored in memory
-- on resume, `AuthController.onResumed(...)` compares elapsed time with the configured auto-lock minutes
-- if the threshold is reached, the app returns to the locked state
+## Fuente de verdad de biometría
 
-This is a session lock, not a process-level encryption feature.
+La fuente de verdad actual es:
 
-## Interaction with Settings
+- `app_settings.biometric_enabled`
 
-The app stores a biometric-enabled flag in two places:
+Impacto:
 
-- secure storage for auth behavior
-- `app_settings` in SQLite for settings UI state and app preferences
+- onboarding actualiza esa preferencia
+- Ajustes lee y actualiza esa preferencia
+- unlock decide si ofrece biometría a partir de esa preferencia
 
-The settings screen updates both through:
+Comportamiento adicional:
 
-- `AuthController.setBiometricEnabled(...)`
-- `SettingsController.setBiometricEnabled(...)`
+- si la app encuentra el flag legacy en secure storage, intenta migrarlo
+- si biometría deja de estar disponible, la preferencia se desactiva con degradación elegante a PIN
 
-## Error Handling
+## Relación con Settings
 
-Global error handling is configured in:
+`SettingsScreen` expone:
 
-- `lib/core/errors/app_error_handler.dart`
+- switch de biometría
+- minutos de auto-lock
 
-Covered hooks:
+El switch:
 
-- `FlutterError.onError`
-- `PlatformDispatcher.instance.onError`
-- `runZonedGuarded`
-- custom `ErrorWidget.builder`
+- muestra el estado efectivo de auth/settings
+- se deshabilita cuando biometría no está disponible
+- persiste sobre la misma preferencia usada en onboarding y unlock
 
-Current behavior:
+## Auto-lock
 
-- prints structured diagnostics in debug output
-- renders a readable in-app fallback widget for widget build failures
+`HomeShell` observa el lifecycle:
 
-No remote crash reporting integration is present in the current code.
+- en `paused`, `AuthController.onPaused()` guarda timestamp en memoria
+- en `resumed`, `AuthController.onResumed(...)` compara el tiempo transcurrido con `autoLockMinutes`
+- si se supera el umbral, la app vuelve a estado `locked`
 
-## Security Boundaries
+Esto es un bloqueo de sesión, no cifrado de base de datos.
 
-### Protected in Secure Storage
+## Límites actuales
 
-- hashed PIN payload
-- biometric enabled flag
-- hashed recovery secrets
-
-### Protected in SQLite
-
-- finance data
-- app settings
-
-SQLite data is local to the device, but the codebase does not implement database encryption.
-
-## Platform and Support Notes
-
-### Biometric Support
-
-Biometrics depend on:
-
-- device support
-- OS configuration
-- plugin availability
-
-The app already handles unavailable biometrics by disabling related actions and surfacing messages.
-
-### Web Support
-
-The repository includes a `web/` directory, but the current source code has no web-specific guards around local auth, secure storage, or SQLite-backed repositories.
-
-Status:
-
-- web runtime support is not determined from the code reviewed
-- biometric and persistence behavior on web should be treated as pending verification
-
-## Current Limitations
-
-- no remote account system
-- no server-side recovery
-- no database encryption layer
-- no anti-tamper or jailbreak/root detection
-- no audit log for auth events
+- no hay cifrado de SQLite
+- no hay cuenta remota ni recuperación server-side
+- no hay detección de root/jailbreak
+- no hay audit log de eventos de autenticación
+- soporte biométrico fuera de plataformas móviles principales requiere validación por entorno

@@ -34,6 +34,10 @@ class SecureStorageService {
     return (await _storage.read(key: _biometricEnabledKey)) == '1';
   }
 
+  Future<void> deleteBiometricEnabled() {
+    return _storage.delete(key: _biometricEnabledKey);
+  }
+
   Future<void> saveRecoveryBirthDate(String payload) {
     return _storage.write(key: _recoveryBirthDateKey, value: payload);
   }

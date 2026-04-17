@@ -3,13 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../brand_logo_asset.dart';
+import '../../../finance/presentation/providers/finance_providers.dart';
 import '../providers/auth_providers.dart';
 
 class RecoverAccessScreen extends ConsumerStatefulWidget {
   const RecoverAccessScreen({super.key});
 
   @override
-  ConsumerState<RecoverAccessScreen> createState() => _RecoverAccessScreenState();
+  ConsumerState<RecoverAccessScreen> createState() =>
+      _RecoverAccessScreenState();
 }
 
 class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
@@ -45,18 +47,21 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
     }
 
     setState(() => _loading = true);
-    final success = await ref.read(authControllerProvider.notifier).recoverAccess(
-          birthDate: birthDate,
-          documentId: document,
-          newPin: newPin,
-          enableBiometrics: _enableBiometrics,
-        );
+    final success =
+        await ref.read(authControllerProvider.notifier).recoverAccess(
+              birthDate: birthDate,
+              documentId: document,
+              newPin: newPin,
+              enableBiometrics: _enableBiometrics,
+            );
     setState(() => _loading = false);
 
     if (!success && mounted) {
       _showMessage(ref.read(authControllerProvider).errorMessage ?? 'Error.');
       return;
     }
+
+    ref.invalidate(settingsControllerProvider);
 
     if (mounted) {
       Navigator.of(context).pop();

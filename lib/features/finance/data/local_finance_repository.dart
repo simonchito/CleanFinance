@@ -171,7 +171,9 @@ class LocalFinanceRepository
         'goal_id': movement.goalId,
         'occurred_on': movement.occurredOn.toIso8601String(),
         'note': movement.note,
-        'payment_method': movement.paymentMethod,
+        'payment_method': movement.paymentMethod == null
+            ? null
+            : PaymentMethodUtils.canonicalizeLabel(movement.paymentMethod!),
         'monthly_reminder_enabled': movement.monthlyReminderEnabled ? 1 : 0,
         'reminder_day': movement.reminderDay,
         'created_at': movement.createdAt.toIso8601String(),
@@ -505,9 +507,7 @@ class LocalFinanceRepository
       }
     });
     if (_secureStorage != null) {
-      final biometricEnabled = settings.isNotEmpty &&
-          ((settings.first['biometric_enabled'] as num?)?.toInt() ?? 0) == 1;
-      await _secureStorage.saveBiometricEnabled(biometricEnabled);
+      await _secureStorage.deleteBiometricEnabled();
     }
     await ensureSeedData();
   }
@@ -537,7 +537,7 @@ class LocalFinanceRepository
       );
     });
     if (_secureStorage != null) {
-      await _secureStorage.saveBiometricEnabled(false);
+      await _secureStorage.deleteBiometricEnabled();
     }
     await ensureSeedData();
   }
@@ -552,7 +552,11 @@ class LocalFinanceRepository
       goalId: map['goal_id'] as String?,
       occurredOn: DateTime.parse(map['occurred_on'] as String),
       note: map['note'] as String?,
-      paymentMethod: map['payment_method'] as String?,
+      paymentMethod: (map['payment_method'] as String?) == null
+          ? null
+          : PaymentMethodUtils.canonicalizeLabel(
+              map['payment_method'] as String,
+            ),
       createdAt: DateTime.parse(map['created_at'] as String),
       updatedAt: DateTime.parse(map['updated_at'] as String),
       categoryName: map['category_name'] as String?,

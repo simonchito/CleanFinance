@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/utils/payment_method_utils.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/movement_filter.dart';
 import '../providers/finance_providers.dart';
+import '../utils/payment_method_icon_resolver.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/selection_sheet_field.dart';
 import '../widgets/section_card.dart';
@@ -60,9 +62,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
     DateTime? endDate = _filter.endDate;
     String? selectedCategoryId = _filter.categoryId;
     final categories = await ref.read(categoriesProvider(null).future);
-    final topLevelCategories = categories
-        .where((category) => category.parentId == null)
-        .toList();
+    final topLevelCategories =
+        categories.where((category) => category.parentId == null).toList();
 
     if (!mounted) {
       return;
@@ -198,7 +199,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                                 startDate: startDate,
                                 endDate: endDate,
                                 categoryId: selectedCategoryId,
-                                clearDates: startDate == null && endDate == null,
+                                clearDates:
+                                    startDate == null && endDate == null,
                                 clearCategory: selectedCategoryId == null,
                               );
                             });
@@ -294,7 +296,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                         label: 'Gastos',
                         selected: _filter.type == MovementType.expense,
                         onTap: () => setState(() {
-                          _filter = _filter.copyWith(type: MovementType.expense);
+                          _filter =
+                              _filter.copyWith(type: MovementType.expense);
                         }),
                       ),
                       _TypeChip(
@@ -317,7 +320,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                 return EmptyStateView(
                   icon: Icons.receipt_long_outlined,
                   title: 'No encontramos movimientos',
-                  message: 'Probá cambiando el filtro o agregando un nuevo registro.',
+                  message:
+                      'Probá cambiando el filtro o agregando un nuevo registro.',
                   actionLabel: 'Agregar movimiento',
                   onAction: _openEditor,
                 );
@@ -369,7 +373,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                                   movement.subcategoryName ??
                                       movement.categoryName ??
                                       'Sin categoría',
-                                  style: Theme.of(context).textTheme.titleMedium,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
@@ -389,6 +394,18 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                                         color: scheme.onSurfaceVariant,
                                       ),
                                 ),
+                                if (movement.paymentMethod?.isNotEmpty ==
+                                    true) ...[
+                                  const SizedBox(height: 10),
+                                  _MovementMetadataChip(
+                                    icon: PaymentMethodIconResolver.resolve(
+                                      movement.paymentMethod!,
+                                    ),
+                                    label: PaymentMethodUtils.canonicalizeLabel(
+                                      movement.paymentMethod!,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -453,6 +470,48 @@ class _TypeChip extends StatelessWidget {
         label: Text(label),
         selected: selected,
         onSelected: (_) => onTap(),
+      ),
+    );
+  }
+}
+
+class _MovementMetadataChip extends StatelessWidget {
+  const _MovementMetadataChip({
+    required this.icon,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: scheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -211,7 +211,10 @@ class SettingsScreen extends ConsumerWidget {
                             strings.isEnglish
                                 ? 'Adjust the experience so it really feels like yours.'
                                 : 'Configurá la experiencia para que se sienta realmente tuya.',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onSurfaceVariant,
@@ -265,7 +268,9 @@ class SettingsScreen extends ConsumerWidget {
                         DropdownMenuItem(
                           value: AppThemePreference.system,
                           child: Text(
-                            strings.isEnglish ? 'Follow system' : 'Seguir sistema',
+                            strings.isEnglish
+                                ? 'Follow system'
+                                : 'Seguir sistema',
                           ),
                         ),
                         DropdownMenuItem(
@@ -347,7 +352,8 @@ class SettingsScreen extends ConsumerWidget {
                           ? 'Keep fast access without losing privacy.'
                           : 'Mantené acceso rápido sin perder privacidad.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     const SizedBox(height: 14),
@@ -363,40 +369,48 @@ class SettingsScreen extends ConsumerWidget {
                                 ? 'This device does not support biometrics.'
                                 : 'Este dispositivo no tiene biometría disponible.'),
                       ),
-                      value: settings.biometricEnabled,
-                      onChanged: (value) async {
-                        final success = await ref
-                            .read(authControllerProvider.notifier)
-                            .setBiometricEnabled(value);
-                        if (success) {
-                          await ref
-                              .read(settingsControllerProvider.notifier)
-                              .setBiometricEnabled(value);
-                        }
-                      },
+                      value: authState.biometricEnabled,
+                      onChanged: authState.biometricAvailable
+                          ? (value) async {
+                              final success = await ref
+                                  .read(authControllerProvider.notifier)
+                                  .setBiometricEnabled(value);
+                              if (success) {
+                                await ref
+                                    .read(settingsControllerProvider.notifier)
+                                    .setBiometricEnabled(value);
+                              }
+                            }
+                          : null,
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
                       initialValue: settings.autoLockMinutes,
                       decoration: InputDecoration(
-                        labelText: strings.isEnglish ? 'Auto lock' : 'Bloqueo automático',
+                        labelText: strings.isEnglish
+                            ? 'Auto lock'
+                            : 'Bloqueo automático',
                       ),
                       items: [
                         DropdownMenuItem(
                           value: 1,
-                          child: Text(strings.isEnglish ? '1 minute' : '1 minuto'),
+                          child:
+                              Text(strings.isEnglish ? '1 minute' : '1 minuto'),
                         ),
                         DropdownMenuItem(
                           value: 5,
-                          child: Text(strings.isEnglish ? '5 minutes' : '5 minutos'),
+                          child: Text(
+                              strings.isEnglish ? '5 minutes' : '5 minutos'),
                         ),
                         DropdownMenuItem(
                           value: 15,
-                          child: Text(strings.isEnglish ? '15 minutes' : '15 minutos'),
+                          child: Text(
+                              strings.isEnglish ? '15 minutes' : '15 minutos'),
                         ),
                         DropdownMenuItem(
                           value: 30,
-                          child: Text(strings.isEnglish ? '30 minutes' : '30 minutos'),
+                          child: Text(
+                              strings.isEnglish ? '30 minutes' : '30 minutos'),
                         ),
                       ],
                       onChanged: (value) {
@@ -433,7 +447,8 @@ class SettingsScreen extends ConsumerWidget {
                           ? 'Customize the lists you use every day so adding data stays quick and clear.'
                           : 'Personalizá las listas que usás todos los días para que cargar datos siga siendo rápido y claro.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     const SizedBox(height: 16),
@@ -502,7 +517,8 @@ class SettingsScreen extends ConsumerWidget {
                           ? 'Your data lives on your device. You can export or restore it whenever you need.'
                           : 'Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                     const SizedBox(height: 16),
@@ -557,6 +573,3 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 }
-
-
-

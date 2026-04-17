@@ -1,226 +1,113 @@
 # Dependencies
 
-## Runtime Dependencies
+## Runtime dependencies
 
-## Flutter SDK
+### Flutter SDK
 
-### `flutter`
+#### `flutter`
 
-Category:
+Propósito:
 
-- framework
+- framework base
 
-Purpose:
+#### `flutter_localizations`
 
-- base UI toolkit and runtime
+Propósito:
 
-### `flutter_localizations`
+- delegates de localización de Flutter
 
-Category:
+## UI / UX
 
-- localization
+#### `cupertino_icons`
 
-Purpose:
+- set de iconos estilo iOS
 
-- material, cupertino, and widgets localization delegates
+#### `google_fonts`
 
-## UI and UX
+- tipografía custom del theme
+- actualmente se usa `Manrope`
 
-### `cupertino_icons`
+#### `intl`
 
-Category:
+- fechas
+- formatos localizados
+- soporte de locale para montos y textos de fechas
 
-- UI
+## State management
 
-Purpose:
-
-- iOS-style icon set
-
-### `google_fonts`
-
-Category:
-
-- UI / typography
-
-Purpose:
-
-- custom fonts in app theme
-
-### `intl`
-
-Category:
-
-- formatting / localization
-
-Purpose:
-
-- date formatting
-- locale-aware number formatting
-
-## State Management and Architecture
-
-### `flutter_riverpod`
-
-Category:
-
-- state management / dependency injection
-
-Purpose:
+#### `flutter_riverpod`
 
 - providers
-- state notifiers
-- async data orchestration
+- dependency injection
+- controllers y providers asíncronos
 
 ## Security
 
-### `cryptography`
+#### `cryptography`
 
-Category:
+- PBKDF2 para PIN y recuperación
 
-- security
+#### `flutter_secure_storage`
 
-Purpose:
+- persistencia segura de PIN y datos de recuperación
 
-- PBKDF2 hashing for PIN and recovery data
+#### `local_auth`
 
-### `flutter_secure_storage`
+- autenticación biométrica
 
-Category:
+## Local persistence / files
 
-- security / storage
+#### `sqflite`
 
-Purpose:
+- base SQLite local
 
-- store auth credentials and recovery secrets securely
+#### `path`
 
-### `local_auth`
+- composición de paths, principalmente para DB
 
-Category:
+#### `path_provider`
 
-- security / platform integration
+- directorios locales, usados por export de backup
 
-Purpose:
+#### `file_picker`
 
-- fingerprint / biometric authentication
+- elegir archivos JSON al importar backup
 
-## Local Persistence and Files
+#### `share_plus`
 
-### `sqflite`
-
-Category:
-
-- database
-
-Purpose:
-
-- local SQLite persistence
-
-### `path`
-
-Category:
-
-- filesystem utility
-
-Purpose:
-
-- build database file paths
-
-### `path_provider`
-
-Category:
-
-- filesystem / platform integration
-
-Purpose:
-
-- find local document directories for export files
-
-### `file_picker`
-
-Category:
-
-- file access
-
-Purpose:
-
-- select backup JSON files for import
-
-### `share_plus`
-
-Category:
-
-- file sharing / platform integration
-
-Purpose:
-
-- share exported backup files
+- compartir archivo exportado del backup
 
 ## Utilities
 
-### `uuid`
+#### `uuid`
 
-Category:
+- IDs para movimientos, categorías, metas y presupuestos
 
-- utility
+## Development dependencies
 
-Purpose:
+#### `flutter_test`
 
-- generate ids for movements, categories, savings goals, and budgets
+- framework de tests
 
-## Development Dependencies
+#### `flutter_launcher_icons`
 
-### `flutter_test`
+- generación de iconos launcher
 
-Category:
+#### `flutter_lints`
 
-- testing
+- reglas base de lint
 
-Purpose:
+#### `mocktail`
 
-- Flutter test framework
+- mocking en tests
 
-### `flutter_launcher_icons`
+#### `pdf`
 
-Category:
+- tooling de generación PDF usado desde scripts/utilidades del repo, no desde el flujo principal de runtime revisado
 
-- tooling / assets
+## Notas
 
-Purpose:
-
-- generate app icons for Android and iOS
-
-### `flutter_lints`
-
-Category:
-
-- linting
-
-Purpose:
-
-- baseline lint rules
-
-### `mocktail`
-
-Category:
-
-- testing
-
-Purpose:
-
-- mocking in tests
-
-### `pdf`
-
-Category:
-
-- development dependency
-
-Purpose:
-
-- purpose not determined from the runtime source files reviewed in this pass
-
-## Notes
-
-- there is no routing package in the current app
-- there is no HTTP client dependency in the current runtime implementation
-- there is no cloud sync dependency in the current runtime implementation
+- no hay paquete de routing declarativo
+- no hay cliente HTTP
+- no hay dependencias de backend o sync cloud
+- el soporte real por plataforma debe leerse junto con [`build-and-run.md`](D:/GITHUB/CleanFinance/docs/build-and-run.md)

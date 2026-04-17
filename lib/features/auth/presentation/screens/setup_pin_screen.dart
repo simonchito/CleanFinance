@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../finance/presentation/providers/finance_providers.dart';
 import '../providers/auth_providers.dart';
 
 class SetupPinScreen extends ConsumerStatefulWidget {
@@ -55,6 +56,11 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
 
     if (!success && mounted) {
       _showMessage(ref.read(authControllerProvider).errorMessage ?? 'Error.');
+      return;
+    }
+
+    if (success) {
+      ref.invalidate(settingsControllerProvider);
     }
   }
 
@@ -122,8 +128,9 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       obscureText: true,
                       maxLength: AppConstants.defaultPinLength,
                       decoration: InputDecoration(
-                        labelText:
-                            strings.isEnglish ? 'Choose your PIN' : 'Elegí tu PIN',
+                        labelText: strings.isEnglish
+                            ? 'Choose your PIN'
+                            : 'Elegí tu PIN',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -133,8 +140,9 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       obscureText: true,
                       maxLength: AppConstants.defaultPinLength,
                       decoration: InputDecoration(
-                        labelText:
-                            strings.isEnglish ? 'Repeat your PIN' : 'Repetí tu PIN',
+                        labelText: strings.isEnglish
+                            ? 'Repeat your PIN'
+                            : 'Repetí tu PIN',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -182,7 +190,9 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       onPressed: _isSubmitting ? null : _submit,
                       child: Text(
                         _isSubmitting
-                            ? (strings.isEnglish ? 'Setting up...' : 'Configurando...')
+                            ? (strings.isEnglish
+                                ? 'Setting up...'
+                                : 'Configurando...')
                             : (strings.isEnglish ? 'Start' : 'Empezar'),
                       ),
                     ),

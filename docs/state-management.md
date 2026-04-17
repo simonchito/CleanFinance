@@ -1,66 +1,73 @@
 # State Management
 
-## Riverpod Usage Overview
+## Overview
 
-CleanFinance uses `flutter_riverpod` as the primary state and dependency management solution.
+CleanFinance usa `flutter_riverpod` para dos cosas principales:
 
-The current design combines:
+- inyección de dependencias
+- lectura y derivación de estado de la app
 
-- infrastructure providers
-- repository providers
-- domain service providers
-- feature-specific asynchronous providers
-- `StateNotifier` controllers for auth and settings
-- a small `StateProvider` for amount visibility session override
+La estructura actual combina:
 
-## Provider Layers
+- providers de infraestructura compartida
+- providers de repositorios
+- providers de servicios de dominio
+- controllers con `StateNotifier`
+- providers asíncronos por pantalla
 
-## 1. Shared Dependency Providers
+## 1. Shared dependency providers
 
-Defined in `lib/shared/providers.dart`.
+Definidos en:
 
-These providers create and expose:
+- `lib/shared/providers.dart`
+
+Exponen:
 
 - `AppDatabase`
 - `SecureStorageService`
 - `PasswordHasher`
 - `BiometricService`
-- repository implementations
-- stateless domain services
+- repositorios concretos
+- servicios de dominio stateless
 
-This is the dependency injection root of the app.
+Este archivo funciona como root de composición del proyecto.
 
-## 2. Feature Controllers
+## 2. Controllers
 
 ### `authControllerProvider`
 
-Type:
+Tipo:
 
 - `StateNotifierProvider<AuthController, AuthState>`
 
-Responsibilities:
+Responsabilidades:
 
-- startup auth bootstrap
-- PIN creation and verification
-- biometric unlock
-- access recovery
-- auto-lock state transitions
+- bootstrap inicial de auth
+- alta de PIN
+- desbloqueo por PIN
+- desbloqueo biométrico
+- recuperación
+- cambios de estado lock/unlock
+- auto-lock por lifecycle
 
 ### `settingsControllerProvider`
 
-Type:
+Tipo:
 
 - `StateNotifierProvider<SettingsController, AsyncValue<AppSettings>>`
 
-Responsibilities:
+Responsabilidades:
 
-- load persisted settings
-- update theme, locale, currency, payment methods
-- update privacy and security-related settings
+- cargar settings persistidos
+- actualizar locale, theme y moneda
+- actualizar privacidad de montos
+- actualizar biometría
+- actualizar auto-lock
+- actualizar medios de pago
 
-## 3. Async Screen Data Providers
+## 3. Async screen providers
 
-Main finance providers in `finance_providers.dart`:
+Principales en `finance_providers.dart`:
 
 - `dashboardSummaryProvider`
 - `recentMovementsProvider`
@@ -74,25 +81,25 @@ Main finance providers in `finance_providers.dart`:
 - `endOfMonthProjectionProvider`
 - `financeOverviewProvider`
 
-Budget provider:
+En budgets:
 
 - `categoryBudgetStatusProvider`
 
-## 4. Session/UI-Specific Provider
+## 4. Session/UI provider
 
 ### `showSensitiveAmountsOverrideProvider`
 
-Type:
+Tipo:
 
 - `StateProvider<bool?>`
 
-Purpose:
+Uso:
 
-- provide a session-level override for amount visibility without changing the persisted preference every time
+- override de sesión para la privacidad de montos sin reescribir inmediatamente la preferencia persistida en cada interacción
 
-## Derived State Flow
+## Flujos derivados
 
-### Authentication Flow
+### Auth flow
 
 ```text
 authControllerProvider
@@ -101,103 +108,73 @@ authControllerProvider
   -> AuthGateScreen
 ```
 
-The UI watches `AuthState.status` and switches screens accordingly.
+La UI observa `AuthState.status` y decide pantalla.
 
-### Settings Flow
+### Settings flow
 
 ```text
 settingsRepositoryProvider
   -> SettingsController
   -> settingsControllerProvider
-  -> widgets read AsyncValue<AppSettings>
+  -> widgets leen AsyncValue<AppSettings>
 ```
 
-`showSensitiveAmountsProvider` combines:
+`showSensitiveAmountsProvider` combina:
 
-- session override from `showSensitiveAmountsOverrideProvider`
-- persisted settings from `settingsControllerProvider`
-- privacy-first fallback while settings are still loading
+- override de sesión
+- valor persistido en settings
+- fallback privacy-first mientras settings cargan
 
-### Finance Overview Flow
+### Finance overview flow
 
-`financeOverviewProvider` is the main aggregation provider for dashboard and reports.
+`financeOverviewProvider` es el provider agregado principal para dashboard y reportes.
 
-It orchestrates:
+Combina:
 
-- movements repository
-- savings goals repository
-- analytics domain services
+- repositorio de movimientos
+- repositorio de metas
+- varios servicios de dominio de analítica
 
-Outputs combined data for:
+Produce:
 
-- dashboard summary blocks
+- summary
+- cashflow
+- trend
+- comparison
+- pace
+- projection
 - reports
-- charts
+- payment method report
 - insights
-- projections
 
-### Reminder Flow
+### Reminder flow
 
-`monthlyDueRemindersProvider` currently:
+`monthlyDueRemindersProvider`:
 
-1. loads expense categories
-2. loads savings goals
-3. loads current-month movements
-4. passes all of that into `MonthlyPaymentReminderService`
+1. carga subcategorías de gasto
+2. carga metas de ahorro
+3. carga movimientos del mes
+4. delega reglas a `MonthlyPaymentReminderService`
 
-This keeps reminder rules out of widgets.
+## Patrón de mutación actual
 
-## Mutation Pattern
+El proyecto no centraliza todas las escrituras en una capa de use cases.
 
-The current project does not use a centralized command bus or dedicated use-case layer for write operations. Instead:
+Patrón visible:
 
-- screens call repository methods directly or via controllers
-- after mutations, screens invalidate dependent providers
+- algunas acciones usan controllers
+- otras llaman repositorios desde la pantalla
+- luego invalidan providers afectados
 
-Examples:
+Ejemplos:
 
-- movement save invalidates overview, summaries, recent movements, reports, reminders, and budget status
-- savings goal save invalidates goal and reminder providers
-- category edits invalidate categories, reminders, and finance overview
+- guardar movimiento invalida overview, listados, reportes, reminders y budgets
+- guardar categorías invalida categorías, reminders, overview y budget status
+- guardar settings actualiza el `AsyncValue<AppSettings>` en el controller
 
-## Thin vs Thick Providers
+## Tradeoffs
 
-### Thin Providers
-
-Many providers are thin orchestration wrappers around repositories or services.
-
-Examples:
-
-- `monthlyDueRemindersProvider`
-- `categoryBudgetStatusProvider`
-- `dashboardSummaryProvider`
-
-### Rich Aggregation Provider
-
-`financeOverviewProvider` is intentionally richer and composes several services into a single UI-oriented model.
-
-## Relationship Between UI and Logic
-
-### UI Layer
-
-Screens typically:
-
-- watch async providers
-- render `loading / data / error`
-- invoke repositories/controllers on user actions
-- invalidate providers after writes
-
-### Business Logic Layer
-
-Business rules live mainly in:
-
-- `AuthController`
-- `SettingsController`
-- domain services such as `BudgetService` and `MonthlyPaymentReminderService`
-
-## Observed Tradeoffs
-
-- Riverpod usage is straightforward and easy to follow
-- provider invalidation is explicit, but can become repetitive
-- some screen actions still call repositories directly rather than through dedicated application services
-- there is no offline sync queue or event sourcing; the state source of truth is local storage plus derived providers
+- Riverpod se usa de forma directa y fácil de seguir
+- la invalidación manual es explícita pero repetitiva
+- hay mezcla deliberada entre controllers y llamadas directas a repositorios según el flujo
+- la fuente de verdad sigue siendo almacenamiento local más providers derivados

@@ -1,80 +1,88 @@
 # Build and Run
 
-## Prerequisites
+## Prerequisitos
 
-The repository is a Flutter application. To run it locally, you need:
+Necesitás:
 
-- Flutter SDK compatible with `sdk: >=3.3.0 <4.0.0`
-- Dart SDK bundled with Flutter
-- platform toolchains for your target device or emulator
+- Flutter SDK compatible con `sdk: >=3.3.0 <4.0.0`
+- Dart incluido con Flutter
+- Android Studio o toolchains de la plataforma objetivo
+- emulador o dispositivo físico si querés validar mobile
 
-## Install Dependencies
+## Dependencias
 
 ```bash
 flutter pub get
 ```
 
-## Run in Debug
+## Ejecutar en debug
 
 ```bash
 flutter run
 ```
 
-If you have multiple devices connected:
+Si hay múltiples dispositivos:
 
 ```bash
 flutter devices
 flutter run -d <device-id>
 ```
 
-## Run Tests
-
-```bash
-flutter test
-```
-
-Current automated tests cover:
-
-- password hashing
-- whole-amount formatting
-- budget service rules
-- analytics services
-- monthly reminder service rules
-
-## Static Analysis
+## Análisis estático
 
 ```bash
 flutter analyze
 ```
 
-Lint configuration:
+Lint config:
 
 - `analysis_options.yaml`
-- based on `flutter_lints`
+- basado en `flutter_lints`
 
-## Build APK
+## Tests
 
-Debug APK:
+```bash
+flutter test
+```
+
+Ejemplos de tests existentes en el repo:
+
+- `test/auth_controller_test.dart`
+- `test/movement_form_screen_test.dart`
+- `test/payment_method_utils_test.dart`
+- `test/budget_service_test.dart`
+- `test/finance_analytics_services_test.dart`
+- `test/monthly_payment_reminder_service_test.dart`
+
+## Build Android
+
+APK debug:
 
 ```bash
 flutter build apk --debug
 ```
 
-Release APK:
+APK release:
 
 ```bash
 flutter build apk --release
 ```
 
-Expected output path:
+App Bundle:
 
-```text
-build/app/outputs/flutter-apk/
+```bash
+flutter build appbundle --release
 ```
 
-## Other Platform Builds
+Salida esperada:
 
-The repository includes Flutter platform folders for:
+```text
+build/app/outputs/
+```
+
+## Otras plataformas
+
+El repo incluye carpetas para:
 
 - Android
 - iOS
@@ -83,7 +91,7 @@ The repository includes Flutter platform folders for:
 - Windows
 - Web
 
-Typical commands:
+Comandos típicos de Flutter:
 
 ```bash
 flutter build ios
@@ -93,54 +101,26 @@ flutter build linux
 flutter build web
 ```
 
-## Platform Support Status
+## Estado de soporte por plataforma
 
-### Repository-Level Presence
+Lo que sí puede afirmarse desde el código:
 
-Platform directories exist for:
+- Android: flujo principal esperado
+- iOS: plausible a nivel dependencias/carpeta, requiere validación de runtime
+- Desktop: presencia de carpetas, pero soporte real depende de plugins usados
+- Web: presencia de carpeta, pero el proyecto no implementa guards específicos para plugins de auth, secure storage y SQLite
 
-- `android/`
-- `ios/`
-- `linux/`
-- `macos/`
-- `windows/`
-- `web/`
-
-### Runtime Compatibility
-
-The codebase uses plugins such as:
+Plugins que condicionan soporte real:
 
 - `sqflite`
-- `local_auth`
 - `flutter_secure_storage`
+- `local_auth`
+- `file_picker`
+- `share_plus`
 
-Because the source code does not include explicit platform-guarded alternatives for every platform, full compatibility should be treated as:
+## Consideraciones de runtime
 
-- Android: likely intended
-- iOS: likely intended
-- Linux/macOS/Windows: partially supported at repository level, runtime verification pending
-- Web: not determined and likely constrained by current plugin choices
-
-## Known Runtime Considerations
-
-### Biometrics
-
-- depend on device support and OS configuration
-- are explicitly handled when unavailable
-- may not behave uniformly across all platforms
-
-### Local Database
-
-- SQLite is the storage backend
-- new installs receive the latest schema version
-- older installs rely on migrations without destructive rebuilds
-
-### Backup Flow
-
-- export creates a local JSON file in the app documents directory
-- import reads a selected JSON file and replaces current local data
-
-## App Startup Flow
+### Startup
 
 ```text
 main.dart
@@ -151,10 +131,20 @@ main.dart
   -> AuthGateScreen
 ```
 
-## Icons and Assets
+### Backup local
 
-The app currently declares:
+- exporta un JSON al directorio de documentos de la app
+- usa `share_plus` para compartir el archivo
+- importa un JSON elegido con `file_picker`
+- la importación reemplaza los datos locales actuales
 
-- `assets/images/cleanfinance-logo.png`
+### Biometría
 
-Launcher icon generation is configured in `pubspec.yaml`.
+- depende del soporte del dispositivo y de la configuración del sistema
+- si no está disponible, la app sigue funcionando con PIN
+
+## Problemas comunes a revisar
+
+- si `flutter run` no encuentra dispositivo, validar `flutter doctor`
+- en plataformas no móviles, verificar compatibilidad real de `sqflite`, `local_auth` y `flutter_secure_storage`
+- para iOS/release signing, el repo no documenta aún configuración de firma o distribución

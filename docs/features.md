@@ -2,68 +2,71 @@
 
 ## Overview
 
-The current repository implements three main runtime features:
+El runtime actual del repo implementa tres módulos principales:
 
 - Authentication
 - Finance
 - Budgets
 
-The budgets feature is separated from finance at the folder level but is functionally integrated into the overall app flow.
+`budgets` vive como feature separado a nivel carpetas, pero se integra funcionalmente con movimientos y categorías de gasto.
 
 ## Authentication
 
-### Purpose
+### Propósito
 
-Protect local financial data behind a PIN-based lock screen, with optional biometric unlock and a recovery flow.
+Proteger el acceso local a la app con PIN y biometría opcional, con recuperación local.
 
-### Responsibilities
+### Responsabilidades actuales
 
-- initial app gatekeeping
-- PIN creation
-- PIN verification
-- biometric unlock
-- recovery questions and PIN reset
-- auto-lock on app resume after a configured inactivity window
+- gate inicial de la app
+- alta de PIN
+- validación de PIN
+- desbloqueo biométrico
+- recuperación de acceso
+- auto-lock al volver desde background
 
-### Main Files
+### Componentes principales
 
-- `lib/features/auth/presentation/auth_controller.dart`
-- `lib/features/auth/presentation/auth_state.dart`
-- `lib/features/auth/presentation/providers/auth_providers.dart`
-- `lib/features/auth/data/local_auth_repository.dart`
+- `AuthController`
+- `AuthState`
+- `LocalAuthRepository`
+- `SecureStorageService`
+- `BiometricService`
 
-### Screens
+### Pantallas
 
 - `AuthGateScreen`
 - `SetupPinScreen`
 - `UnlockScreen`
 - `RecoverAccessScreen`
 
-### Main Logic
+### Comportamiento real
 
-- `AuthController.bootstrap()` decides the initial auth state
-- `createPin(...)` stores hashed credentials and recovery data
-- `unlockWithPin(...)` and `unlockWithBiometrics()` unlock the app
-- `recoverAccess(...)` validates recovery answers and updates the PIN
-- `onPaused()` / `onResumed(...)` implement auto-lock timing
+- el PIN se guarda hasheado en secure storage
+- fecha de nacimiento y documento también se guardan hasheados en secure storage
+- la preferencia persistida de biometría se guarda en `app_settings.biometric_enabled`
+- onboarding, unlock y settings usan esa misma preferencia
+- si biometría no está disponible, la app vuelve a PIN sin romper el flujo
 
 ## Finance
 
-### Purpose
+### Propósito
 
-Provide the main product experience for registering finances and reviewing the current state of money, savings, reminders, and reports.
+Concentrar la experiencia principal de registro, seguimiento y lectura de la situación financiera local del usuario.
 
-### Responsibilities
+### Responsabilidades actuales
 
-- dashboard summary
-- movement creation and edition
-- category and subcategory management
-- savings goal management
-- monthly reminder management
-- reports and analytics
-- settings, backup, import, export, and payment methods
+- dashboard
+- alta, edición y borrado de movimientos
+- categorías y subcategorías
+- metas de ahorro
+- recordatorios mensuales
+- reportes
+- settings
+- backup/import/export
+- medios de pago
 
-### Main Screens
+### Pantallas principales
 
 - `HomeShell`
 - `DashboardScreen`
@@ -77,7 +80,7 @@ Provide the main product experience for registering finances and reviewing the c
 - `ManageRemindersScreen`
 - `PaymentMethodsScreen`
 
-### Main Providers
+### Providers principales
 
 - `settingsControllerProvider`
 - `showSensitiveAmountsProvider`
@@ -93,7 +96,7 @@ Provide the main product experience for registering finances and reviewing the c
 - `endOfMonthProjectionProvider`
 - `financeOverviewProvider`
 
-### Main Domain Services
+### Servicios de dominio principales
 
 - `CashflowSnapshotService`
 - `MonthlyTrendService`
@@ -108,67 +111,71 @@ Provide the main product experience for registering finances and reviewing the c
 
 ## Budgets
 
-### Purpose
+### Propósito
 
-Let users define monthly spending limits per expense category and track the current status of each budget.
+Definir límites mensuales por categoría de gasto y calcular el estado del presupuesto en base al consumo actual.
 
-### Responsibilities
+### Responsabilidades actuales
 
-- create and update category budgets
-- validate uniqueness per category and month
-- calculate spending vs limit
-- classify budget status (`normal`, `warning`, `exceeded`)
+- alta y edición de presupuestos mensuales
+- unicidad por categoría y mes
+- cálculo de consumo vs límite
+- clasificación visual del estado del presupuesto
 
-### Main Files
+### Archivos principales
 
 - `lib/features/budgets/data/repositories/local_budget_repository.dart`
 - `lib/features/budgets/domain/services/budget_service.dart`
 - `lib/features/budgets/presentation/providers/budget_providers.dart`
 
-### Screens
-
-- `BudgetsScreen`
-- `BudgetFormScreen`
-
-### Main Logic
-
-- `LocalBudgetRepository` persists monthly budget rows
-- `BudgetService.getCategoryBudgetStatuses(...)` joins budgets, expense categories, and current-month expense movements
-- `categoryBudgetStatusProvider` exposes the computed list to the UI
-
-## Feature Cross-Cutting Concerns
+## Concerns transversales
 
 ### Settings
 
-Settings are implemented inside the finance feature, not as a standalone module.
+Settings están implementados dentro de `finance`.
 
-Current responsibilities:
+Preferencias persistidas actuales:
 
 - locale
 - theme preference
 - currency
-- amount visibility preference
-- biometric setting mirror
+- show/hide amounts
+- biometric enabled
 - auto-lock minutes
 - payment methods
 
-### Monthly Reminders
+### Monthly reminders
 
-Reminders are not stored as standalone records.
+Los recordatorios no viven como tabla independiente.
 
-Current source of truth:
+Fuentes reales:
 
-- expense reminders come from expense subcategories
-- savings reminders come from savings goals
+- subcategorías de gasto con `reminderEnabled` y `reminderDay`
+- metas de ahorro con `reminderEnabled` y `reminderDay`
 
-The dashboard only shows reminders currently due for the month according to `MonthlyPaymentReminderService`.
+### Payment methods
 
-### Backup and Restore
+Catálogo base actual:
 
-Backup is implemented through the finance repository:
+- `Transferencia`
+- `Tarjeta débito`
+- `Tarjeta crédito`
+- `Efectivo`
+- `QR`
 
-- export all local tables to JSON
-- import JSON into SQLite
-- reset local data
+Comportamiento actual:
 
-There is no cloud sync implementation in the current repository.
+- el formulario de movimientos usa los métodos configurados en settings
+- el valor se canonicaliza con `PaymentMethodUtils`
+- se persiste en `movements.payment_method`
+- se ve en formulario, listados y reportes donde aporta valor
+
+### Backup and restore
+
+Implementado dentro de `LocalFinanceRepository`:
+
+- exporta tablas locales a JSON
+- importa JSON reemplazando datos locales
+- restablece settings por default si el backup no incluye `app_settings`
+
+No hay sync en nube ni backend en el código actual.

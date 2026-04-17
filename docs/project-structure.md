@@ -1,6 +1,6 @@
 # Project Structure
 
-## Top-Level Structure
+## Top level
 
 ```text
 CleanFinance/
@@ -20,7 +20,7 @@ CleanFinance/
 └── README.md
 ```
 
-## Main Source Tree
+## Main source tree
 
 ```text
 lib/
@@ -37,123 +37,91 @@ lib/
 │   └── utils/
 ├── features/
 │   ├── auth/
-│   │   ├── data/
-│   │   ├── domain/
-│   │   └── presentation/
 │   ├── budgets/
-│   │   ├── data/
-│   │   ├── domain/
-│   │   └── presentation/
 │   └── finance/
-│       ├── data/
-│       ├── domain/
-│       └── presentation/
 ├── shared/
 ├── brand_logo_asset.dart
 └── main.dart
 ```
 
-## Folder Purpose
+## Responsabilidad por carpeta
 
 ### `lib/app/`
 
-Application-wide configuration and UI resources.
-
-- `app.dart`: creates `MaterialApp`, theme mode, locale, and root screen
-- `app_strings.dart`: app copy and localization helper logic
-- `theme/`: palette and theme configuration
-- `widgets/`: app-level reusable branding widgets
+- `app.dart`: `MaterialApp`, theme mode, locale y root screen
+- `app_strings.dart`: copy y helper simple de localización
+- `theme/`: palette y theme Material 3
+- `widgets/`: widgets globales de marca
 
 ### `lib/core/`
 
-Shared infrastructure and low-level utilities.
-
-- `constants/`: application constants such as database version and defaults
-- `database/`: SQLite opening, schema creation, and migrations
-- `errors/`: global error capture and reporting
-- `security/`: hashing, biometrics, and secure storage wrappers
-- `utils/`: formatting and month/date helpers
+- `constants/`: defaults, catálogos e icon options
+- `database/`: apertura, schema, migraciones y seed helpers
+- `errors/`: manejo global de errores
+- `security/`: secure storage, biometría y hashing
+- `utils/`: formateadores, mapeos de iconos y helpers varios
 
 ### `lib/features/auth/`
 
-Authentication and unlock lifecycle.
-
-- `data/`: secure-storage-backed auth repository
-- `domain/`: auth repository contract
-- `presentation/`: auth controller, state, provider, and screens
+- `data/`: repositorio local de auth
+- `domain/`: contrato de repositorio
+- `presentation/`: controller, state, provider y pantallas de auth
 
 ### `lib/features/finance/`
 
-Main finance product feature.
-
-- `data/`: local repository for movements, categories, goals, settings, backup
-- `domain/entities/`: finance data models
-- `domain/repositories/`: repository contracts
-- `domain/services/`: analytics and reminder business rules
-- `presentation/controllers/`: settings controller
-- `presentation/mappers/`: view-specific mapping helpers
-- `presentation/models/`: composed UI model (`FinanceOverview`)
-- `presentation/providers/`: Riverpod providers for finance screens
-- `presentation/screens/`: main finance screens
-- `presentation/widgets/`: reusable UI widgets for finance
+- `data/`: repositorio local principal para datos financieros
+- `domain/entities/`: modelos de dominio como `Movement`, `Category`, `AppSettings`
+- `domain/repositories/`: contratos
+- `domain/services/`: reglas derivadas para reportes, insights y recordatorios
+- `presentation/controllers/`: `SettingsController`
+- `presentation/providers/`: providers de lectura
+- `presentation/screens/`: pantallas de dashboard, movimientos, ahorro, reportes, settings, categorías y recordatorios
+- `presentation/widgets/`: building blocks de UI reutilizables
+- `presentation/utils/`: helpers visuales como íconos de medio de pago
 
 ### `lib/features/budgets/`
 
-Monthly category budget management.
-
-- `data/repositories/`: SQLite-backed budget repository
-- `domain/models/`: budget entities and computed budget status models
-- `domain/repositories/`: budget repository contract
-- `domain/services/`: budget calculations and orchestration
-- `presentation/providers/`: budget providers
-- `presentation/screens/`: budget list and editor
-- `presentation/widgets/`: reusable budget cards
+- `data/repositories/`: persistencia local de presupuestos
+- `domain/models/`: entidades y estados de presupuesto
+- `domain/repositories/`: contrato
+- `domain/services/`: cálculos de presupuesto
+- `presentation/providers/`: provider de estados calculados
+- `presentation/screens/`: listado y formulario
 
 ### `lib/shared/`
 
-Global Riverpod dependency wiring.
-
-- `providers.dart`: repositories, services, and infrastructure providers shared across features
+- `providers.dart`: composición global de dependencias
 
 ### `test/`
 
-Automated tests currently focused on:
+Cobertura actual visible en el repo:
 
-- budget rules
-- analytics services
-- reminder rules
-- password hashing
-- whole-amount formatting
-- default Flutter widget test scaffold
+- hashing y seguridad
+- movement form
+- payment methods
+- services de analítica
+- services de recordatorios
+- budgets
+- formateo de montos
 
-## Conventions Detected
+## Convenciones actuales
 
-### Naming
+- archivos en `snake_case.dart`
+- clases en `PascalCase`
+- providers con sufijo `Provider`
+- controllers con sufijo `Controller`
+- services con sufijo `Service`
 
-- files use `snake_case.dart`
-- classes use `PascalCase`
-- providers follow a `...Provider` suffix
-- controllers use the `...Controller` suffix
-- domain services use the `...Service` suffix
+## Patrones visibles
 
-### Layer Placement
+- entidades y contratos sin imports de Flutter
+- persistencia concreta bajo `data`
+- UI dividida entre `screens` y `widgets`
+- navegación imperativa con `Navigator` y `MaterialPageRoute`
+- acceso a estado mediante `WidgetRef`
 
-- domain entities and contracts avoid Flutter imports
-- concrete persistence lives under `data`
-- most widget trees live under `presentation/screens` and `presentation/widgets`
+## Notas
 
-### State Access
-
-- shared infrastructure is defined once in `lib/shared/providers.dart`
-- feature providers build on top of those dependencies
-- screens read providers directly through `WidgetRef`
-
-### Navigation
-
-- screen transitions use `Navigator` and `MaterialPageRoute`
-- navigation is local to the calling screen rather than centralized
-
-## Notes About the Current Repository
-
-- the repo already contains a `docs/` directory with product-oriented documents not tied to the runtime source tree
-- `tool/` exists at the repository root, but its purpose is not determined from the files reviewed in this pass
+- `tool/` contiene tooling auxiliar del repo y no forma parte del runtime principal
+- `docs/` mantiene documentación técnica y de producto
+- `docs/plan_maestro.md` se conserva como documento histórico, no como fuente de verdad del estado actual

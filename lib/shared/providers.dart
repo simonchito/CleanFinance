@@ -40,6 +40,7 @@ final authRepositoryProvider = Provider<AuthRepository>(
     secureStorage: ref.watch(secureStorageProvider),
     passwordHasher: ref.watch(passwordHasherProvider),
     biometricService: ref.watch(biometricServiceProvider),
+    settingsRepository: ref.watch(settingsRepositoryProvider),
   ),
 );
 
@@ -69,8 +70,8 @@ final financeInsightsServiceProvider =
     Provider<FinanceInsightsService>((ref) => const FinanceInsightsService());
 final monthlyPaymentReminderServiceProvider =
     Provider<MonthlyPaymentReminderService>(
-      (ref) => const MonthlyPaymentReminderService(),
-    );
+  (ref) => const MonthlyPaymentReminderService(),
+);
 final monthlyTrendServiceProvider =
     Provider<MonthlyTrendService>((ref) => const MonthlyTrendService());
 final categoryComparisonServiceProvider = Provider<CategoryComparisonService>(
@@ -95,4 +96,3 @@ final financialHealthScoreServiceProvider =
     Provider<FinancialHealthScoreService>(
   (ref) => const FinancialHealthScoreService(),
 );
-

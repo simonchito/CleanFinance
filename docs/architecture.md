@@ -2,115 +2,117 @@
 
 ## Overview
 
-CleanFinance is a Flutter application with a local-first personal finance scope. The codebase is organized mainly by feature and uses Riverpod for dependency injection and state management.
+CleanFinance es una app Flutter local-first de finanzas personales. El código actual está organizado por features y usa Riverpod tanto para inyección de dependencias como para orquestación de estado.
 
-Runtime entry flow:
+Flujo principal de runtime:
 
-1. `lib/main.dart` starts the app inside `AppErrorHandler.run(...)`.
-2. `ProviderScope` exposes repositories, services, controllers, and screen-level providers.
-3. `CleanFinanceApp` reads persisted settings to configure theme and locale.
-4. `AuthGateScreen` decides whether the user sees setup, unlock, or the main shell.
-5. `HomeShell` hosts the main finance experience through a bottom navigation shell.
+1. `lib/main.dart` arranca la app dentro de `AppErrorHandler.run(...)`.
+2. `ProviderScope` expone infraestructura, repositorios, servicios y controllers.
+3. `CleanFinanceApp` lee settings persistidos para theme y locale.
+4. `AuthGateScreen` decide entre setup, unlock o shell principal.
+5. `HomeShell` mantiene las cinco secciones principales con `IndexedStack`.
 
-## Layers
+## Capas reales
 
-The repository follows a lightweight clean architecture style with three recurring layers.
+El proyecto sigue una clean architecture liviana y pragmática.
 
 ### Data
 
-The data layer contains concrete persistence and integration code.
+Responsabilidad:
 
-Examples:
+- persistencia SQLite
+- acceso a secure storage
+- integración con plugins nativos
+- mapeo entre filas/valores crudos y entidades de dominio
+
+Archivos principales:
 
 - `lib/core/database/app_database.dart`
 - `lib/features/auth/data/local_auth_repository.dart`
 - `lib/features/finance/data/local_finance_repository.dart`
 - `lib/features/budgets/data/repositories/local_budget_repository.dart`
 
-Responsibilities:
-
-- open and migrate the SQLite database
-- read and write secure storage values
-- map raw storage rows to domain entities
-- implement repository interfaces used by upper layers
-
 ### Domain
 
-The domain layer contains entities, repository contracts, and pure services.
+Responsabilidad:
 
-Examples:
+- entidades
+- contratos de repositorio
+- servicios puros de negocio y analítica
 
-- entities: `movement.dart`, `category.dart`, `savings_goal.dart`, `app_settings.dart`
-- repository contracts: `auth_repository.dart`, `movements_repository.dart`, `budget_repository.dart`
-- services: `monthly_trend_service.dart`, `budget_service.dart`, `monthly_payment_reminder_service.dart`
+Ejemplos:
 
-Responsibilities:
-
-- represent business data
-- define contracts between UI and persistence
-- encapsulate derived calculations and business rules
+- `movement.dart`
+- `category.dart`
+- `app_settings.dart`
+- `monthly_payment_reminder_service.dart`
+- `budget_service.dart`
+- `payment_method_report_service.dart`
 
 ### Presentation
 
-The presentation layer contains screens, widgets, controllers, mappers, and feature providers.
+Responsabilidad:
 
-Examples:
+- pantallas
+- widgets reutilizables
+- controllers
+- providers de lectura
+- mappers orientados a UI
 
-- auth screens under `lib/features/auth/presentation/screens/`
-- finance screens under `lib/features/finance/presentation/screens/`
-- budget screens under `lib/features/budgets/presentation/screens/`
+Ejemplos:
 
-Responsibilities:
+- `features/auth/presentation/`
+- `features/finance/presentation/`
+- `features/budgets/presentation/`
 
-- build widgets and screen flows
-- trigger repository calls through providers/controllers
-- render derived state from providers
-- keep UI-specific logic close to the view
+## Organización por features
 
-## Feature Organization
-
-Main runtime features currently present:
+Features de runtime actuales:
 
 - `auth`
 - `finance`
 - `budgets`
 
-The `finance` feature is the largest one and contains dashboard, movements, categories, savings goals, reminders, reports, settings, and supporting UI widgets.
+`finance` concentra la mayor parte del producto: dashboard, movimientos, categorías, ahorro, recordatorios, reportes, settings, backup y medios de pago.
 
-## State Management Pattern
+## Wiring e inyección de dependencias
 
-Riverpod is used in two main ways:
+`lib/shared/providers.dart` es el punto de composición principal.
 
-- global dependency providers in `lib/shared/providers.dart`
-- feature-scoped providers in each presentation module
+Expone:
 
-Patterns detected:
+- `AppDatabase`
+- `SecureStorageService`
+- `PasswordHasher`
+- `BiometricService`
+- repositorios concretos
+- servicios de dominio stateless
 
-- `Provider` for repositories and stateless domain services
-- `StateNotifierProvider` for auth and settings controllers
-- `FutureProvider` and `FutureProvider.family` for async screen data
-- `StateProvider` for small presentation/session overrides
+Patrones usados en Riverpod:
 
-## Navigation Pattern
+- `Provider` para infraestructura, repositorios y servicios puros
+- `StateNotifierProvider` para `AuthController` y `SettingsController`
+- `FutureProvider` y `FutureProvider.family` para lectura asíncrona de datos
+- `StateProvider` para overrides pequeños de sesión, como privacidad de montos
 
-Navigation is imperative and screen-based:
+## Flujo de autenticación
 
-- `MaterialPageRoute`
-- `Navigator.push(...)`
-- `Navigator.pop(...)`
+`AuthController.bootstrap()`:
 
-There is no dedicated router package in the current codebase.
+- verifica si existe credencial local
+- verifica disponibilidad de biometría
+- lee la preferencia persistida de biometría
+- verifica si hay datos de recuperación
 
-## General App Flow
+Resultado:
 
-### Bootstrap and Authentication
+- `setupRequired` si no hay PIN
+- `locked` si ya existe credencial
+- `unlocked` cuando el usuario valida PIN o biometría
 
-- `AuthController.bootstrap()` checks whether a credential exists, whether biometrics are available, whether biometric login is enabled, and whether recovery data exists.
-- Depending on that result, the app routes to `SetupPinScreen`, `UnlockScreen`, or `HomeShell`.
+## Flujo principal de la app
 
-### Main Finance Shell
-
-`HomeShell` uses an `IndexedStack` and a `NavigationBar` to keep five sections mounted:
+`HomeShell` mantiene montadas cinco tabs:
 
 - Dashboard
 - Movements
@@ -118,33 +120,43 @@ There is no dedicated router package in the current codebase.
 - Reports
 - Settings
 
-It also listens to app lifecycle events to support auto-lock behavior.
+También escucha el lifecycle para aplicar auto-lock según `autoLockMinutes`.
 
-### Data Refresh Strategy
+## Persistencia
 
-The current app relies on Riverpod invalidation after mutations. Common mutation flows call `ref.invalidate(...)` for the affected providers after saving or deleting data.
+Persistencia actual:
 
-## Architectural Characteristics
+- SQLite para datos de negocio y preferencias de app
+- secure storage para PIN y datos de recuperación
 
-### Strengths
+Fuente de verdad actual de biometría:
 
-- clear split between data access and business calculations
-- repositories are injected through Riverpod, making testing simpler
-- analytics and reminder rules are mostly isolated in domain services
-- the app is fully local-first in its current implementation
+- `app_settings.biometric_enabled`
 
-### Current Tradeoffs
+Secure storage mantiene una clave legacy de biometría solo para compatibilidad/migración de instalaciones previas; el comportamiento actual usa settings.
 
-- navigation is decentralized and inferred from individual screens
-- some presentation logic remains embedded directly in widgets and dialogs
-- one large finance repository implements several interfaces, which keeps things simple but centralizes many responsibilities
-- settings loading is asynchronous, so some startup values can briefly depend on defaults until the persisted state resolves
+## Patrón de escritura
 
-## Patterns in Use
+El proyecto no usa una capa formal de use cases para todas las mutaciones.
 
-- feature-based modular structure
-- repository pattern
-- StateNotifier-based controllers
-- pure domain services for analytics and reminder calculations
-- local-first persistence with SQLite and secure storage
-- Provider-based dependency injection
+Patrón actual:
+
+- algunas escrituras pasan por controllers (`AuthController`, `SettingsController`)
+- otras escrituras llaman repositorios directamente desde pantallas
+- después de mutar, las pantallas invalidan providers dependientes
+
+## Características y tradeoffs actuales
+
+Fortalezas:
+
+- estructura simple de seguir
+- separación clara entre persistencia y lógica derivada
+- app completamente local-first
+- servicios de dominio aislados para analítica, presupuestos y recordatorios
+
+Tradeoffs:
+
+- navegación distribuida por pantalla con `Navigator`
+- `LocalFinanceRepository` concentra muchas responsabilidades
+- varias pantallas invalidan providers manualmente después de guardar
+- carga asíncrona de settings al inicio, con algunos defaults transitorios hasta que resuelve

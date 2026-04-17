@@ -1,4 +1,5 @@
 import '../../../../core/utils/month_context.dart';
+import '../../../../core/utils/payment_method_utils.dart';
 import '../entities/analytics_models.dart';
 import '../entities/movement.dart';
 
@@ -22,8 +23,9 @@ class PaymentMethodReportService {
       }
 
       final method = movement.paymentMethod?.trim();
-      final normalizedMethod =
-          method == null || method.isEmpty ? 'Sin definir' : method;
+      final normalizedMethod = method == null || method.isEmpty
+          ? 'Sin definir'
+          : PaymentMethodUtils.canonicalizeLabel(method);
       totals.update(
         normalizedMethod,
         (value) => value + movement.amount,

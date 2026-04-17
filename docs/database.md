@@ -2,39 +2,40 @@
 
 ## Overview
 
-CleanFinance uses SQLite through `sqflite`.
+CleanFinance usa SQLite vía `sqflite`.
 
-Main file:
+Archivo principal:
 
 - `lib/core/database/app_database.dart`
 
-Database identity:
+Identidad actual:
 
-- Name: `clean_finance.db`
-- Version: `6`
+- nombre: `clean_finance.db`
+- versión: `7`
 
-`AppDatabase.instance` memoizes a single `Database` instance.
+`AppDatabase.instance` memoiza una sola instancia de `Database`.
 
-## PRAGMA Configuration
+## Configuración
 
-On open, the app enables:
+Al abrir la base se ejecuta:
 
 ```sql
 PRAGMA foreign_keys = ON
 ```
 
-## Tables
+## Tablas
 
 ### `categories`
 
-Purpose:
+Propósito:
 
-- store top-level categories and subcategories
+- categorías principales y subcategorías
 
-Columns:
+Columnas:
 
 - `id TEXT PRIMARY KEY`
 - `name TEXT NOT NULL`
+- `icon_key TEXT NOT NULL DEFAULT 'category'`
 - `scope TEXT NOT NULL`
 - `parent_id TEXT`
 - `is_default INTEGER NOT NULL DEFAULT 0`
@@ -43,18 +44,18 @@ Columns:
 - `created_at TEXT NOT NULL`
 - `updated_at TEXT NOT NULL`
 
-Notes:
+Notas:
 
-- `parent_id != null` indicates a subcategory
-- expense subcategories can act as recurring reminder sources
+- `parent_id != null` identifica subcategorías
+- recordatorios mensuales de gastos salen de subcategorías de gasto
 
 ### `savings_goals`
 
-Purpose:
+Propósito:
 
-- store savings goals and reminder configuration
+- metas de ahorro y su configuración de recordatorios
 
-Columns:
+Columnas:
 
 - `id TEXT PRIMARY KEY`
 - `name TEXT NOT NULL`
@@ -68,11 +69,11 @@ Columns:
 
 ### `movements`
 
-Purpose:
+Propósito:
 
-- store incomes, expenses, and saving contributions
+- ingresos, gastos y aportes de ahorro
 
-Columns:
+Columnas:
 
 - `id TEXT PRIMARY KEY`
 - `type TEXT NOT NULL`
@@ -88,36 +89,37 @@ Columns:
 - `created_at TEXT NOT NULL`
 - `updated_at TEXT NOT NULL`
 
-Notes:
+Notas:
 
-- `subcategory_id` links expenses to a specific subcategory when used
-- `goal_id` links saving movements to a savings goal
-- `monthly_reminder_enabled` and `reminder_day` still exist in the movement table, but the current reminder UI and reminder service derive reminders from subcategories and savings goals instead
+- `payment_method` guarda el label canonicalizado del medio de pago
+- `subcategory_id` vincula una subcategoría si corresponde
+- `goal_id` se usa para movimientos de tipo `saving`
+- `monthly_reminder_enabled` y `reminder_day` siguen existiendo por legado de esquema, pero la UI actual de recordatorios deriva recordatorios desde subcategorías y metas, no desde movimientos
 
 ### `budgets`
 
-Purpose:
+Propósito:
 
-- store one monthly budget per expense category and month
+- un presupuesto mensual por categoría de gasto
 
-Columns:
+Columnas:
 
 - `id TEXT PRIMARY KEY`
 - `category_id TEXT NOT NULL`
 - `monthly_limit REAL NOT NULL CHECK (monthly_limit >= 0)`
 - `month TEXT NOT NULL`
 
-Constraint:
+Restricción:
 
-- unique index on `(category_id, month)`
+- índice único en `(category_id, month)`
 
 ### `app_settings`
 
-Purpose:
+Propósito:
 
-- store app-wide local preferences
+- preferencias globales persistidas de la app
 
-Columns:
+Columnas:
 
 - `id INTEGER PRIMARY KEY CHECK (id = 1)`
 - `currency_code TEXT NOT NULL`
@@ -129,100 +131,93 @@ Columns:
 - `locale_code TEXT NOT NULL DEFAULT 'es'`
 - `payment_methods TEXT NOT NULL`
 
-Notes:
+Notas:
 
-- the table is seeded with a single row on database creation
+- se inicializa con una única fila `id = 1`
+- `biometric_enabled` es la fuente de verdad persistida para la preferencia de biometría
+- `payment_methods` guarda una lista JSON de labels visibles/canonicalizados
 
-## Relationships
+## Relaciones
 
-Logical relationships documented in code and schema:
+Relaciones lógicas actuales:
 
 - `movements.category_id -> categories.id`
 - `movements.goal_id -> savings_goals.id`
 - `budgets.category_id -> categories.id`
 
-Current delete behavior for new installs:
+Delete behavior para instalaciones nuevas:
 
-- category deletion is restricted when movements or budgets depend on it
-- goal deletion sets `movements.goal_id` to `NULL`
+- categoría: `ON DELETE RESTRICT`
+- meta de ahorro: `ON DELETE SET NULL` en `movements.goal_id`
 
-Reference:
+Referencia:
 
-- `lib/core/database/schema_relationships.md`
+- [`lib/core/database/schema_relationships.md`](D:/GITHUB/CleanFinance/lib/core/database/schema_relationships.md)
 
-## Important Migration Note
-
-The repository explicitly documents that older SQLite databases are not rebuilt just to add foreign keys.
-
-Implication:
-
-- new installs receive the stronger schema
-- older user databases may keep older physical schemas because SQLite does not add foreign keys retroactively without rebuilding tables
-- repository logic still performs defensive cleanup and deletion checks to keep behavior aligned
-
-## Current Migrations
+## Migraciones actuales
 
 ### Version 2
 
-- add `locale_code` to `app_settings`
-- add `payment_methods` to `app_settings`
+- agrega `locale_code` a `app_settings`
+- agrega `payment_methods` a `app_settings`
 
 ### Version 3
 
-- create `budgets`
-- create related budget indexes
+- crea tabla `budgets`
+- crea índices de presupuestos
 
 ### Version 4
 
-- add `show_sensitive_amounts` to `app_settings`
+- agrega `show_sensitive_amounts` a `app_settings`
 
 ### Version 5
 
-- add `monthly_reminder_enabled` and `reminder_day` to `movements`
-- add reminder-related movement index
+- agrega `monthly_reminder_enabled` y `reminder_day` a `movements`
+- crea índice relacionado a recordatorios de movimientos
 
 ### Version 6
 
-- add `reminder_enabled` and `reminder_day` to `categories`
-- add `reminder_enabled` and `reminder_day` to `savings_goals`
+- agrega `reminder_enabled` y `reminder_day` a `categories`
+- agrega `reminder_enabled` y `reminder_day` a `savings_goals`
 
-## Seed Data
+### Version 7
 
-`LocalFinanceRepository.ensureSeedData()` seeds default categories if the categories table is empty.
+- agrega `icon_key` a `categories`
 
-Default scopes currently seeded:
+## Seed actual
+
+`LocalFinanceRepository.ensureSeedData()` usa `DefaultCategoriesSeed`.
+
+Scopes seed actuales:
 
 - income
 - expense
 - saving
 
-Examples include:
+Ejemplos:
 
-- `Sueldo`
-- `Freelance`
-- `Comida`
-- `Servicios`
-- `Suscripciones`
-- `Ahorro general`
-- `Fondo de emergencia`
-- `Viaje`
+- ingresos: `Sueldo`, `Freelance`, `Venta`
+- ahorro: `Ahorro general`, `Fondo de emergencia`, `Viaje`
+- gastos con subcategorías extensas: `Hogar`, `Servicios`, `Alimentos`, `Transporte`, `Salud`, `Educación`, `Compras`, `Ocio`, `Finanzas`, `Familia`, `Trabajo`, `Otros`
 
-## Persistence Strategy
+Cada categoría y subcategoría seeded tiene `iconKey`.
 
-Concrete persistence is split across:
+## Persistencia y repositorios
 
-- `LocalFinanceRepository`
-- `LocalBudgetRepository`
+Persistencia concreta actual:
 
-Patterns used:
+- `LocalFinanceRepository` maneja movimientos, categorías, metas, settings, backup y reportes
+- `LocalBudgetRepository` maneja presupuestos
 
-- direct `db.insert`, `db.update`, `db.delete`, `db.query`
-- `rawQuery` calls for aggregates and reporting
-- manual mapping from `Map<String, Object?>` to domain entities
+Patrones:
 
-## Backup and Import
+- `db.insert`, `db.update`, `db.delete`, `db.query`
+- `rawQuery` para agregados y reportes
+- mapeo manual desde `Map<String, Object?>`
 
-The finance repository exports the following tables to JSON:
+## Backup e importación
+
+El backup exporta:
 
 - `categories`
 - `movements`
@@ -230,21 +225,17 @@ The finance repository exports the following tables to JSON:
 - `budgets`
 - `app_settings`
 
-Import behavior:
+La importación:
 
-- clears those tables
-- re-inserts imported data
-- recreates default settings when the backup does not include them
+- borra esas tablas
+- re-inserta los datos importados
+- recrea settings default si el backup no trae `app_settings`
+- limpia el flag legacy de biometría en secure storage
 
-## Date Handling
+## Fechas
 
-Dates are stored as ISO-8601 strings.
+Las fechas se guardan como strings ISO-8601.
 
-Examples of current query style:
-
-- month aggregates use `occurred_on >= start` and `< endExclusive`
-- movement filtering uses `occurred_on >= start` and `<= endInclusive`
-
-The helper used to derive month bounds is:
+El helper de contexto mensual actual es:
 
 - `lib/core/utils/month_context.dart`

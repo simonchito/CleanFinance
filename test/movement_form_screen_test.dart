@@ -88,6 +88,66 @@ void main() {
       );
     },
   );
+
+  testWidgets(
+    'updates the selected payment method label immediately',
+    (tester) async {
+      final now = DateTime(2026, 4, 17);
+      final categories = [
+        Category(
+          id: 'food',
+          name: 'Alimentos',
+          iconKey: 'restaurant',
+          scope: CategoryScope.expense,
+          isDefault: true,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            categoriesRepositoryProvider.overrideWithValue(
+              _FakeCategoriesRepository(categories),
+            ),
+            movementsRepositoryProvider.overrideWithValue(
+              _FakeMovementsRepository(),
+            ),
+            settingsRepositoryProvider.overrideWithValue(
+              _FakeSettingsRepository(
+                paymentMethods: const ['Transferencia', 'QR'],
+              ),
+            ),
+            savingsGoalsRepositoryProvider.overrideWithValue(
+              _FakeSavingsGoalsRepository(),
+            ),
+          ],
+          child: const MaterialApp(
+            locale: Locale('es'),
+            home: MovementFormScreen(initialType: MovementType.expense),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final selectionFields = find.byWidgetPredicate(
+        (widget) =>
+            widget.runtimeType.toString().startsWith('SelectionSheetField'),
+      );
+
+      expect(selectionFields, findsAtLeastNWidgets(3));
+
+      await tester.tap(selectionFields.last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('QR').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('QR'), findsWidgets);
+    },
+  );
 }
 
 class _FakeCategoriesRepository implements CategoriesRepository {
@@ -166,9 +226,15 @@ class _FakeSavingsGoalsRepository implements SavingsGoalsRepository {
 }
 
 class _FakeSettingsRepository implements SettingsRepository {
+  _FakeSettingsRepository({
+    this.paymentMethods = const [],
+  });
+
+  final List<String> paymentMethods;
+
   @override
   Future<AppSettings> getSettings() async {
-    return const AppSettings(
+    return AppSettings(
       currencyCode: 'ARS',
       currencySymbol: r'$',
       showSensitiveAmounts: true,
@@ -176,7 +242,7 @@ class _FakeSettingsRepository implements SettingsRepository {
       biometricEnabled: false,
       autoLockMinutes: 0,
       localeCode: 'es',
-      paymentMethods: [],
+      paymentMethods: paymentMethods,
     );
   }
 

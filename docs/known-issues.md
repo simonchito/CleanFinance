@@ -1,72 +1,65 @@
 # Known Issues
 
-## Scope of This File
+## Scope
 
-This document lists technical risks, limitations, and open points inferred directly from the current repository state.
+Este documento lista límites, riesgos y puntos abiertos observables en el código actual del repo. No describe ideas hipotéticas de producto.
 
-Items are not speculative product ideas; they reflect code-level observations.
+## Issues actuales
 
-## Current Issues and Limitations
+## 1. La privacidad de montos no se aplica de forma global
 
-## 1. Amount privacy is not applied consistently across all screens
+`showSensitiveAmounts` existe y el dashboard usa `AmountVisibilityFormatter`, pero varias pantallas todavía renderizan montos directamente con `CurrencyFormatter`.
 
-The project stores and reads `showSensitiveAmounts`, and the dashboard uses `AmountVisibilityFormatter`, but several screens still format amounts directly with `CurrencyFormatter`.
+Ejemplos actuales:
 
-Examples detected:
+- `ReportsScreen`
+- `MovementsScreen`
+- `SavingsScreen`
+- vistas de presupuestos
 
-- `DashboardScreen` respects amount visibility
-- `ReportsScreen` renders values directly with `CurrencyFormatter`
-- `MovementsScreen` renders values directly with `CurrencyFormatter`
-- `SavingsScreen` renders values directly with `CurrencyFormatter`
-- budget-related screens and widgets also render amounts directly
+Impacto:
 
-Impact:
+- la preferencia de privacidad no funciona todavía como ocultamiento global consistente
 
-- the privacy setting is not a guaranteed global concealment mechanism in the current codebase
+## 2. El esquema mantiene campos legacy de recordatorios en `movements`
 
-## 2. Legacy reminder fields still exist on `movements`
+La estrategia activa de recordatorios usa:
 
-The current reminder design derives reminders from:
+- subcategorías de gasto
+- metas de ahorro
 
-- expense subcategories
-- savings goals
-
-However, the `movements` table and `Movement` entity still include:
+Pero el esquema y la entidad `Movement` todavía tienen:
 
 - `monthly_reminder_enabled`
 - `reminder_day`
 
-Impact:
+Impacto:
 
-- duplicated reminder-related schema concepts remain in the codebase
-- those fields appear to be legacy or transitional in the current implementation
+- hay conceptos de recordatorio duplicados a nivel modelo/esquema
+- hoy esos campos no son la fuente principal del flujo de recordatorios
 
-## 3. Migration safety differs between new installs and older databases
+## 3. La paridad física de esquema puede variar entre instalaciones nuevas y migradas
 
-The repository explicitly documents that older SQLite databases are not rebuilt just to add foreign keys.
+La app evita rebuilds destructivos de SQLite durante migraciones.
 
-Impact:
+Impacto:
 
-- schema enforcement may differ between new users and migrated users
-- repository logic compensates, but physical schema parity is not guaranteed
+- instalaciones nuevas reciben el esquema más reforzado
+- instalaciones antiguas pueden conservar diferencias físicas de schema
+- la capa repositorio compensa parte de eso con validaciones defensivas
 
-## 4. Navigation is decentralized
+## 4. La navegación sigue descentralizada
 
-Navigation uses direct `Navigator.push(...)` calls from many screens.
+La app usa `Navigator.push(...)` directamente desde múltiples pantallas.
 
-Impact:
+Impacto:
 
-- route flow is easy to follow locally
-- harder to centralize, audit, or refactor globally
+- simple de seguir hoy
+- menos centralizado para auditar o refactorizar a futuro
 
-Status:
+## 5. `LocalFinanceRepository` concentra varias responsabilidades
 
-- acceptable for the current app size
-- may become a maintenance issue as screen count grows
-
-## 5. One finance repository handles many responsibilities
-
-`LocalFinanceRepository` implements multiple interfaces:
+Actualmente implementa:
 
 - `FinanceRepository`
 - `MovementsRepository`
@@ -75,87 +68,66 @@ Status:
 - `SettingsRepository`
 - `BackupRepository`
 
-Impact:
+Impacto:
 
-- simple dependency graph
-- but concentrated persistence logic in a single class
+- menos ceremonia
+- más acoplamiento de persistencia en una sola clase
 
-## 6. Settings load asynchronously at startup
+## 6. Los settings cargan de forma asíncrona al inicio
 
-`CleanFinanceApp` reads settings from `settingsControllerProvider`, which loads asynchronously.
+`CleanFinanceApp` lee `settingsControllerProvider`, que resuelve asíncronamente.
 
-Impact:
+Impacto:
 
-- startup behavior can briefly depend on defaults until settings finish loading
-- some preferences are therefore sensitive to initial-frame timing
+- algunas preferencias pueden depender de defaults transitorios durante el arranque
+- theme y locale no son estrictamente síncronos en el primer frame
 
-Amount visibility already has a privacy-first fallback, but theme and locale still depend on async resolution timing.
+## 7. El soporte real de Web/Desktop sigue sin validación cerrada
 
-## 7. Web support is not clearly implemented
+El repo incluye carpetas para esas plataformas, pero el runtime usa plugins pensados principalmente para mobile.
 
-The repository includes a `web/` directory, but the runtime code uses local-auth, secure-storage, and SQLite-oriented infrastructure without explicit web-specific fallbacks in the reviewed source.
+Estado:
 
-Status:
+- soporte real pendiente de validación por entorno
 
-- web support is not determined from the current code
+## 8. Varias eliminaciones siguen siendo directas desde UI
 
-## 8. Delete flows are mostly direct
+Ejemplos:
 
-Several delete actions call repositories immediately from the UI.
+- movimientos
+- metas
+- medios de pago
 
-Examples:
+Impacto:
 
-- deleting movements
-- deleting savings goals
-- deleting payment methods
+- flujo rápido y simple
+- confirmaciones y undo no están unificados en toda la app
 
-Impact:
+## Límites deliberados del proyecto actual
 
-- behavior is simple and fast
-- confirmation and undo patterns are not consistently present
+- no hay backend
+- no hay sync cloud
+- no hay router declarativo
+- no hay crash reporting remoto
+- no hay cifrado de base SQLite
 
-## 9. Router, remote sync, and crash reporting are not implemented
+## Puntos abiertos
 
-Not detected in the current repository:
+## 1. Tooling en `tool/`
 
-- declarative routing package
-- backend API integration
-- cloud sync
-- remote crash analytics
+Existe `tool/`, pero no es parte del flujo principal de runtime documentado.
 
-This is not a defect by itself, but it is an important boundary for future planning.
+## 2. Firma y distribución release
 
-## 10. Some repository interfaces are very coarse-grained
+El repo permite builds, pero no documenta signing, CI/CD ni publicación en stores.
 
-The current repository contracts are pragmatic, but some feature boundaries are still broad.
+## 3. Validación multi-plataforma de biometría
 
-Example:
+El flujo móvil está contemplado, pero el comportamiento fuera de Android/iOS sigue pendiente de validación real.
 
-- settings, backup, categories, movements, reports, and seed data are all partly coordinated through the same finance persistence layer
+## Seguimientos razonables
 
-Impact:
-
-- lower ceremony today
-- harder extraction into independent modules later
-
-## Open Points / Not Determined
-
-## 1. Tooling under `tool/`
-
-The repository contains a `tool/` directory, but its runtime role was not determined from the reviewed files.
-
-## 2. Distribution signing and release process
-
-The codebase and `pubspec.yaml` allow builds, but keystore signing, CI/CD, and store distribution setup are not documented in the runtime source.
-
-## 3. Platform-specific biometric behavior beyond Android and iOS
-
-The app checks for biometric availability, but cross-platform behavior outside primary mobile flows remains pending verification.
-
-## Suggested Technical Follow-Ups
-
-- unify amount privacy so all monetary widgets go through the same visibility-aware formatter
-- remove or repurpose legacy movement-level reminder fields if they are no longer part of the product model
-- consider splitting `LocalFinanceRepository` if feature growth continues
-- introduce a routing strategy if the screen graph expands further
-- document tested target platforms explicitly once runtime validation is complete
+- unificar privacidad de montos en todas las pantallas
+- decidir si los campos legacy de recordatorio en `movements` se eliminan o reutilizan
+- revisar si `LocalFinanceRepository` necesita partirse si el producto sigue creciendo
+- documentar plataformas realmente testeadas cuando esa validación exista

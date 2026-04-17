@@ -4,9 +4,11 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/payment_method_utils.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../mappers/finance_text_mapper.dart';
 import '../providers/finance_providers.dart';
+import '../utils/payment_method_icon_resolver.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/insight_banner.dart';
 import '../widgets/section_card.dart';
@@ -65,7 +67,8 @@ class ReportsScreen extends ConsumerWidget {
                         ),
                         _StatusPill(
                           label: healthCopy.label,
-                          color: _healthColor(context, overview.healthScore.level),
+                          color:
+                              _healthColor(context, overview.healthScore.level),
                         ),
                       ],
                     ),
@@ -73,7 +76,8 @@ class ReportsScreen extends ConsumerWidget {
                     Text(
                       healthCopy.message,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ],
@@ -205,7 +209,8 @@ class ReportsScreen extends ConsumerWidget {
                       const EmptyStateView(
                         icon: Icons.pie_chart_outline_rounded,
                         title: 'Sin datos todavía',
-                        message: 'Cuando registres gastos, vas a ver acá en qué categorías se fue más dinero.',
+                        message:
+                            'Cuando registres gastos, vas a ver acá en qué categorías se fue más dinero.',
                       )
                     else ...[
                       DonutChart(
@@ -290,7 +295,8 @@ class ReportsScreen extends ConsumerWidget {
                           child: _MetricBox(
                             label: 'Estado',
                             value: _paceLabel(overview.spendingPace.status),
-                            color: _paceColor(context, overview.spendingPace.status),
+                            color: _paceColor(
+                                context, overview.spendingPace.status),
                           ),
                         ),
                       ],
@@ -299,7 +305,8 @@ class ReportsScreen extends ConsumerWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(999),
                       child: LinearProgressIndicator(
-                        value: overview.spendingPace.progressRatio.clamp(0.02, 1.4),
+                        value: overview.spendingPace.progressRatio
+                            .clamp(0.02, 1.4),
                         minHeight: 12,
                         backgroundColor: _paceColor(
                           context,
@@ -314,7 +321,8 @@ class ReportsScreen extends ConsumerWidget {
                     Text(
                       overview.spendingPace.status == SpendingPaceStatus.risk
                           ? 'El ritmo actual es exigente para tu margen disponible.'
-                          : overview.spendingPace.status == SpendingPaceStatus.watch
+                          : overview.spendingPace.status ==
+                                  SpendingPaceStatus.watch
                               ? 'Vas cerca del límite. Conviene mirar con atención la segunda mitad del mes.'
                               : 'Tu gasto viene en una zona saludable para este momento del mes.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -345,7 +353,8 @@ class ReportsScreen extends ConsumerWidget {
                       const EmptyStateView(
                         icon: Icons.savings_outlined,
                         title: 'Todavía no hay metas para analizar',
-                        message: 'Cuando tengas metas y aportes, vas a ver acá el ritmo de avance.',
+                        message:
+                            'Cuando tengas metas y aportes, vas a ver acá el ritmo de avance.',
                       )
                     else
                       ...overview.savingsGoals.map(
@@ -691,9 +700,22 @@ class _PaymentMethodTile extends StatelessWidget {
       ),
       child: Row(
         children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              PaymentMethodIconResolver.resolve(item.name),
+              color: scheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
-              item.name,
+              PaymentMethodUtils.canonicalizeLabel(item.name),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ),

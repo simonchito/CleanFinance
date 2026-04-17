@@ -51,9 +51,7 @@ class AuthController extends StateNotifier<AuthState> {
       birthDate: birthDate,
       documentId: documentId,
     );
-    if (enableBiometrics) {
-      await _authRepository.setBiometricEnabled(true);
-    }
+    await _authRepository.setBiometricEnabled(enableBiometrics);
     await _ensureFinanceSeed();
 
     state = state.copyWith(
@@ -153,9 +151,7 @@ class AuthController extends StateNotifier<AuthState> {
     }
 
     await _authRepository.savePin(newPin);
-    if (enableBiometrics) {
-      await _authRepository.setBiometricEnabled(true);
-    }
+    await _authRepository.setBiometricEnabled(enableBiometrics);
     await _ensureFinanceSeed();
     state = state.copyWith(
       status: AuthStatus.unlocked,
