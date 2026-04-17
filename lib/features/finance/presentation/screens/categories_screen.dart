@@ -8,6 +8,7 @@ import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
 import '../providers/finance_providers.dart';
+import '../widgets/confirm_action_dialog.dart';
 import '../widgets/icon_picker_field.dart';
 import '../widgets/selection_sheet_field.dart';
 
@@ -92,7 +93,7 @@ class _CategoryTab extends ConsumerWidget {
                         ),
                         onDelete: child.isDefault
                             ? null
-                            : () => _deleteCategory(context, ref, child.id),
+                            : () => _deleteCategory(context, ref, child),
                       ),
                     _CategoryEntryRow(
                       icon: IconMapper.getIcon(category.iconKey),
@@ -106,7 +107,7 @@ class _CategoryTab extends ConsumerWidget {
                       ),
                       onDelete: category.isDefault
                           ? null
-                          : () => _deleteCategory(context, ref, category.id),
+                          : () => _deleteCategory(context, ref, category),
                     ),
                     ListTile(
                       leading: const Icon(Icons.add),
@@ -133,10 +134,24 @@ class _CategoryTab extends ConsumerWidget {
   Future<void> _deleteCategory(
     BuildContext context,
     WidgetRef ref,
-    String categoryId,
+    Category category,
   ) async {
     try {
-      await ref.read(categoriesRepositoryProvider).deleteCategory(categoryId);
+      final confirmed = await showConfirmActionDialog(
+        context: context,
+        title: category.isSubcategory
+            ? 'Eliminar subcategoría'
+            : 'Eliminar categoría',
+        message: category.isSubcategory
+            ? 'Se eliminará la subcategoría "${category.name}". Si tiene movimientos o dependencias, la app lo bloqueará antes de borrar.'
+            : 'Se eliminará la categoría "${category.name}". Si tiene movimientos, subcategorías o presupuestos asociados, la app lo bloqueará antes de borrar.',
+        confirmLabel: 'Eliminar',
+      );
+      if (!confirmed) {
+        return;
+      }
+
+      await ref.read(categoriesRepositoryProvider).deleteCategory(category.id);
       ref.invalidate(categoriesProvider(scope));
       ref.invalidate(categoryBudgetStatusProvider);
       ref.invalidate(expenseReminderSubcategoriesProvider);

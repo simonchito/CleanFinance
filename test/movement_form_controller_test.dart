@@ -25,8 +25,9 @@ void main() {
   });
 
   testWidgets(
-    'keeps the selected payment method in the current form state',
+    'saves the explicitly selected category and payment method',
     (tester) async {
+      final movementsRepository = _CapturingMovementsRepository();
       final categories = [
         Category(
           id: 'food',
@@ -43,7 +44,7 @@ void main() {
         ProviderScope(
           overrides: [
             movementsRepositoryProvider.overrideWithValue(
-              _CapturingMovementsRepository(),
+              movementsRepository,
             ),
             categoriesRepositoryProvider.overrideWithValue(
               _FakeCategoriesRepository(categories),
@@ -75,12 +76,28 @@ void main() {
         (widget) =>
             widget.runtimeType.toString().startsWith('SelectionSheetField'),
       );
+      await tester.tap(selectionFields.at(1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Alimentos').last);
+      await tester.pumpAndSettle();
+
       await tester.tap(selectionFields.last);
       await tester.pumpAndSettle();
       await tester.tap(find.text('QR').last);
       await tester.pumpAndSettle();
 
-      expect(find.text('QR'), findsWidgets);
+      await tester.drag(find.byType(ListView).first, const Offset(0, -600));
+      await tester.pumpAndSettle();
+      final saveButtons =
+          find.byWidgetPredicate((widget) => widget is ButtonStyleButton);
+      await tester.tap(
+        saveButtons.last,
+      );
+      await tester.pumpAndSettle();
+
+      expect(movementsRepository.savedMovement, isNotNull);
+      expect(movementsRepository.savedMovement!.categoryId, 'food');
+      expect(movementsRepository.savedMovement!.paymentMethod, 'QR');
     },
   );
 }

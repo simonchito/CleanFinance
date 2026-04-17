@@ -9,6 +9,7 @@ import '../../domain/entities/movement.dart';
 import '../../domain/entities/movement_filter.dart';
 import '../providers/finance_providers.dart';
 import '../utils/payment_method_icon_resolver.dart';
+import '../widgets/confirm_action_dialog.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/selection_sheet_field.dart';
 import '../widgets/section_card.dart';
@@ -53,6 +54,17 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
   }
 
   Future<void> _deleteMovement(Movement movement) async {
+    final confirmed = await showConfirmActionDialog(
+      context: context,
+      title: 'Eliminar movimiento',
+      message:
+          'Se eliminará este movimiento de forma permanente. Verificá los datos antes de continuar.',
+      confirmLabel: 'Eliminar',
+    );
+    if (!confirmed) {
+      return;
+    }
+
     await ref.read(movementsRepositoryProvider).deleteMovement(movement.id);
     _refresh();
   }

@@ -17,6 +17,18 @@ class AppDatabase {
     return _database!;
   }
 
+  Future<void> reset() async {
+    final existing = _database;
+    _database = null;
+    if (existing != null && existing.isOpen) {
+      await existing.close();
+    }
+
+    final databasesPath = await getDatabasesPath();
+    final path = p.join(databasesPath, AppConstants.databaseName);
+    await deleteDatabase(path);
+  }
+
   Future<Database> _open() async {
     final databasesPath = await getDatabasesPath();
     final path = p.join(databasesPath, AppConstants.databaseName);

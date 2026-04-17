@@ -25,7 +25,7 @@ void main() {
   });
 
   testWidgets(
-    'shows expense subcategories when the default category is preselected',
+    'does not preselect a category or subcategory silently',
     (tester) async {
       final now = DateTime(2026, 4, 17);
       final categories = [
@@ -76,13 +76,143 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.text('Alimentos'), findsOneWidget);
+      final selectionFields = tester
+          .widgetList(
+            find.byWidgetPredicate(
+              (widget) =>
+                  widget.runtimeType.toString().startsWith('SelectionSheetField'),
+            ),
+          )
+          .toList();
+      final categoryField = selectionFields[1] as SelectionSheetField<String>;
+      expect(categoryField.value, isNull);
       expect(
         find.byWidgetPredicate(
           (widget) =>
               widget is SelectionSheetField &&
-              widget.label == 'Subcategory (optional)' &&
-              widget.placeholder == 'No subcategory',
+              widget.label == 'Subcategoría (opcional)',
+        ),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets(
+    'shows the current payment method in preview even if it is not configured anymore',
+    (tester) async {
+      final now = DateTime(2026, 4, 17);
+      final categories = [
+        Category(
+          id: 'food',
+          name: 'Alimentos',
+          iconKey: 'restaurant',
+          scope: CategoryScope.expense,
+          isDefault: true,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            categoriesRepositoryProvider.overrideWithValue(
+              _FakeCategoriesRepository(categories),
+            ),
+            movementsRepositoryProvider.overrideWithValue(
+              _FakeMovementsRepository(),
+            ),
+            settingsRepositoryProvider.overrideWithValue(
+              _FakeSettingsRepository(
+                paymentMethods: const ['Transferencia', 'QR'],
+              ),
+            ),
+            savingsGoalsRepositoryProvider.overrideWithValue(
+              _FakeSavingsGoalsRepository(),
+            ),
+          ],
+          child: MaterialApp(
+            locale: const Locale('es'),
+            home: MovementFormScreen(
+              initialMovement: Movement(
+                id: 'movement-1',
+                type: MovementType.expense,
+                amount: 1800,
+                categoryId: 'food',
+                occurredOn: now,
+                paymentMethod: 'Efectivo',
+                createdAt: now,
+                updatedAt: now,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('Efectivo'), findsWidgets);
+    },
+  );
+
+  testWidgets(
+    'shows a clear error before saving when no category was selected',
+    (tester) async {
+      final now = DateTime(2026, 4, 17);
+      final categories = [
+        Category(
+          id: 'food',
+          name: 'Alimentos',
+          iconKey: 'restaurant',
+          scope: CategoryScope.expense,
+          isDefault: true,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            categoriesRepositoryProvider.overrideWithValue(
+              _FakeCategoriesRepository(categories),
+            ),
+            movementsRepositoryProvider.overrideWithValue(
+              _FakeMovementsRepository(),
+            ),
+            settingsRepositoryProvider.overrideWithValue(
+              _FakeSettingsRepository(),
+            ),
+            savingsGoalsRepositoryProvider.overrideWithValue(
+              _FakeSavingsGoalsRepository(),
+            ),
+          ],
+          child: const MaterialApp(
+            locale: Locale('es'),
+            home: MovementFormScreen(initialType: MovementType.expense),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.enterText(find.byType(TextFormField).first, '2500');
+      await tester.drag(find.byType(ListView).first, const Offset(0, -600));
+      await tester.pumpAndSettle();
+      final saveButtons =
+          find.byWidgetPredicate((widget) => widget is ButtonStyleButton);
+      await tester.tap(
+        saveButtons.last,
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byWidgetPredicate(
+          (widget) =>
+              widget is Text &&
+              (widget.data == 'Select a category before saving.' ||
+                  widget.data == 'Seleccioná una categoría antes de guardar.'),
         ),
         findsOneWidget,
       );

@@ -10,6 +10,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../finance/domain/entities/category.dart';
 import '../../../finance/presentation/providers/finance_providers.dart';
+import '../../../finance/presentation/widgets/confirm_action_dialog.dart';
 import '../../../finance/presentation/widgets/selection_sheet_field.dart';
 import '../../../finance/presentation/widgets/empty_state_view.dart';
 import '../../../finance/presentation/widgets/section_card.dart';
@@ -58,6 +59,33 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
   void dispose() {
     _limitController.dispose();
     super.dispose();
+  }
+
+  Future<void> _deleteBudget() async {
+    final strings = AppStrings.of(context);
+    final budget = widget.initialBudget;
+    if (budget == null) {
+      return;
+    }
+
+    final confirmed = await showConfirmActionDialog(
+      context: context,
+      title: strings.isEnglish ? 'Delete budget' : 'Eliminar presupuesto',
+      message: strings.isEnglish
+          ? 'This monthly budget will be removed and tracking for this category will stop until you create a new one.'
+          : 'Este presupuesto mensual se eliminará y el seguimiento de esta categoría se detendrá hasta que crees uno nuevo.',
+      confirmLabel: strings.isEnglish ? 'Delete' : 'Eliminar',
+      cancelLabel: strings.cancel,
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    await ref.read(budgetRepositoryProvider).deleteBudget(budget.id);
+    ref.invalidate(categoryBudgetStatusProvider);
+    if (mounted) {
+      Navigator.of(context).pop(true);
+    }
   }
 
   Future<void> _save() async {
@@ -126,16 +154,21 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(isEditing ? strings.editBudget : strings.newBudget),
+        actions: [
+          if (isEditing)
+            IconButton(
+              onPressed: _isSaving ? null : _deleteBudget,
+              icon: const Icon(Icons.delete_outline_rounded),
+              tooltip:
+                  strings.isEnglish ? 'Delete budget' : 'Eliminar presupuesto',
+            ),
+        ],
       ),
       body: categoriesState.when(
         data: (categories) {
           final availableCategories = categories
               .where((category) => category.parentId == null)
               .toList();
-
-          if (_categoryId == null && availableCategories.isNotEmpty) {
-            _categoryId = availableCategories.first.id;
-          }
 
           if (availableCategories.isEmpty) {
             return ListView(
@@ -199,6 +232,9 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                 SelectionSheetField<String>(
                   label: strings.category,
                   value: _categoryId,
+                  placeholder: strings.isEnglish
+                      ? 'Choose a category'
+                      : 'Elegí una categoría',
                   enabled: !isEditing,
                   sheetTitle: strings.category,
                   sheetDescription: strings.isEnglish

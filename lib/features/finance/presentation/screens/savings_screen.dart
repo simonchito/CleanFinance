@@ -7,6 +7,7 @@ import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/savings_goal.dart';
 import '../providers/finance_providers.dart';
+import '../widgets/confirm_action_dialog.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 import 'movement_form_screen.dart';
@@ -60,6 +61,26 @@ class SavingsScreen extends ConsumerWidget {
     ref.invalidate(reportsSnapshotProvider);
     ref.invalidate(savingsGoalRemindersProvider);
     ref.invalidate(monthlyDueRemindersProvider);
+  }
+
+  Future<void> _deleteGoal(
+    BuildContext context,
+    WidgetRef ref,
+    SavingsGoal goal,
+  ) async {
+    final confirmed = await showConfirmActionDialog(
+      context: context,
+      title: 'Eliminar meta',
+      message:
+          'Se eliminará la meta "${goal.name}". Los aportes ya registrados seguirán existiendo, pero dejarán de estar vinculados a esta meta.',
+      confirmLabel: 'Eliminar',
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    await ref.read(savingsGoalsRepositoryProvider).deleteSavingsGoal(goal.id);
+    _refresh(ref);
   }
 
   @override
@@ -209,12 +230,8 @@ class SavingsScreen extends ConsumerWidget {
                           ),
                           onContribute: () =>
                               _openContribution(context, ref, progress),
-                          onDelete: () async {
-                            await ref
-                                .read(savingsGoalsRepositoryProvider)
-                                .deleteSavingsGoal(progress.goal.id);
-                            _refresh(ref);
-                          },
+                          onDelete: () =>
+                              _deleteGoal(context, ref, progress.goal),
                         ),
                       ),
                     ),
@@ -243,12 +260,8 @@ class SavingsScreen extends ConsumerWidget {
                           ),
                           onContribute: () =>
                               _openContribution(context, ref, progress),
-                          onDelete: () async {
-                            await ref
-                                .read(savingsGoalsRepositoryProvider)
-                                .deleteSavingsGoal(progress.goal.id);
-                            _refresh(ref);
-                          },
+                          onDelete: () =>
+                              _deleteGoal(context, ref, progress.goal),
                         ),
                       ),
                     ),

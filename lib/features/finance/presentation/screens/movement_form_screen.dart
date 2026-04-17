@@ -45,6 +45,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
   String? _categoryId;
   String? _subcategoryId;
   String? _goalId;
+  String? _categoryErrorText;
 
   @override
   void initState() {
@@ -98,14 +99,12 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    final categories = ref
-            .read(categoriesProvider(_scopeFromMovementType(_type)))
-            .valueOrNull ??
-        const <Category>[];
-    final resolvedCategoryId =
-        _categoryId ?? _defaultTopLevelCategoryId(categories);
-    if (resolvedCategoryId == null) {
-      _showMessage('Seleccioná una categoría.');
+    if (_categoryId == null) {
+      setState(() {
+        _categoryErrorText = AppStrings.of(context).isEnglish
+            ? 'Select a category before saving.'
+            : 'Seleccioná una categoría antes de guardar.';
+      });
       return;
     }
     final now = DateTime.now();
@@ -118,7 +117,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
         _amountController.text,
         localeCode: _localeCode,
       )!,
-      categoryId: resolvedCategoryId,
+      categoryId: _categoryId!,
       subcategoryId: _subcategoryId,
       goalId: _type == MovementType.saving ? _goalId : null,
       occurredOn: _selectedDate,
@@ -148,12 +147,6 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     }
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
@@ -162,8 +155,13 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     final goalsState = ref.watch(savingsGoalsProvider);
     final isEditing =
         widget.initialMovement != null && widget.initialMovement!.id.isNotEmpty;
-    final paymentMethods =
+    final configuredPaymentMethods =
         ref.watch(settingsControllerProvider).valueOrNull?.paymentMethods ?? [];
+    final paymentMethods = PaymentMethodUtils.normalizeMethods([
+      ...configuredPaymentMethods,
+      if (_paymentMethodController.text.trim().isNotEmpty)
+        _paymentMethodController.text.trim(),
+    ]);
 
     return Scaffold(
       appBar: AppBar(
@@ -174,20 +172,9 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
           final topLevel = categories
               .where((category) => category.parentId == null)
               .toList();
-          final effectiveCategoryId =
-              _categoryId ?? (topLevel.isNotEmpty ? topLevel.first.id : null);
-
-          if (_categoryId == null && effectiveCategoryId != null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted || _categoryId == effectiveCategoryId) {
-                return;
-              }
-              setState(() => _categoryId = effectiveCategoryId);
-            });
-          }
 
           final subcategories = categories
-              .where((category) => category.parentId == effectiveCategoryId)
+              .where((category) => category.parentId == _categoryId)
               .toList();
 
           if (_subcategoryId != null &&
@@ -263,6 +250,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       _type = value;
                       _categoryId = null;
                       _subcategoryId = null;
+                      _categoryErrorText = null;
                       if (_type != MovementType.saving) {
                         _goalId = null;
                       }
@@ -291,7 +279,10 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 const SizedBox(height: 12),
                 SelectionSheetField<String>(
                   label: strings.category,
-                  value: effectiveCategoryId,
+                  value: _categoryId,
+                  placeholder: strings.isEnglish
+                      ? 'Choose a category'
+                      : 'Elegí una categoría',
                   sheetTitle: strings.category,
                   sheetDescription: strings.isEnglish
                       ? 'Choose the main category.'
@@ -309,9 +300,22 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                     setState(() {
                       _categoryId = value;
                       _subcategoryId = null;
+                      _categoryErrorText = null;
                     });
                   },
                 ),
+                if (_categoryErrorText != null) ...[
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      _categoryErrorText!,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                    ),
+                  ),
+                ],
                 if (subcategories.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   SelectionSheetField<String?>(
@@ -454,13 +458,4 @@ CategoryScope _scopeFromMovementType(MovementType type) {
     case MovementType.saving:
       return CategoryScope.saving;
   }
-}
-
-String? _defaultTopLevelCategoryId(List<Category> categories) {
-  for (final category in categories) {
-    if (category.parentId == null) {
-      return category.id;
-    }
-  }
-  return null;
 }

@@ -100,6 +100,46 @@ void main() {
 
     expect(find.text('QR'), findsNothing);
   });
+
+  testWidgets('canonicalizes card payment methods in the list',
+      (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          movementsRepositoryProvider.overrideWithValue(
+            _FakeMovementsRepository(
+              movements: [
+                Movement(
+                  id: 'movement-3',
+                  type: MovementType.expense,
+                  amount: 4500,
+                  categoryId: 'transport',
+                  occurredOn: DateTime(2026, 4, 17),
+                  paymentMethod: 'tarjeta debito',
+                  categoryName: 'Transporte',
+                  createdAt: DateTime(2026, 4, 17, 10),
+                  updatedAt: DateTime(2026, 4, 17, 10),
+                ),
+              ],
+            ),
+          ),
+          settingsRepositoryProvider
+              .overrideWithValue(_FakeSettingsRepository()),
+        ],
+        child: const MaterialApp(
+          locale: Locale('es'),
+          supportedLocales: [Locale('es'), Locale('en')],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          home: MovementsScreen(),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Tarjeta débito'), findsOneWidget);
+  });
 }
 
 class _FakeMovementsRepository implements MovementsRepository {

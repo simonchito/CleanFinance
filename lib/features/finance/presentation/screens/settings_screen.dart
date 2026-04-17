@@ -15,6 +15,7 @@ import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../../budgets/presentation/screens/budgets_screen.dart';
 import '../../domain/entities/app_theme_preference.dart';
 import '../providers/finance_providers.dart';
+import '../widgets/confirm_action_dialog.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
 import 'categories_screen.dart';
@@ -58,91 +59,75 @@ class SettingsScreen extends ConsumerWidget {
       return;
     }
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmActionDialog(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(strings.importBackup),
-          content: Text(
-            strings.isEnglish
-                ? 'This will replace your current data. Export a backup first if you want a copy.'
-                : 'Esta acción reemplaza los datos actuales. Si querés, exportá un backup antes de seguir.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(strings.cancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(strings.importBackup),
-            ),
-          ],
-        );
-      },
+      title: strings.importBackup,
+      message: strings.isEnglish
+          ? 'This will replace your current local data. The file will be validated before importing so your existing data stays untouched if something is wrong.'
+          : 'Esta acción reemplazará tus datos locales actuales. El archivo se validará antes de importar para no tocar tus datos si encuentra problemas.',
+      confirmLabel: strings.importBackup,
+      cancelLabel: strings.cancel,
     );
 
-    if (confirmed != true) {
+    if (!confirmed) {
       return;
     }
 
-    final payload = await File(path).readAsString();
-    await ref.read(backupRepositoryProvider).importData(payload);
-    ref.invalidate(settingsControllerProvider);
-    ref.invalidate(financeOverviewProvider);
-    ref.invalidate(dashboardSummaryProvider);
-    ref.invalidate(recentMovementsProvider);
-    ref.invalidate(reportsSnapshotProvider);
-    ref.invalidate(savingsGoalsProvider);
-    ref.invalidate(categoriesProvider);
-    ref.invalidate(movementsProvider);
-    ref.invalidate(monthlyDueRemindersProvider);
-    ref.invalidate(categoryBudgetStatusProvider);
+    try {
+      final payload = await File(path).readAsString();
+      await ref.read(backupRepositoryProvider).importData(payload);
+      ref.invalidate(settingsControllerProvider);
+      ref.invalidate(financeOverviewProvider);
+      ref.invalidate(dashboardSummaryProvider);
+      ref.invalidate(recentMovementsProvider);
+      ref.invalidate(reportsSnapshotProvider);
+      ref.invalidate(savingsGoalsProvider);
+      ref.invalidate(categoriesProvider);
+      ref.invalidate(movementsProvider);
+      ref.invalidate(monthlyDueRemindersProvider);
+      ref.invalidate(categoryBudgetStatusProvider);
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            strings.isEnglish
-                ? 'Data imported successfully.'
-                : 'Datos importados correctamente.',
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              strings.isEnglish
+                  ? 'Data imported successfully.'
+                  : 'Datos importados correctamente.',
+            ),
           ),
-        ),
-      );
+        );
+      }
+    } catch (error) {
+      if (context.mounted) {
+        final message = error is FormatException
+            ? error.message
+            : error.toString();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
     }
   }
 
   Future<void> _clearAllData(BuildContext context, WidgetRef ref) async {
     final strings = AppStrings.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmActionDialog(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(strings.isEnglish ? 'Delete data' : 'Borrar datos'),
-          content: Text(
-            strings.isEnglish
-                ? 'Movements, goals and custom categories will be removed from this device.'
-                : 'Se eliminarán movimientos, metas y categorías personalizadas del dispositivo.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(strings.cancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(strings.isEnglish ? 'Delete' : 'Borrar'),
-            ),
-          ],
-        );
-      },
+      title: strings.isEnglish ? 'Delete all data' : 'Borrar todos los datos',
+      message: strings.isEnglish
+          ? 'This will remove the full local database, PIN, recovery data and biometric flags, leaving the app as a clean install.'
+          : 'Esto eliminará la base local completa, el PIN, los datos de recuperación y las banderas de biometría, dejando la app como una instalación limpia.',
+      confirmLabel: strings.isEnglish ? 'Delete everything' : 'Borrar todo',
+      cancelLabel: strings.cancel,
     );
 
-    if (confirmed != true) {
+    if (!confirmed) {
       return;
     }
 
     await ref.read(backupRepositoryProvider).clearAllData();
+    ref.read(showSensitiveAmountsOverrideProvider.notifier).state = null;
     ref.invalidate(settingsControllerProvider);
     ref.invalidate(financeOverviewProvider);
     ref.invalidate(dashboardSummaryProvider);
@@ -153,14 +138,15 @@ class SettingsScreen extends ConsumerWidget {
     ref.invalidate(movementsProvider);
     ref.invalidate(monthlyDueRemindersProvider);
     ref.invalidate(categoryBudgetStatusProvider);
+    ref.invalidate(authControllerProvider);
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             strings.isEnglish
-                ? 'Local data was reset.'
-                : 'Se restablecieron tus datos locales.',
+                ? 'All local data was deleted. The app is now in clean-install state.'
+                : 'Se borraron todos los datos locales. La app quedó en estado de instalación limpia.',
           ),
         ),
       );
