@@ -4,9 +4,16 @@ import '../core/database/app_database.dart';
 import '../core/security/biometric_service.dart';
 import '../core/security/password_hasher.dart';
 import '../core/security/secure_storage_service.dart';
-import '../features/auth/data/local_auth_repository.dart';
+import '../features/auth/data/local_security_repository.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
+import '../features/auth/domain/repositories/security_repository.dart';
+import '../features/finance/data/local_backup_repository.dart';
+import '../features/finance/data/local_category_repository.dart';
 import '../features/finance/data/local_finance_repository.dart';
+import '../features/finance/data/local_finance_support.dart';
+import '../features/finance/data/local_movement_repository.dart';
+import '../features/finance/data/local_savings_repository.dart';
+import '../features/finance/data/local_settings_repository.dart';
 import '../features/finance/domain/repositories/backup_repository.dart';
 import '../features/finance/domain/repositories/categories_repository.dart';
 import '../features/finance/domain/repositories/finance_repository.dart';
@@ -35,8 +42,56 @@ final passwordHasherProvider =
 final biometricServiceProvider =
     Provider<BiometricService>((ref) => BiometricService());
 
-final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => LocalAuthRepository(
+final localFinanceSupportProvider = Provider<LocalFinanceSupport>(
+  (ref) => LocalFinanceSupport(
+    ref.watch(appDatabaseProvider),
+    secureStorage: ref.watch(secureStorageProvider),
+  ),
+);
+
+final movementRepositoryProvider = Provider<MovementsRepository>(
+  (ref) => LocalMovementRepository(ref.watch(localFinanceSupportProvider)),
+);
+final categoryRepositoryProvider = Provider<CategoriesRepository>(
+  (ref) => LocalCategoryRepository(ref.watch(localFinanceSupportProvider)),
+);
+final savingsRepositoryProvider = Provider<SavingsGoalsRepository>(
+  (ref) => LocalSavingsRepository(ref.watch(localFinanceSupportProvider)),
+);
+final financeSettingsRepositoryProvider = Provider<SettingsRepository>(
+  (ref) => LocalSettingsRepository(ref.watch(localFinanceSupportProvider)),
+);
+final backupDataRepositoryProvider = Provider<BackupRepository>(
+  (ref) => LocalBackupRepository(ref.watch(localFinanceSupportProvider)),
+);
+
+final financeRepositoryProvider = Provider<FinanceRepository>(
+  (ref) => LocalFinanceRepository.composed(
+    movementsRepository: ref.watch(movementRepositoryProvider),
+    categoriesRepository: ref.watch(categoryRepositoryProvider),
+    savingsRepository: ref.watch(savingsRepositoryProvider),
+    settingsRepository: ref.watch(financeSettingsRepositoryProvider),
+    backupRepository: ref.watch(backupDataRepositoryProvider),
+  ),
+);
+final movementsRepositoryProvider = Provider<MovementsRepository>(
+  (ref) => ref.watch(movementRepositoryProvider),
+);
+final categoriesRepositoryProvider = Provider<CategoriesRepository>(
+  (ref) => ref.watch(categoryRepositoryProvider),
+);
+final savingsGoalsRepositoryProvider = Provider<SavingsGoalsRepository>(
+  (ref) => ref.watch(savingsRepositoryProvider),
+);
+final settingsRepositoryProvider = Provider<SettingsRepository>(
+  (ref) => ref.watch(financeSettingsRepositoryProvider),
+);
+final backupRepositoryProvider = Provider<BackupRepository>(
+  (ref) => ref.watch(backupDataRepositoryProvider),
+);
+
+final securityRepositoryProvider = Provider<SecurityRepository>(
+  (ref) => LocalSecurityRepository(
     secureStorage: ref.watch(secureStorageProvider),
     passwordHasher: ref.watch(passwordHasherProvider),
     biometricService: ref.watch(biometricServiceProvider),
@@ -44,26 +99,8 @@ final authRepositoryProvider = Provider<AuthRepository>(
   ),
 );
 
-final financeRepositoryProvider = Provider<FinanceRepository>(
-  (ref) => LocalFinanceRepository(
-    ref.watch(appDatabaseProvider),
-    secureStorage: ref.watch(secureStorageProvider),
-  ),
-);
-final movementsRepositoryProvider = Provider<MovementsRepository>(
-  (ref) => ref.watch(financeRepositoryProvider),
-);
-final categoriesRepositoryProvider = Provider<CategoriesRepository>(
-  (ref) => ref.watch(financeRepositoryProvider),
-);
-final savingsGoalsRepositoryProvider = Provider<SavingsGoalsRepository>(
-  (ref) => ref.watch(financeRepositoryProvider),
-);
-final settingsRepositoryProvider = Provider<SettingsRepository>(
-  (ref) => ref.watch(financeRepositoryProvider),
-);
-final backupRepositoryProvider = Provider<BackupRepository>(
-  (ref) => ref.watch(financeRepositoryProvider),
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => ref.watch(securityRepositoryProvider),
 );
 
 final financeInsightsServiceProvider =

@@ -9,11 +9,10 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/providers.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
-import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../../budgets/presentation/screens/budgets_screen.dart';
 import '../../domain/entities/app_theme_preference.dart';
+import '../controllers/data_management_controller.dart';
 import '../providers/finance_providers.dart';
 import '../widgets/confirm_action_dialog.dart';
 import '../widgets/empty_state_view.dart';
@@ -39,8 +38,9 @@ class SettingsScreen extends ConsumerWidget {
       return;
     }
 
-    final payload =
-        await ref.read(backupRepositoryProvider).exportData(password: password);
+    final payload = await ref
+        .read(dataManagementControllerProvider)
+        .exportData(password: password);
     final directory = await getApplicationDocumentsDirectory();
     final file = File(
       '${directory.path}/clean_finance_backup_${DateTime.now().millisecondsSinceEpoch}.json',
@@ -113,18 +113,8 @@ class SettingsScreen extends ConsumerWidget {
       }
 
       await ref
-          .read(backupRepositoryProvider)
+          .read(dataManagementControllerProvider)
           .importData(payload, password: password);
-      ref.invalidate(settingsControllerProvider);
-      ref.invalidate(financeOverviewProvider);
-      ref.invalidate(dashboardSummaryProvider);
-      ref.invalidate(recentMovementsProvider);
-      ref.invalidate(reportsSnapshotProvider);
-      ref.invalidate(savingsGoalsProvider);
-      ref.invalidate(categoriesProvider);
-      ref.invalidate(movementsProvider);
-      ref.invalidate(monthlyDueRemindersProvider);
-      ref.invalidate(categoryBudgetStatusProvider);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -164,19 +154,7 @@ class SettingsScreen extends ConsumerWidget {
       return;
     }
 
-    await ref.read(backupRepositoryProvider).clearAllData();
-    ref.read(showSensitiveAmountsOverrideProvider.notifier).state = null;
-    ref.invalidate(settingsControllerProvider);
-    ref.invalidate(financeOverviewProvider);
-    ref.invalidate(dashboardSummaryProvider);
-    ref.invalidate(recentMovementsProvider);
-    ref.invalidate(reportsSnapshotProvider);
-    ref.invalidate(savingsGoalsProvider);
-    ref.invalidate(categoriesProvider);
-    ref.invalidate(movementsProvider);
-    ref.invalidate(monthlyDueRemindersProvider);
-    ref.invalidate(categoryBudgetStatusProvider);
-    ref.invalidate(authControllerProvider);
+    await ref.read(dataManagementControllerProvider).clearAllData();
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../app/app_strings.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/payment_method_utils.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
-import '../../../../shared/providers.dart';
-import '../../../budgets/presentation/providers/budget_providers.dart';
-import '../../domain/entities/category.dart';
 import '../../domain/entities/movement.dart';
+import '../controllers/movement_form_controller.dart';
 import '../providers/finance_providers.dart';
 import '../utils/payment_method_icon_resolver.dart';
 import '../widgets/section_card.dart';
@@ -37,7 +34,6 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
   final _paymentMethodController = TextEditingController();
-  final _uuid = const Uuid();
 
   late MovementType _type;
   late final String _localeCode;
@@ -99,51 +95,32 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    if (_categoryId == null) {
-      setState(() {
-        _categoryErrorText = AppStrings.of(context).isEnglish
-            ? 'Select a category before saving.'
-            : 'Seleccioná una categoría antes de guardar.';
-      });
-      return;
-    }
-    final now = DateTime.now();
-    final movement = Movement(
-      id: widget.initialMovement?.id.isNotEmpty == true
-          ? widget.initialMovement!.id
-          : _uuid.v4(),
-      type: _type,
-      amount: CurrencyFormatter.tryParseWholeAmount(
-        _amountController.text,
-        localeCode: _localeCode,
-      )!,
-      categoryId: _categoryId!,
-      subcategoryId: _subcategoryId,
-      goalId: _type == MovementType.saving ? _goalId : null,
-      occurredOn: _selectedDate,
-      note: _noteController.text.trim().isEmpty
-          ? null
-          : _noteController.text.trim(),
-      paymentMethod: _paymentMethodController.text.trim().isEmpty
-          ? null
-          : PaymentMethodUtils.canonicalizeLabel(
-              _paymentMethodController.text.trim(),
+    try {
+      await ref.read(movementFormControllerProvider).saveMovement(
+            MovementFormInput(
+              initialMovement: widget.initialMovement,
+              type: _type,
+              amountText: _amountController.text,
+              localeCode: _localeCode,
+              categoryId: _categoryId,
+              subcategoryId: _subcategoryId,
+              goalId: _goalId,
+              occurredOn: _selectedDate,
+              note: _noteController.text,
+              paymentMethod: _paymentMethodController.text,
             ),
-      createdAt: widget.initialMovement?.createdAt ?? now,
-      updatedAt: now,
-    );
-
-    await ref.read(movementsRepositoryProvider).upsertMovement(movement);
-    ref.invalidate(financeOverviewProvider);
-    ref.invalidate(dashboardSummaryProvider);
-    ref.invalidate(recentMovementsProvider);
-    ref.invalidate(reportsSnapshotProvider);
-    ref.invalidate(savingsGoalsProvider);
-    ref.invalidate(movementsProvider);
-    ref.invalidate(monthlyDueRemindersProvider);
-    ref.invalidate(categoryBudgetStatusProvider);
-    if (mounted) {
-      Navigator.of(context).pop();
+          );
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } on MovementFormValidationException catch (error) {
+      if (error.error == MovementFormValidationError.missingCategory) {
+        setState(() {
+          _categoryErrorText = AppStrings.of(context).isEnglish
+              ? 'Select a category before saving.'
+              : 'Seleccioná una categoría antes de guardar.';
+        });
+      }
     }
   }
 
@@ -151,7 +128,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final categoriesState =
-        ref.watch(categoriesProvider(_scopeFromMovementType(_type)));
+        ref.watch(categoriesProvider(categoryScopeFromMovementType(_type)));
     final goalsState = ref.watch(savingsGoalsProvider);
     final isEditing =
         widget.initialMovement != null && widget.initialMovement!.id.isNotEmpty;
@@ -446,16 +423,5 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
         ),
       ),
     );
-  }
-}
-
-CategoryScope _scopeFromMovementType(MovementType type) {
-  switch (type) {
-    case MovementType.income:
-      return CategoryScope.income;
-    case MovementType.expense:
-      return CategoryScope.expense;
-    case MovementType.saving:
-      return CategoryScope.saving;
   }
 }
