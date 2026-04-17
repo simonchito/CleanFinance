@@ -42,6 +42,87 @@ void main() {
     expect(saved.note, 'Compra grande');
     expect(saved.paymentMethod, 'QR');
   });
+
+  test('MovementFormController keeps id and createdAt when editing', () async {
+    final movementsRepository = _CapturingMovementsRepository();
+    final container = ProviderContainer(
+      overrides: [
+        movementRepositoryProvider.overrideWithValue(movementsRepository),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final original = Movement(
+      id: 'movement-existing',
+      type: MovementType.saving,
+      amount: 1000,
+      categoryId: 'savings',
+      goalId: 'goal-1',
+      occurredOn: DateTime(2026, 4, 1),
+      createdAt: DateTime(2026, 4, 1, 9),
+      updatedAt: DateTime(2026, 4, 1, 9),
+    );
+
+    await container.read(movementFormControllerProvider).saveMovement(
+          MovementFormInput(
+            initialMovement: original,
+            type: MovementType.expense,
+            amountText: '4500',
+            localeCode: 'es',
+            categoryId: 'food',
+            subcategoryId: 'weekly',
+            goalId: 'goal-1',
+            occurredOn: DateTime(2026, 4, 17),
+            note: ' Actualizado ',
+            paymentMethod: 'efectivo',
+          ),
+        );
+
+    final saved = movementsRepository.savedMovement;
+    expect(saved, isNotNull);
+    expect(saved!.id, 'movement-existing');
+    expect(saved.createdAt, original.createdAt);
+    expect(saved.goalId, isNull);
+    expect(saved.note, 'Actualizado');
+    expect(saved.paymentMethod, 'Efectivo');
+  });
+
+  test('MovementFormController rejects missing category without saving',
+      () async {
+    final movementsRepository = _CapturingMovementsRepository();
+    final container = ProviderContainer(
+      overrides: [
+        movementRepositoryProvider.overrideWithValue(movementsRepository),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await expectLater(
+      () => container.read(movementFormControllerProvider).saveMovement(
+            MovementFormInput(
+              initialMovement: null,
+              type: MovementType.expense,
+              amountText: '2500',
+              localeCode: 'es',
+              categoryId: null,
+              subcategoryId: null,
+              goalId: null,
+              occurredOn: DateTime(2026, 4, 17),
+              note: '',
+              paymentMethod: '',
+            ),
+          ),
+      throwsA(
+        isA<MovementFormValidationException>().having(
+          (error) => error.error,
+          'error',
+          MovementFormValidationError.missingCategory,
+        ),
+      ),
+    );
+
+    expect(movementsRepository.savedMovement, isNull);
+  });
 }
 
 class _CapturingMovementsRepository implements MovementsRepository {

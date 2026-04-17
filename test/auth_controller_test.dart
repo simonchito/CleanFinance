@@ -8,6 +8,26 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AuthController biometric preference sync', () {
+    test('bootstrap loads persisted biometric state from the repository',
+        () async {
+      final authRepository = _FakeAuthRepository()
+        ..hasCredentialResult = true
+        ..hasRecoveryDataResult = true
+        ..biometricAvailableResult = true
+        ..biometricEnabledResult = true;
+      final controller = AuthController(
+        authRepository: authRepository,
+        categoriesRepository: _FakeCategoriesRepository(),
+      );
+
+      await controller.bootstrap();
+
+      expect(controller.state.status, AuthStatus.locked);
+      expect(controller.state.biometricAvailable, isTrue);
+      expect(controller.state.biometricEnabled, isTrue);
+      expect(controller.state.recoveryConfigured, isTrue);
+    });
+
     test('createPin persists biometric preference even when disabled',
         () async {
       final authRepository = _FakeAuthRepository();
@@ -77,6 +97,10 @@ void main() {
 class _FakeAuthRepository implements AuthRepository {
   bool recoveryVerificationResult = false;
   bool? lastBiometricEnabledValue;
+  bool hasCredentialResult = false;
+  bool hasRecoveryDataResult = false;
+  bool biometricAvailableResult = true;
+  bool biometricEnabledResult = false;
 
   @override
   Future<bool> authenticateWithBiometrics() async => false;
@@ -86,16 +110,17 @@ class _FakeAuthRepository implements AuthRepository {
       const PinSecurityState.initial();
 
   @override
-  Future<bool> hasCredential() async => false;
+  Future<bool> hasCredential() async => hasCredentialResult;
 
   @override
-  Future<bool> hasRecoveryData() async => false;
+  Future<bool> hasRecoveryData() async => hasRecoveryDataResult;
 
   @override
-  Future<bool> isBiometricAvailable() async => true;
+  Future<bool> isBiometricAvailable() async => biometricAvailableResult;
 
   @override
-  Future<bool> isBiometricEnabled() async => lastBiometricEnabledValue ?? false;
+  Future<bool> isBiometricEnabled() async =>
+      lastBiometricEnabledValue ?? biometricEnabledResult;
 
   @override
   Future<void> savePin(String pin) async {}

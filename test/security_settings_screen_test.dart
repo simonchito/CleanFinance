@@ -123,7 +123,65 @@ void main() {
       isTrue,
     );
   });
+
+  testWidgets('uses auth state as the real source for the biometric switch',
+      (tester) async {
+    final authRepository = _FakeAuthRepository(
+      biometricAvailable: true,
+      biometricEnabled: true,
+    );
+    final settingsRepository = _FakeSettingsRepository()
+      ..current = settingsRepositoryCurrent.copyWith(biometricEnabled: false);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(authRepository),
+          settingsRepositoryProvider.overrideWithValue(settingsRepository),
+          categoriesRepositoryProvider.overrideWithValue(
+            _FakeCategoriesRepository(),
+          ),
+        ],
+        child: const MaterialApp(
+          locale: Locale('es'),
+          supportedLocales: [Locale('es'), Locale('en')],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          home: SettingsScreen(),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    final biometricTitle = find.text('Desbloqueo con biometría');
+    await tester.scrollUntilVisible(
+      biometricTitle,
+      300,
+      scrollable: find.byType(Scrollable),
+    );
+    final biometricTile = tester.widget<SwitchListTile>(
+      find.ancestor(
+        of: biometricTitle,
+        matching: find.byType(SwitchListTile),
+      ),
+    );
+
+    expect(biometricTile.value, isTrue);
+    expect(settingsRepository.current.biometricEnabled, isFalse);
+  });
 }
+
+const settingsRepositoryCurrent = AppSettings(
+  currencyCode: 'ARS',
+  currencySymbol: r'$',
+  showSensitiveAmounts: true,
+  themePreference: AppThemePreference.system,
+  biometricEnabled: false,
+  autoLockMinutes: 5,
+  localeCode: 'es',
+  paymentMethods: ['Transferencia', 'QR'],
+);
 
 class _FakeAuthRepository implements AuthRepository {
   _FakeAuthRepository({
@@ -186,16 +244,7 @@ class _FakeAuthRepository implements AuthRepository {
 }
 
 class _FakeSettingsRepository implements SettingsRepository {
-  AppSettings current = const AppSettings(
-    currencyCode: 'ARS',
-    currencySymbol: r'$',
-    showSensitiveAmounts: true,
-    themePreference: AppThemePreference.system,
-    biometricEnabled: false,
-    autoLockMinutes: 5,
-    localeCode: 'es',
-    paymentMethods: ['Transferencia', 'QR'],
-  );
+  AppSettings current = settingsRepositoryCurrent;
 
   final List<bool> savedBiometricEnabledValues = [];
 
