@@ -536,6 +536,21 @@ class LocalBackupRepository implements BackupRepository {
         _optionalTrimmedString(row, 'locale_code'),
       ),
       'payment_methods': jsonEncode(paymentMethods),
+      'notifications_enabled': row.containsKey('notifications_enabled')
+          ? _readBoolAsInt(row, 'notifications_enabled')
+          : 0,
+      'notification_reminder_hour':
+          (_readNullableInt(row, 'notification_reminder_hour') ?? 9)
+              .clamp(0, 23)
+              .toInt(),
+      'notification_reminder_minute':
+          (_readNullableInt(row, 'notification_reminder_minute') ?? 0)
+              .clamp(0, 59)
+              .toInt(),
+      'notification_permission_requested':
+          row.containsKey('notification_permission_requested')
+              ? _readBoolAsInt(row, 'notification_permission_requested')
+              : 0,
     };
   }
 
@@ -551,6 +566,10 @@ class LocalBackupRepository implements BackupRepository {
       'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,
       'locale_code': AppConstants.defaultLocalePreferenceCode,
       'payment_methods': jsonEncode(AppConstants.defaultPaymentMethods),
+      'notifications_enabled': 0,
+      'notification_reminder_hour': 9,
+      'notification_reminder_minute': 0,
+      'notification_permission_requested': 0,
     };
   }
 

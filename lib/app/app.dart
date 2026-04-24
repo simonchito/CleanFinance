@@ -7,20 +7,33 @@ import '../features/auth/presentation/screens/auth_gate_screen.dart';
 import '../features/finance/domain/entities/app_theme_preference.dart';
 import '../features/finance/presentation/mappers/theme_mode_mapper.dart';
 import '../features/finance/presentation/providers/finance_providers.dart';
+import '../features/finance/presentation/providers/monthly_reminder_notification_providers.dart';
 import 'theme/app_theme.dart';
 
-class CleanFinanceApp extends ConsumerWidget {
+class CleanFinanceApp extends ConsumerStatefulWidget {
   const CleanFinanceApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CleanFinanceApp> createState() => _CleanFinanceAppState();
+}
+
+class _CleanFinanceAppState extends ConsumerState<CleanFinanceApp> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+      () => ref.read(notificationSettingsControllerProvider).initialize(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final settingsState = ref.watch(settingsControllerProvider);
     final themeMode = ThemeModeMapper.toFlutter(
       settingsState.valueOrNull?.themePreference ?? AppThemePreference.system,
     );
-    final localePreferenceCode =
-        settingsState.valueOrNull?.localeCode ??
-            AppConstants.defaultLocalePreferenceCode;
+    final localePreferenceCode = settingsState.valueOrNull?.localeCode ??
+        AppConstants.defaultLocalePreferenceCode;
 
     return MaterialApp(
       title: 'CleanFinance',
@@ -68,4 +81,3 @@ class CleanFinanceApp extends ConsumerWidget {
     return const Locale('es');
   }
 }
-

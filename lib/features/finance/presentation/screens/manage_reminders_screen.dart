@@ -6,6 +6,7 @@ import '../../../../shared/providers.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/savings_goal.dart';
 import '../providers/finance_providers.dart';
+import '../providers/monthly_reminder_notification_providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/selection_sheet_field.dart';
 import '../widgets/section_card.dart';
@@ -19,7 +20,8 @@ class ManageRemindersScreen extends ConsumerWidget {
     final expenseCategoriesState = ref.watch(
       categoriesProvider(CategoryScope.expense),
     );
-    final expenseRemindersState = ref.watch(expenseReminderSubcategoriesProvider);
+    final expenseRemindersState =
+        ref.watch(expenseReminderSubcategoriesProvider);
     final savingsRemindersState = ref.watch(savingsGoalRemindersProvider);
 
     return Scaffold(
@@ -69,8 +71,8 @@ class ManageRemindersScreen extends ConsumerWidget {
                 );
               }
 
-              final allExpenseCategories = expenseCategoriesState.valueOrNull ??
-                  const <Category>[];
+              final allExpenseCategories =
+                  expenseCategoriesState.valueOrNull ?? const <Category>[];
               final parentNames = {
                 for (final category in allExpenseCategories.where(
                   (item) => item.parentId == null,
@@ -88,7 +90,8 @@ class ManageRemindersScreen extends ConsumerWidget {
                           subtitle: parentNames[subcategory.parentId],
                           reminderDay: subcategory.reminderDay ?? 1,
                           icon: Icons.receipt_long_outlined,
-                          onDisable: () => _disableExpenseReminder(ref, subcategory),
+                          onDisable: () =>
+                              _disableExpenseReminder(ref, subcategory),
                           onEditDay: () => _editExpenseReminderDay(
                             context,
                             ref,
@@ -146,7 +149,8 @@ class ManageRemindersScreen extends ConsumerWidget {
                               : null,
                           reminderDay: progress.goal.reminderDay ?? 1,
                           icon: Icons.savings_outlined,
-                          onDisable: () => _disableGoalReminder(ref, progress.goal),
+                          onDisable: () =>
+                              _disableGoalReminder(ref, progress.goal),
                           onEditDay: () => _editGoalReminderDay(
                             context,
                             ref,
@@ -175,7 +179,8 @@ class ManageRemindersScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _disableExpenseReminder(WidgetRef ref, Category subcategory) async {
+  Future<void> _disableExpenseReminder(
+      WidgetRef ref, Category subcategory) async {
     await ref.read(categoriesRepositoryProvider).upsertCategory(
           subcategory.copyWith(
             reminderEnabled: false,
@@ -183,6 +188,7 @@ class ManageRemindersScreen extends ConsumerWidget {
             updatedAt: DateTime.now(),
           ),
         );
+    await _syncNotifications(ref);
     _refresh(ref);
   }
 
@@ -194,6 +200,7 @@ class ManageRemindersScreen extends ConsumerWidget {
             updatedAt: DateTime.now(),
           ),
         );
+    await _syncNotifications(ref);
     _refresh(ref);
   }
 
@@ -217,6 +224,7 @@ class ManageRemindersScreen extends ConsumerWidget {
             updatedAt: DateTime.now(),
           ),
         );
+    await _syncNotifications(ref);
     _refresh(ref);
   }
 
@@ -240,7 +248,18 @@ class ManageRemindersScreen extends ConsumerWidget {
             updatedAt: DateTime.now(),
           ),
         );
+    await _syncNotifications(ref);
     _refresh(ref);
+  }
+
+  Future<void> _syncNotifications(WidgetRef ref) async {
+    try {
+      await ref
+          .read(monthlyReminderNotificationSchedulerProvider)
+          .syncScheduledReminders();
+    } catch (_) {
+      // Reminder edits should remain saved even if notification scheduling fails.
+    }
   }
 
   Future<int?> _pickReminderDay(

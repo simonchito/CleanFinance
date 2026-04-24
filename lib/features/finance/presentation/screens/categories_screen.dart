@@ -9,6 +9,7 @@ import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
 import '../providers/finance_providers.dart';
+import '../providers/monthly_reminder_notification_providers.dart';
 import '../widgets/confirm_action_dialog.dart';
 import '../widgets/icon_picker_field.dart';
 import '../widgets/selection_sheet_field.dart';
@@ -66,8 +67,9 @@ class _CategoryTab extends ConsumerWidget {
             return Center(child: Text(strings.noCategories));
           }
 
-          final topLevel =
-              categories.where((category) => category.parentId == null).toList();
+          final topLevel = categories
+              .where((category) => category.parentId == null)
+              .toList();
 
           return ListView(
             padding: const EdgeInsets.all(12),
@@ -171,6 +173,7 @@ class _CategoryTab extends ConsumerWidget {
       }
 
       await ref.read(categoriesRepositoryProvider).deleteCategory(category.id);
+      await _syncNotifications(ref);
       ref.invalidate(categoriesProvider(scope));
       ref.invalidate(categoryBudgetStatusProvider);
       ref.invalidate(expenseReminderSubcategoriesProvider);
@@ -271,9 +274,7 @@ class _CategoryTab extends ConsumerWidget {
                               : 'Sin categoría padre',
                           iconData: Icons.account_tree_outlined,
                         ),
-                        ...parents
-                            .where((item) => item.id != initial?.id)
-                            .map(
+                        ...parents.where((item) => item.id != initial?.id).map(
                               (item) => SelectionSheetItem<String?>(
                                 value: item.id,
                                 label: item.name,
@@ -354,16 +355,16 @@ class _CategoryTab extends ConsumerWidget {
                   parentId: selectedParentId,
                   isDefault: initial?.isDefault ?? false,
                   reminderEnabled: selectedParentId != null && reminderEnabled,
-                  reminderDay:
-                      selectedParentId != null && reminderEnabled
-                          ? reminderDay
-                          : null,
+                  reminderDay: selectedParentId != null && reminderEnabled
+                      ? reminderDay
+                      : null,
                   createdAt: initial?.createdAt ?? now,
                   updatedAt: now,
                 );
                 await ref
                     .read(categoriesRepositoryProvider)
                     .upsertCategory(category);
+                await _syncNotifications(ref);
                 ref.invalidate(categoriesProvider(scope));
                 ref.invalidate(categoryBudgetStatusProvider);
                 ref.invalidate(expenseReminderSubcategoriesProvider);
@@ -379,6 +380,16 @@ class _CategoryTab extends ConsumerWidget {
         );
       },
     );
+  }
+
+  Future<void> _syncNotifications(WidgetRef ref) async {
+    try {
+      await ref
+          .read(monthlyReminderNotificationSchedulerProvider)
+          .syncScheduledReminders();
+    } catch (_) {
+      // Category changes should not fail because notification scheduling failed.
+    }
   }
 }
 

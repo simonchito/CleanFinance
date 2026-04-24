@@ -19,21 +19,24 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
   }
 
   Future<void> setThemePreference(AppThemePreference themePreference) async {
-    final current = state.valueOrNull ?? await _settingsRepository.getSettings();
+    final current =
+        state.valueOrNull ?? await _settingsRepository.getSettings();
     final updated = current.copyWith(themePreference: themePreference);
     await _settingsRepository.saveSettings(updated);
     state = AsyncData(updated);
   }
 
   Future<void> setBiometricEnabled(bool enabled) async {
-    final current = state.valueOrNull ?? await _settingsRepository.getSettings();
+    final current =
+        state.valueOrNull ?? await _settingsRepository.getSettings();
     final updated = current.copyWith(biometricEnabled: enabled);
     await _settingsRepository.saveSettings(updated);
     state = AsyncData(updated);
   }
 
   Future<void> setAutoLockMinutes(int minutes) async {
-    final current = state.valueOrNull ?? await _settingsRepository.getSettings();
+    final current =
+        state.valueOrNull ?? await _settingsRepository.getSettings();
     final updated = current.copyWith(autoLockMinutes: minutes);
     await _settingsRepository.saveSettings(updated);
     state = AsyncData(updated);
@@ -43,7 +46,8 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
     required String code,
     required String symbol,
   }) async {
-    final current = state.valueOrNull ?? await _settingsRepository.getSettings();
+    final current =
+        state.valueOrNull ?? await _settingsRepository.getSettings();
     final updated = current.copyWith(
       currencyCode: code,
       currencySymbol: symbol,
@@ -53,14 +57,16 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
   }
 
   Future<void> setShowSensitiveAmounts(bool visible) async {
-    final current = state.valueOrNull ?? await _settingsRepository.getSettings();
+    final current =
+        state.valueOrNull ?? await _settingsRepository.getSettings();
     final updated = current.copyWith(showSensitiveAmounts: visible);
     await _settingsRepository.saveSettings(updated);
     state = AsyncData(updated);
   }
 
   Future<void> setLocalePreferenceCode(String localePreferenceCode) async {
-    final current = state.valueOrNull ?? await _settingsRepository.getSettings();
+    final current =
+        state.valueOrNull ?? await _settingsRepository.getSettings();
     final updated = current.copyWith(
       localeCode:
           AppConstants.normalizeLocalePreferenceCode(localePreferenceCode),
@@ -74,10 +80,41 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
   }
 
   Future<void> setPaymentMethods(List<String> paymentMethods) async {
-    final current = state.valueOrNull ?? await _settingsRepository.getSettings();
+    final current =
+        state.valueOrNull ?? await _settingsRepository.getSettings();
     final updated = current.copyWith(paymentMethods: paymentMethods);
     await _settingsRepository.saveSettings(updated);
     state = AsyncData(updated);
   }
-}
 
+  Future<void> setNotificationsEnabled(
+    bool enabled, {
+    bool? permissionRequested,
+  }) async {
+    final current =
+        state.valueOrNull ?? await _settingsRepository.getSettings();
+    final updated = current.copyWith(
+      notificationsEnabled: enabled,
+      notificationPermissionRequested:
+          permissionRequested ?? current.notificationPermissionRequested,
+    );
+    await _settingsRepository.saveSettings(updated);
+    state = AsyncData(updated);
+  }
+
+  Future<void> setNotificationTime({
+    required int hour,
+    required int minute,
+  }) async {
+    final normalizedHour = hour.clamp(0, 23).toInt();
+    final normalizedMinute = minute.clamp(0, 59).toInt();
+    final current =
+        state.valueOrNull ?? await _settingsRepository.getSettings();
+    final updated = current.copyWith(
+      notificationReminderHour: normalizedHour,
+      notificationReminderMinute: normalizedMinute,
+    );
+    await _settingsRepository.saveSettings(updated);
+    state = AsyncData(updated);
+  }
+}

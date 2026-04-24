@@ -114,7 +114,11 @@ class AppDatabase {
             biometric_enabled INTEGER NOT NULL DEFAULT 0,
             auto_lock_minutes INTEGER NOT NULL DEFAULT 5,
             locale_code TEXT NOT NULL DEFAULT 'system',
-            payment_methods TEXT NOT NULL
+            payment_methods TEXT NOT NULL,
+            notifications_enabled INTEGER NOT NULL DEFAULT 0,
+            notification_reminder_hour INTEGER NOT NULL DEFAULT 9,
+            notification_reminder_minute INTEGER NOT NULL DEFAULT 0,
+            notification_permission_requested INTEGER NOT NULL DEFAULT 0
           )
         ''');
 
@@ -129,6 +133,10 @@ class AppDatabase {
           'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,
           'locale_code': AppConstants.defaultLocalePreferenceCode,
           'payment_methods': jsonEncode(AppConstants.defaultPaymentMethods),
+          'notifications_enabled': 0,
+          'notification_reminder_hour': 9,
+          'notification_reminder_minute': 0,
+          'notification_permission_requested': 0,
         });
 
         await db.execute(
@@ -217,6 +225,20 @@ class AppDatabase {
             "UPDATE app_settings SET locale_code = 'system' "
             "WHERE locale_code IS NULL OR TRIM(locale_code) = '' "
             "OR LOWER(locale_code) NOT IN ('system', 'es', 'en')",
+          );
+        }
+        if (oldVersion < 9) {
+          await db.execute(
+            'ALTER TABLE app_settings ADD COLUMN notifications_enabled INTEGER NOT NULL DEFAULT 0',
+          );
+          await db.execute(
+            'ALTER TABLE app_settings ADD COLUMN notification_reminder_hour INTEGER NOT NULL DEFAULT 9',
+          );
+          await db.execute(
+            'ALTER TABLE app_settings ADD COLUMN notification_reminder_minute INTEGER NOT NULL DEFAULT 0',
+          );
+          await db.execute(
+            'ALTER TABLE app_settings ADD COLUMN notification_permission_requested INTEGER NOT NULL DEFAULT 0',
           );
         }
       },

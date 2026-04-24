@@ -1,5 +1,6 @@
 import '../entities/category.dart';
 import '../entities/monthly_payment_reminder.dart';
+import '../entities/monthly_reminder_schedule_item.dart';
 import '../entities/movement.dart';
 import '../entities/savings_goal.dart';
 
@@ -12,23 +13,21 @@ class MonthlyPaymentReminderService {
     required List<Movement> currentMonthMovements,
     required DateTime referenceDate,
   }) {
-    final resolvedExpenseSubcategoryIds =
-        currentMonthMovements
-            .where(
-              (movement) =>
-                  movement.type == MovementType.expense &&
-                  movement.subcategoryId != null,
-            )
-            .map((movement) => movement.subcategoryId!)
-            .toSet();
-    final resolvedSavingsGoalIds =
-        currentMonthMovements
-            .where(
-              (movement) =>
-                  movement.type == MovementType.saving && movement.goalId != null,
-            )
-            .map((movement) => movement.goalId!)
-            .toSet();
+    final resolvedExpenseSubcategoryIds = currentMonthMovements
+        .where(
+          (movement) =>
+              movement.type == MovementType.expense &&
+              movement.subcategoryId != null,
+        )
+        .map((movement) => movement.subcategoryId!)
+        .toSet();
+    final resolvedSavingsGoalIds = currentMonthMovements
+        .where(
+          (movement) =>
+              movement.type == MovementType.saving && movement.goalId != null,
+        )
+        .map((movement) => movement.goalId!)
+        .toSet();
 
     final dueExpenseReminders = buildExpenseReminders(
       categories: expenseCategories,
@@ -51,6 +50,81 @@ class MonthlyPaymentReminderService {
       });
 
     return reminders;
+  }
+
+  List<MonthlyReminderScheduleItem> buildScheduledReminderItems({
+    required List<Category> expenseCategories,
+    required List<SavingsGoalProgress> savingsGoals,
+    required List<Movement> currentMonthMovements,
+    required DateTime referenceDate,
+  }) {
+    final resolvedExpenseSubcategoryIds = currentMonthMovements
+        .where(
+          (movement) =>
+              movement.type == MovementType.expense &&
+              movement.subcategoryId != null,
+        )
+        .map((movement) => movement.subcategoryId!)
+        .toSet();
+    final resolvedSavingsGoalIds = currentMonthMovements
+        .where(
+          (movement) =>
+              movement.type == MovementType.saving && movement.goalId != null,
+        )
+        .map((movement) => movement.goalId!)
+        .toSet();
+
+    final parentNames = {
+      for (final category
+          in expenseCategories.where((item) => item.parentId == null))
+        category.id: category.name,
+    };
+
+    final expenseItems = expenseCategories
+        .where(
+          (category) =>
+              category.scope == CategoryScope.expense &&
+              category.isSubcategory &&
+              category.reminderEnabled &&
+              _isValidReminderDay(category.reminderDay) &&
+              !resolvedExpenseSubcategoryIds.contains(category.id),
+        )
+        .map(
+          (category) => MonthlyReminderScheduleItem(
+            id: category.id,
+            source: MonthlyReminderSource.expenseSubcategory,
+            title: category.name,
+            subtitle: parentNames[category.parentId],
+            reminderDay: category.reminderDay!,
+          ),
+        );
+
+    final savingsItems = savingsGoals
+        .where(
+          (progress) =>
+              !progress.goal.isArchived &&
+              !progress.completed &&
+              progress.goal.reminderEnabled &&
+              _isValidReminderDay(progress.goal.reminderDay) &&
+              !resolvedSavingsGoalIds.contains(progress.goal.id),
+        )
+        .map(
+          (progress) => MonthlyReminderScheduleItem(
+            id: progress.goal.id,
+            source: MonthlyReminderSource.savingsGoal,
+            title: progress.goal.name,
+            reminderDay: progress.goal.reminderDay!,
+          ),
+        );
+
+    final items = [...expenseItems, ...savingsItems]..sort((a, b) {
+        final dayComparison = a.reminderDay.compareTo(b.reminderDay);
+        if (dayComparison != 0) {
+          return dayComparison;
+        }
+        return a.title.toLowerCase().compareTo(b.title.toLowerCase());
+      });
+    return items;
   }
 
   List<MonthlyPaymentReminder> buildExpenseReminders({
@@ -116,9 +190,11 @@ class MonthlyPaymentReminderService {
   }
 
   bool _isDue(int? reminderDay, DateTime referenceDate) {
-    return reminderDay != null &&
-        reminderDay >= 1 &&
-        reminderDay <= 31 &&
-        referenceDate.day >= reminderDay;
+    return _isValidReminderDay(reminderDay) &&
+        referenceDate.day >= reminderDay!;
+  }
+
+  bool _isValidReminderDay(int? reminderDay) {
+    return reminderDay != null && reminderDay >= 1 && reminderDay <= 31;
   }
 }

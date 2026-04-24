@@ -13,7 +13,9 @@ import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../budgets/presentation/screens/budgets_screen.dart';
 import '../../domain/entities/app_theme_preference.dart';
 import '../controllers/data_management_controller.dart';
+import '../controllers/notification_settings_controller.dart';
 import '../providers/finance_providers.dart';
+import '../providers/monthly_reminder_notification_providers.dart';
 import '../widgets/confirm_action_dialog.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/section_card.dart';
@@ -233,6 +235,25 @@ class SettingsScreen extends ConsumerWidget {
     return result;
   }
 
+  Future<void> _pickNotificationTime(
+    BuildContext context,
+    WidgetRef ref, {
+    required int hour,
+    required int minute,
+  }) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: hour, minute: minute),
+    );
+    if (picked == null) {
+      return;
+    }
+    await ref.read(notificationSettingsControllerProvider).setReminderTime(
+          hour: picked.hour,
+          minute: picked.minute,
+        );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = AppStrings.of(context);
@@ -288,6 +309,82 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              SectionCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      strings.isEnglish ? 'Notifications' : 'Notificaciones',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      strings.isEnglish
+                          ? 'Receive monthly reminders on this device.'
+                          : 'Recibí recordatorios mensuales en este teléfono.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: 14),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(
+                        strings.isEnglish
+                            ? 'System notifications'
+                            : 'Notificaciones del sistema',
+                      ),
+                      subtitle: _NotificationStatusText(
+                        isEnglish: strings.isEnglish,
+                      ),
+                      value: settings.notificationsEnabled,
+                      onChanged: (value) => ref
+                          .read(notificationSettingsControllerProvider)
+                          .setNotificationsEnabled(value),
+                    ),
+                    const SizedBox(height: 8),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.schedule_outlined),
+                      title: Text(
+                        strings.isEnglish
+                            ? 'Reminder time'
+                            : 'Hora de recordatorio',
+                      ),
+                      subtitle: Text(
+                        MaterialLocalizations.of(context).formatTimeOfDay(
+                          TimeOfDay(
+                            hour: settings.notificationReminderHour,
+                            minute: settings.notificationReminderMinute,
+                          ),
+                        ),
+                      ),
+                      onTap: settings.notificationsEnabled
+                          ? () => _pickNotificationTime(
+                                context,
+                                ref,
+                                hour: settings.notificationReminderHour,
+                                minute: settings.notificationReminderMinute,
+                              )
+                          : null,
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ManageRemindersScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.notifications_active_outlined),
+                      label: Text(strings.manageReminders),
                     ),
                   ],
                 ),
@@ -574,19 +671,6 @@ class SettingsScreen extends ConsumerWidget {
                       icon: const Icon(Icons.account_balance_wallet_outlined),
                       label: Text(strings.managePaymentMethods),
                     ),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const ManageRemindersScreen(),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.notifications_active_outlined),
-                      label: Text(strings.manageReminders),
-                    ),
-                    const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () {
                         Navigator.of(context).push(
@@ -703,5 +787,52 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class _NotificationStatusText extends ConsumerWidget {
+  const _NotificationStatusText({required this.isEnglish});
+
+  final bool isEnglish;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statusState = ref.watch(cleanFinanceNotificationStatusProvider);
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+    return statusState.when(
+      data: (status) => Text(
+        _labelFor(status),
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
+      ),
+      loading: () => Text(
+        isEnglish ? 'Checking permission...' : 'Revisando permiso...',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
+      ),
+      error: (_, __) => Text(
+        isEnglish
+            ? 'Permission status unavailable'
+            : 'No se pudo revisar el permiso',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
+      ),
+    );
+  }
+
+  String _labelFor(CleanFinanceNotificationStatus status) {
+    switch (status) {
+      case CleanFinanceNotificationStatus.disabled:
+        return isEnglish
+            ? 'Notifications are off'
+            : 'Notificaciones desactivadas';
+      case CleanFinanceNotificationStatus.active:
+        return isEnglish ? 'Notifications enabled' : 'Notificaciones activadas';
+      case CleanFinanceNotificationStatus.permissionPending:
+        return isEnglish ? 'Permission pending' : 'Permiso pendiente';
+      case CleanFinanceNotificationStatus.permissionDenied:
+        return isEnglish ? 'Permission denied' : 'Permiso denegado';
+      case CleanFinanceNotificationStatus.unsupported:
+        return isEnglish
+            ? 'Not available on this platform'
+            : 'No disponible en esta plataforma';
+    }
   }
 }

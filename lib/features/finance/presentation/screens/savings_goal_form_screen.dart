@@ -12,6 +12,7 @@ import '../widgets/section_card.dart';
 import '../widgets/selection_sheet_field.dart';
 import '../../domain/entities/savings_goal.dart';
 import '../providers/finance_providers.dart';
+import '../providers/monthly_reminder_notification_providers.dart';
 
 class SavingsGoalFormScreen extends ConsumerStatefulWidget {
   const SavingsGoalFormScreen({
@@ -108,6 +109,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
     );
 
     await ref.read(savingsGoalsRepositoryProvider).upsertSavingsGoal(goal);
+    await _syncNotifications();
     ref.invalidate(savingsGoalsProvider);
     ref.invalidate(unassignedSavingsProvider);
     ref.invalidate(savingsSummaryProvider);
@@ -118,12 +120,23 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
     }
   }
 
+  Future<void> _syncNotifications() async {
+    try {
+      await ref
+          .read(monthlyReminderNotificationSchedulerProvider)
+          .syncScheduledReminders();
+    } catch (_) {
+      // Goal changes should remain saved even if notification scheduling fails.
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initialGoal == null ? strings.newGoal : strings.editGoal),
+        title: Text(
+            widget.initialGoal == null ? strings.newGoal : strings.editGoal),
       ),
       body: Form(
         key: _formKey,

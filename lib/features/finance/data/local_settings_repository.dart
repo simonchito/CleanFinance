@@ -33,6 +33,13 @@ class LocalSettingsRepository implements SettingsRepository {
       ),
       paymentMethods:
           _support.paymentMethodsFromDb(row['payment_methods'] as String?),
+      notificationsEnabled: (row['notifications_enabled'] as int? ?? 0) == 1,
+      notificationReminderHour:
+          (row['notification_reminder_hour'] as int?) ?? 9,
+      notificationReminderMinute:
+          (row['notification_reminder_minute'] as int?) ?? 0,
+      notificationPermissionRequested:
+          (row['notification_permission_requested'] as int? ?? 0) == 1,
     );
   }
 
@@ -51,6 +58,11 @@ class LocalSettingsRepository implements SettingsRepository {
         'locale_code':
             AppConstants.normalizeLocalePreferenceCode(settings.localeCode),
         'payment_methods': jsonEncode(settings.paymentMethods),
+        'notifications_enabled': settings.notificationsEnabled ? 1 : 0,
+        'notification_reminder_hour': settings.notificationReminderHour,
+        'notification_reminder_minute': settings.notificationReminderMinute,
+        'notification_permission_requested':
+            settings.notificationPermissionRequested ? 1 : 0,
       },
       where: 'id = 1',
     );

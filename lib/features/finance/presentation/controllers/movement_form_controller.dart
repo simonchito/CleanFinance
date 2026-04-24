@@ -8,6 +8,7 @@ import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/movement.dart';
 import '../providers/finance_providers.dart';
+import '../providers/monthly_reminder_notification_providers.dart';
 
 final movementFormControllerProvider =
     Provider.autoDispose<MovementFormController>(
@@ -62,7 +63,18 @@ class MovementFormController {
     );
 
     await _ref.read(movementRepositoryProvider).upsertMovement(movement);
+    await _syncMonthlyReminderNotifications();
     _refreshFinanceData();
+  }
+
+  Future<void> _syncMonthlyReminderNotifications() async {
+    try {
+      await _ref
+          .read(monthlyReminderNotificationSchedulerProvider)
+          .syncScheduledReminders();
+    } catch (_) {
+      // Saving data must not fail because Android notification scheduling failed.
+    }
   }
 
   void _refreshFinanceData() {
