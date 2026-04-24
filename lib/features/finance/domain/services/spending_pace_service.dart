@@ -9,10 +9,10 @@ class SpendingPaceService {
     required CashflowSnapshot cashflow,
   }) {
     final monthContext = MonthContext.forDate(referenceDate);
-    final safeSpendingCapacity =
-        (cashflow.income - cashflow.savings).clamp(0, double.infinity).toDouble();
-    final expectedSpendToDate =
-        safeSpendingCapacity *
+    final safeSpendingCapacity = (cashflow.income - cashflow.savings)
+        .clamp(0, double.infinity)
+        .toDouble();
+    final expectedSpendToDate = safeSpendingCapacity *
         (monthContext.daysElapsed / monthContext.totalDaysInMonth);
     final averageDailySpend = cashflow.expense / monthContext.daysElapsed;
     final projectedEndOfMonth =
@@ -22,8 +22,8 @@ class SpendingPaceService {
 
     final status = switch ((safeSpendingCapacity, projectedNetBalance)) {
       (_, final projectedNet) when projectedNet < 0 => SpendingPaceStatus.risk,
-      (final capacity, _) when capacity > 0 &&
-              projectedEndOfMonth > capacity * 0.92 =>
+      (final capacity, _)
+          when capacity > 0 && projectedEndOfMonth > capacity * 0.92 =>
         SpendingPaceStatus.watch,
       _ => SpendingPaceStatus.onTrack,
     };

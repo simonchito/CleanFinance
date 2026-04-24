@@ -53,7 +53,8 @@ class ManageRemindersScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            strings.isEnglish ? 'Expense reminders' : 'Recordatorios de gastos',
+            strings.localized(
+                es: 'Recordatorios de gastos', en: 'Expense reminders'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 10),
@@ -117,7 +118,8 @@ class ManageRemindersScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 18),
           Text(
-            strings.isEnglish ? 'Savings reminders' : 'Recordatorios de ahorro',
+            strings.localized(
+                es: 'Recordatorios de ahorro', en: 'Savings reminders'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 10),

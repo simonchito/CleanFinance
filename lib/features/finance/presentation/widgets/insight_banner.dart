@@ -18,9 +18,15 @@ class InsightBanner extends StatelessWidget {
     final localized = FinanceTextMapper.insight(strings, insight);
     final scheme = Theme.of(context).colorScheme;
     final (icon, color) = switch (insight.tone) {
-      FinanceInsightTone.positive => (Icons.trending_up_rounded, scheme.primary),
+      FinanceInsightTone.positive => (
+          Icons.trending_up_rounded,
+          scheme.primary
+        ),
       FinanceInsightTone.warning => (Icons.warning_amber_rounded, scheme.error),
-      FinanceInsightTone.neutral => (Icons.auto_awesome_rounded, scheme.secondary),
+      FinanceInsightTone.neutral => (
+          Icons.auto_awesome_rounded,
+          scheme.secondary
+        ),
     };
 
     return Container(
@@ -66,9 +72,10 @@ class InsightBanner extends StatelessWidget {
                       ),
                       child: Text(
                         localized.kindLabel,
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: color,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.labelMedium?.copyWith(
+                                  color: color,
+                                ),
                       ),
                     ),
                   ],

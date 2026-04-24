@@ -122,7 +122,8 @@ class BudgetStatusCard extends StatelessWidget {
                     symbol: currencySymbol,
                     localeCode: localeCode,
                   ),
-                  valueColor: item.remaining < 0 ? scheme.error : scheme.primary,
+                  valueColor:
+                      item.remaining < 0 ? scheme.error : scheme.primary,
                 ),
               ),
             ],
@@ -139,19 +140,19 @@ class BudgetStatusCard extends StatelessWidget {
     switch (status) {
       case BudgetStatus.warning:
         return _BudgetVisualStyle(
-          label: strings.isEnglish ? 'Warning' : 'Atención',
+          label: strings.localized(es: 'Atención', en: 'Warning'),
           foreground: Colors.orange.shade800,
           background: Colors.orange.shade100,
         );
       case BudgetStatus.exceeded:
         return _BudgetVisualStyle(
-          label: strings.isEnglish ? 'Exceeded' : 'Excedido',
+          label: strings.localized(es: 'Excedido', en: 'Exceeded'),
           foreground: scheme.error,
           background: scheme.errorContainer,
         );
       case BudgetStatus.normal:
         return _BudgetVisualStyle(
-          label: strings.isEnglish ? 'Normal' : 'Normal',
+          label: strings.localized(es: 'Normal', en: 'Normal'),
           foreground: scheme.primary,
           background: scheme.primaryContainer,
         );

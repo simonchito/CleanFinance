@@ -57,8 +57,7 @@ class CategoryComparisonReport {
     if (items.isEmpty) {
       return null;
     }
-    final ranked = [...items]
-      ..sort(
+    final ranked = [...items]..sort(
         (a, b) => (b.deltaPercentage?.abs() ?? 0)
             .compareTo(a.deltaPercentage?.abs() ?? 0),
       );
@@ -174,7 +173,8 @@ class FinancialHealthScore {
   final FinancialHealthLevel level;
 }
 
-double largestExpenseForMonth(List<Movement> movements, DateTime referenceDate) {
+double largestExpenseForMonth(
+    List<Movement> movements, DateTime referenceDate) {
   final monthContext = MonthContext.forDate(referenceDate);
   var largestExpense = 0.0;
 

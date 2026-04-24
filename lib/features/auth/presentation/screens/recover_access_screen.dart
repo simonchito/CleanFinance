@@ -169,9 +169,8 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
               labelText: strings.documentId,
-              hintText: strings.isEnglish
-                  ? 'Example: 12345678'
-                  : 'Ejemplo: 12345678',
+              hintText:
+                  strings.isEnglish ? 'Example: 12345678' : 'Ejemplo: 12345678',
             ),
           ),
           const SizedBox(height: 12),
@@ -181,7 +180,7 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             obscureText: true,
             maxLength: AppConstants.defaultPinLength,
             decoration: InputDecoration(
-              labelText: strings.isEnglish ? 'New PIN' : 'Nuevo PIN',
+              labelText: strings.localized(es: 'Nuevo PIN', en: 'New PIN'),
             ),
           ),
           const SizedBox(height: 12),
@@ -191,7 +190,8 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             obscureText: true,
             maxLength: AppConstants.defaultPinLength,
             decoration: InputDecoration(
-              labelText: strings.isEnglish ? 'Confirm PIN' : 'Confirmar PIN',
+              labelText:
+                  strings.localized(es: 'Confirmar PIN', en: 'Confirm PIN'),
             ),
           ),
           const SizedBox(height: 8),
@@ -221,7 +221,7 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             onPressed: _loading ? null : _recover,
             child: Text(
               _loading
-                  ? (strings.isEnglish ? 'Validating...' : 'Validando...')
+                  ? (strings.localized(es: 'Validando...', en: 'Validating...'))
                   : strings.recoverAccess,
             ),
           ),

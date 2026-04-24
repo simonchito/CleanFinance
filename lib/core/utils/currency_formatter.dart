@@ -87,6 +87,7 @@ class CurrencyFormatter {
     return switch (localeCode) {
       'en' => 'en_US',
       'es' => 'es_AR',
+      'pt_BR' => 'pt_BR',
       _ => localeCode,
     };
   }
@@ -117,8 +118,7 @@ class CurrencyFormatter {
       return localeCut;
     }
 
-    final alternateDecimalSeparator =
-        localeDecimalSeparator == '.' ? ',' : '.';
+    final alternateDecimalSeparator = localeDecimalSeparator == '.' ? ',' : '.';
     return _cutAtSingleAlternateDecimal(
       text,
       alternateDecimalSeparator,

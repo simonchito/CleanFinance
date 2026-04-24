@@ -13,7 +13,8 @@ class MonthlyTrendService {
     String locale = 'es',
     int months = 6,
   }) {
-    final monthlyBuckets = <String, ({double income, double expense, double savings})>{};
+    final monthlyBuckets =
+        <String, ({double income, double expense, double savings})>{};
 
     for (var i = 0; i < months; i++) {
       final month = DateTime(

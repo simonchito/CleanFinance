@@ -90,11 +90,11 @@ class SavingsScreen extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final confirmed = await showConfirmActionDialog(
       context: context,
-      title: strings.isEnglish ? 'Delete goal' : 'Eliminar meta',
+      title: strings.localized(es: 'Eliminar meta', en: 'Delete goal'),
       message: strings.isEnglish
           ? 'The goal "${goal.name}" will be deleted. Existing contributions will remain but no longer be linked to this goal.'
           : 'Se eliminará la meta "${goal.name}". Los aportes ya registrados seguirán existiendo, pero dejarán de estar vinculados a esta meta.',
-      confirmLabel: strings.isEnglish ? 'Delete' : 'Eliminar',
+      confirmLabel: strings.localized(es: 'Eliminar', en: 'Delete'),
       cancelLabel: strings.cancel,
     );
     if (!confirmed) {
@@ -138,8 +138,8 @@ class SavingsScreen extends ConsumerWidget {
                       message: strings.isEnglish
                           ? 'Create a goal or register a contribution to start organizing your savings.'
                           : 'Creá una meta o registrá un aporte para empezar a ordenar tus ahorros.',
-                      actionLabel:
-                          strings.isEnglish ? 'Create goal' : 'Crear meta',
+                      actionLabel: strings.localized(
+                          es: 'Crear meta', en: 'Create goal'),
                       onAction: () => _openGoalEditor(context, ref),
                     );
                   }
@@ -202,9 +202,8 @@ class SavingsScreen extends ConsumerWidget {
                               children: [
                                 Expanded(
                                   child: _SummaryStat(
-                                    label: strings.isEnglish
-                                        ? 'Goals'
-                                        : 'Metas',
+                                    label:
+                                        strings.isEnglish ? 'Goals' : 'Metas',
                                     value: '${summary.goalsCount}',
                                   ),
                                 ),
@@ -375,7 +374,7 @@ class _GeneralSavingsCard extends StatelessWidget {
               const Icon(Icons.account_balance_wallet_outlined),
               const SizedBox(width: 8),
               Text(
-                strings.isEnglish ? 'General savings' : 'Ahorro general',
+                strings.localized(es: 'Ahorro general', en: 'General savings'),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
@@ -469,7 +468,7 @@ class _GoalCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final dueDate = goal.targetDate == null
         ? strings.unlimitedDate
-        : '${strings.isEnglish ? 'Target' : 'Objetivo'}: ${DateFormat('d MMM y', strings.languageCode).format(goal.targetDate!)}';
+        : '${strings.localized(es: 'Objetivo', en: 'Target')}: ${DateFormat('d MMM y', strings.languageCode).format(goal.targetDate!)}';
 
     return SectionCard(
       child: Column(

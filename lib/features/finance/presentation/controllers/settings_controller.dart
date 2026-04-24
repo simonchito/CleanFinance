@@ -4,6 +4,7 @@ import '../../domain/entities/app_settings.dart';
 import '../../domain/entities/app_theme_preference.dart';
 import '../../domain/repositories/settings_repository.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/localization/app_locale_mode.dart';
 
 class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
   SettingsController({
@@ -77,6 +78,10 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
 
   Future<void> setLocaleCode(String localeCode) {
     return setLocalePreferenceCode(localeCode);
+  }
+
+  Future<void> setLocaleMode(AppLocaleMode mode) {
+    return setLocalePreferenceCode(mode.preferenceCode);
   }
 
   Future<void> setPaymentMethods(List<String> paymentMethods) async {

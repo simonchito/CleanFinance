@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/localization/app_locale_mode.dart';
 import '../../../../core/utils/month_context.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/app_settings.dart';
@@ -29,14 +30,18 @@ final settingsControllerProvider =
   return controller;
 });
 
+final systemLocaleProvider = StateProvider<Locale>((ref) {
+  return WidgetsBinding.instance.platformDispatcher.locale;
+});
+
 final appLocaleCodeProvider = Provider<String>((ref) {
-  final localePreferenceCode = ref.watch(settingsControllerProvider).valueOrNull?.localeCode ??
-      AppConstants.defaultLocalePreferenceCode;
-  final deviceLocaleCode =
-      WidgetsBinding.instance.platformDispatcher.locale.languageCode;
-  return AppConstants.resolveLocaleCodeFromPreference(
+  final localePreferenceCode =
+      ref.watch(settingsControllerProvider).valueOrNull?.localeCode ??
+          AppConstants.defaultLocalePreferenceCode;
+  final deviceLocale = ref.watch(systemLocaleProvider);
+  return AppLocaleMode.resolveLocaleCodeFromPreference(
     localePreferenceCode: localePreferenceCode,
-    deviceLocaleCode: deviceLocaleCode,
+    deviceLocale: deviceLocale,
   );
 });
 

@@ -46,7 +46,8 @@ class MonthlyDueRemindersCard extends StatelessWidget {
                 child: Ink(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: scheme.surfaceContainerHighest.withValues(alpha: 0.42),
+                    color:
+                        scheme.surfaceContainerHighest.withValues(alpha: 0.42),
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Row(
@@ -55,7 +56,8 @@ class MonthlyDueRemindersCard extends StatelessWidget {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          color: reminder.source == MonthlyReminderSource.savingsGoal
+                          color: reminder.source ==
+                                  MonthlyReminderSource.savingsGoal
                               ? scheme.tertiary.withValues(alpha: 0.14)
                               : scheme.error.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(14),
@@ -64,7 +66,8 @@ class MonthlyDueRemindersCard extends StatelessWidget {
                           reminder.source == MonthlyReminderSource.savingsGoal
                               ? Icons.savings_outlined
                               : Icons.receipt_long_outlined,
-                          color: reminder.source == MonthlyReminderSource.savingsGoal
+                          color: reminder.source ==
+                                  MonthlyReminderSource.savingsGoal
                               ? scheme.tertiary
                               : scheme.error,
                         ),
@@ -80,10 +83,14 @@ class MonthlyDueRemindersCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              reminder.source == MonthlyReminderSource.savingsGoal
+                              reminder.source ==
+                                      MonthlyReminderSource.savingsGoal
                                   ? '${strings.savingGoal} · ${strings.reminderDayPrefix} ${reminder.reminderDay}'
                                   : '${reminder.subtitle ?? strings.expense} · ${strings.reminderDayPrefix} ${reminder.reminderDay}',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
                                     color: scheme.onSurfaceVariant,
                                   ),
                             ),
@@ -93,9 +100,10 @@ class MonthlyDueRemindersCard extends StatelessWidget {
                       const SizedBox(width: 12),
                       Text(
                         strings.add,
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: scheme.primary,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.labelMedium?.copyWith(
+                                  color: scheme.primary,
+                                ),
                       ),
                     ],
                   ),

@@ -1,4 +1,5 @@
 enum ProjectionRiskLevel { low, medium, high }
+
 enum ProjectionInterpretationType {
   insufficientActivity,
   positiveBalance,

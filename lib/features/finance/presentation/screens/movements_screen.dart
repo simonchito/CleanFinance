@@ -61,11 +61,12 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
     final strings = AppStrings.of(context);
     final confirmed = await showConfirmActionDialog(
       context: context,
-      title: strings.isEnglish ? 'Delete movement' : 'Eliminar movimiento',
+      title:
+          strings.localized(es: 'Eliminar movimiento', en: 'Delete movement'),
       message: strings.isEnglish
           ? 'This movement will be permanently deleted. Verify the details before continuing.'
           : 'Se eliminará este movimiento de forma permanente. Verificá los datos antes de continuar.',
-      confirmLabel: strings.isEnglish ? 'Delete' : 'Eliminar',
+      confirmLabel: strings.localized(es: 'Eliminar', en: 'Delete'),
       cancelLabel: strings.cancel,
     );
     if (!confirmed) {
@@ -353,8 +354,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                   message: strings.isEnglish
                       ? 'Try changing the filters or adding a new record.'
                       : 'Probá cambiando el filtro o agregando un nuevo registro.',
-                  actionLabel:
-                      strings.isEnglish ? 'Add movement' : 'Agregar movimiento',
+                  actionLabel: strings.localized(
+                      es: 'Agregar movimiento', en: 'Add movement'),
                   onAction: _openEditor,
                 );
               }

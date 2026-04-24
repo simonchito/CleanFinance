@@ -22,15 +22,15 @@ class SavingsGoalReportService {
     }
 
     final forecasts = goals.map((progress) {
-      final movementsForGoal = goalMovements[progress.goal.id] ?? const <Movement>[];
+      final movementsForGoal =
+          goalMovements[progress.goal.id] ?? const <Movement>[];
       final activeMonths = movementsForGoal
           .map((movement) => MonthContext.monthKeyFor(movement.occurredOn))
           .toSet()
           .length;
-      final averageMonthlyContribution = (activeMonths == 0
-              ? 0
-              : progress.savedAmount / activeMonths)
-          .toDouble();
+      final averageMonthlyContribution =
+          (activeMonths == 0 ? 0 : progress.savedAmount / activeMonths)
+              .toDouble();
       final currentMonthContribution = movementsForGoal
           .where(
             (movement) =>

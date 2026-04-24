@@ -36,5 +36,3 @@ class FinanceOverview {
 
   double get monthRemaining => cashflow.netBalance;
 }
-
-

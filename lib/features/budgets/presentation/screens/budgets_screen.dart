@@ -50,7 +50,8 @@ class BudgetsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final symbol = settings?.currencySymbol ?? r'$';
     final localeCode = ref.watch(appLocaleCodeProvider);
-    final monthLabel = DateFormat.yMMMM(strings.languageCode).format(DateTime.now());
+    final monthLabel =
+        DateFormat.yMMMM(strings.languageCode).format(DateTime.now());
 
     return Scaffold(
       appBar: AppBar(
@@ -85,7 +86,9 @@ class BudgetsScreen extends ConsumerWidget {
                             ? 'Track how each category is doing this month and update limits whenever you need.'
                             : 'Seguí cómo viene cada categoría este mes y ajustá los límites cuando lo necesites.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                       ),
                       const SizedBox(height: 14),
@@ -163,7 +166,7 @@ class BudgetsScreen extends ConsumerWidget {
                     ? 'Could not load budgets'
                     : 'No se pudieron cargar los presupuestos',
                 message: '$error',
-                actionLabel: strings.isEnglish ? 'Retry' : 'Reintentar',
+                actionLabel: strings.localized(es: 'Reintentar', en: 'Retry'),
                 onAction: () => ref.invalidate(categoryBudgetStatusProvider),
               ),
             ],

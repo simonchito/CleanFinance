@@ -16,36 +16,24 @@ class AppTheme {
       brightness: brightness,
       primary: AppPalette.brand,
       onPrimary: Colors.white,
-      primaryContainer: isDark
-          ? const Color(0xFF134A47)
-          : const Color(0xFFD6F1ED),
-      onPrimaryContainer: isDark
-          ? AppPalette.darkText
-          : AppPalette.lightText,
+      primaryContainer:
+          isDark ? const Color(0xFF134A47) : const Color(0xFFD6F1ED),
+      onPrimaryContainer: isDark ? AppPalette.darkText : AppPalette.lightText,
       secondary: AppPalette.accent,
       onSecondary: const Color(0xFF2A1C12),
-      secondaryContainer: isDark
-          ? const Color(0xFF4D3321)
-          : const Color(0xFFFCE7D2),
-      onSecondaryContainer: isDark
-          ? AppPalette.darkText
-          : AppPalette.lightText,
+      secondaryContainer:
+          isDark ? const Color(0xFF4D3321) : const Color(0xFFFCE7D2),
+      onSecondaryContainer: isDark ? AppPalette.darkText : AppPalette.lightText,
       tertiary: const Color(0xFF6A8DFF),
       onTertiary: Colors.white,
-      tertiaryContainer: isDark
-          ? const Color(0xFF213774)
-          : const Color(0xFFE0E7FF),
-      onTertiaryContainer: isDark
-          ? AppPalette.darkText
-          : AppPalette.lightText,
+      tertiaryContainer:
+          isDark ? const Color(0xFF213774) : const Color(0xFFE0E7FF),
+      onTertiaryContainer: isDark ? AppPalette.darkText : AppPalette.lightText,
       error: AppPalette.danger,
       onError: Colors.white,
-      errorContainer: isDark
-          ? const Color(0xFF4D2424)
-          : const Color(0xFFF8DADA),
-      onErrorContainer: isDark
-          ? AppPalette.darkText
-          : AppPalette.lightText,
+      errorContainer:
+          isDark ? const Color(0xFF4D2424) : const Color(0xFFF8DADA),
+      onErrorContainer: isDark ? AppPalette.darkText : AppPalette.lightText,
       surface: isDark ? AppPalette.darkSurface : AppPalette.lightSurface,
       onSurface: isDark ? AppPalette.darkText : AppPalette.lightText,
       surfaceContainerHighest:

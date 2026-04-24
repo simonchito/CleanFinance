@@ -241,7 +241,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                             ? (strings.isEnglish
                                 ? 'Setting up...'
                                 : 'Configurando...')
-                            : (strings.isEnglish ? 'Start' : 'Empezar'),
+                            : (strings.localized(es: 'Empezar', en: 'Start')),
                       ),
                     ),
                   ],

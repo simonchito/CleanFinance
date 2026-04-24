@@ -72,15 +72,17 @@ class EndOfMonthProjectionCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: _ProjectionMetric(
-                  label: strings.isEnglish ? 'Projected net' : 'Neto estimado',
+                  label: strings.localized(
+                      es: 'Neto estimado', en: 'Projected net'),
                   value: AmountVisibilityFormatter.formatCurrency(
                     amount: projection.projectedNet,
                     symbol: currencySymbol,
                     isVisible: showAmounts,
                     localeCode: localeCode,
                   ),
-                  color:
-                      projection.projectedNet >= 0 ? scheme.primary : scheme.error,
+                  color: projection.projectedNet >= 0
+                      ? scheme.primary
+                      : scheme.error,
                 ),
               ),
             ],

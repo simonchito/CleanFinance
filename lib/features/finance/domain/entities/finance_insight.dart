@@ -1,5 +1,7 @@
 enum FinanceInsightTone { positive, warning, neutral }
+
 enum FinanceInsightKind { descriptive, diagnostic, predictive, actionable }
+
 enum FinanceInsightType {
   overcommitted,
   monthWithMargin,

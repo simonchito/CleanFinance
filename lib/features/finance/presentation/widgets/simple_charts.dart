@@ -39,7 +39,7 @@ class DonutChart extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    strings.isEnglish ? 'Total' : 'Total',
+                    strings.localized(es: 'Total', en: 'Total'),
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                   Text(
@@ -199,12 +199,14 @@ class MonthlyTrendChart extends StatelessWidget {
       height: 220,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final slotWidth =
-              points.isEmpty ? constraints.maxWidth : constraints.maxWidth / points.length;
+          final slotWidth = points.isEmpty
+              ? constraints.maxWidth
+              : constraints.maxWidth / points.length;
           final horizontalPadding = slotWidth < 42 ? 1.0 : 2.0;
           final spacing = slotWidth < 42 ? 2.0 : 4.0;
           final availableBarWidth =
-              (slotWidth - (horizontalPadding * 2) - (spacing * 2)).clamp(6.0, 24.0);
+              (slotWidth - (horizontalPadding * 2) - (spacing * 2))
+                  .clamp(6.0, 24.0);
           final barWidth = (availableBarWidth / 3).clamp(2.0, 14.0);
 
           return Row(
@@ -213,7 +215,8 @@ class MonthlyTrendChart extends StatelessWidget {
               for (final point in points)
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: horizontalPadding),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -283,7 +286,8 @@ class _TrendBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final heightFactor = maxValue == 0 ? 0.04 : (value / maxValue).clamp(0.04, 1.0);
+    final heightFactor =
+        maxValue == 0 ? 0.04 : (value / maxValue).clamp(0.04, 1.0);
     return FractionallySizedBox(
       heightFactor: heightFactor,
       child: Container(

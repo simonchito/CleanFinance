@@ -180,7 +180,8 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish ? 'Monthly trend' : 'Evolución mensual',
+                      strings.localized(
+                          es: 'Evolución mensual', en: 'Monthly trend'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 6),
@@ -254,7 +255,8 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish ? 'Spending pace' : 'Ritmo de gasto',
+                      strings.localized(
+                          es: 'Ritmo de gasto', en: 'Spending pace'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 6),
@@ -301,8 +303,8 @@ class ReportsScreen extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: _MetricBox(
-                            label:
-                                strings.isEnglish ? 'Projection' : 'Proyección',
+                            label: strings.localized(
+                                es: 'Proyección', en: 'Projection'),
                             value: CurrencyFormatter.format(
                               overview.spendingPace.projectedEndOfMonth,
                               symbol: symbol,
@@ -314,7 +316,8 @@ class ReportsScreen extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _MetricBox(
-                            label: strings.isEnglish ? 'Status' : 'Estado',
+                            label:
+                                strings.localized(es: 'Estado', en: 'Status'),
                             value: _paceLabel(
                                 strings, overview.spendingPace.status),
                             color: _paceColor(
@@ -366,7 +369,8 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish ? 'Savings goals' : 'Metas de ahorro',
+                      strings.localized(
+                          es: 'Metas de ahorro', en: 'Savings goals'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 6),
@@ -442,7 +446,7 @@ class ReportsScreen extends ConsumerWidget {
               if (overview.insights.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Text(
-                  strings.isEnglish ? 'Quick read' : 'Lectura rápida',
+                  strings.localized(es: 'Lectura rápida', en: 'Quick read'),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 12),
@@ -484,9 +488,11 @@ class ReportsScreen extends ConsumerWidget {
 
   String _paceLabel(AppStrings strings, SpendingPaceStatus status) {
     return switch (status) {
-      SpendingPaceStatus.onTrack => strings.isEnglish ? 'On track' : 'En rango',
-      SpendingPaceStatus.watch => strings.isEnglish ? 'Watch' : 'Atención',
-      SpendingPaceStatus.risk => strings.isEnglish ? 'Risk' : 'Riesgo',
+      SpendingPaceStatus.onTrack =>
+        strings.localized(es: 'En rango', en: 'On track'),
+      SpendingPaceStatus.watch =>
+        strings.localized(es: 'Atención', en: 'Watch'),
+      SpendingPaceStatus.risk => strings.localized(es: 'Riesgo', en: 'Risk'),
     };
   }
 
@@ -584,7 +590,7 @@ class _CategoryComparisonTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final deltaColor = item.deltaAmount >= 0 ? scheme.error : scheme.primary;
     final deltaLabel = item.deltaPercentage == null
-        ? (strings.isEnglish ? 'New' : 'Nuevo')
+        ? (strings.localized(es: 'Nuevo', en: 'New'))
         : '${item.deltaAmount >= 0 ? '+' : ''}${(item.deltaPercentage! * 100).round()}%';
 
     return Container(
@@ -664,7 +670,8 @@ class _GoalForecastTile extends StatelessWidget {
     final strings = AppStrings.of(context);
     final scheme = Theme.of(context).colorScheme;
     final estimatedDate = goal.estimatedCompletionDate == null
-        ? (strings.isEnglish ? 'No estimate yet' : 'Sin estimación todavía')
+        ? (strings.localized(
+            es: 'Sin estimación todavía', en: 'No estimate yet'))
         : DateFormat('MMM yyyy', strings.languageCode)
             .format(goal.estimatedCompletionDate!);
 

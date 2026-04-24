@@ -67,11 +67,11 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
 
     final confirmed = await showConfirmActionDialog(
       context: context,
-      title: strings.isEnglish ? 'Delete budget' : 'Eliminar presupuesto',
+      title: strings.localized(es: 'Eliminar presupuesto', en: 'Delete budget'),
       message: strings.isEnglish
           ? 'This monthly budget will be removed and tracking for this category will stop until you create a new one.'
           : 'Este presupuesto mensual se eliminará y el seguimiento de esta categoría se detendrá hasta que crees uno nuevo.',
-      confirmLabel: strings.isEnglish ? 'Delete' : 'Eliminar',
+      confirmLabel: strings.localized(es: 'Eliminar', en: 'Delete'),
       cancelLabel: strings.cancel,
     );
     if (!confirmed) {
@@ -145,7 +145,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    final categoriesState = ref.watch(categoriesProvider(CategoryScope.expense));
+    final categoriesState =
+        ref.watch(categoriesProvider(CategoryScope.expense));
     final isEditing = widget.initialBudget != null;
 
     return Scaffold(
@@ -156,8 +157,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
             IconButton(
               onPressed: _isSaving ? null : _deleteBudget,
               icon: const Icon(Icons.delete_outline_rounded),
-              tooltip:
-                  strings.isEnglish ? 'Delete budget' : 'Eliminar presupuesto',
+              tooltip: strings.localized(
+                  es: 'Eliminar presupuesto', en: 'Delete budget'),
             ),
         ],
       ),
@@ -209,7 +210,9 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                             ? 'Budgets are stored locally and tracked against your current-month expenses.'
                             : 'Los presupuestos se guardan localmente y se comparan con tus gastos del mes actual.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                       ),
                     ],
@@ -222,7 +225,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                     prefixIcon: const Icon(Icons.calendar_month_outlined),
                   ),
                   child: Text(
-                    DateFormat.yMMMM(strings.languageCode).format(_referenceDate),
+                    DateFormat.yMMMM(strings.languageCode)
+                        .format(_referenceDate),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -276,7 +280,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                   onPressed: _isSaving ? null : _save,
                   child: Text(
                     _isSaving
-                        ? (strings.isEnglish ? 'Saving...' : 'Guardando...')
+                        ? (strings.localized(
+                            es: 'Guardando...', en: 'Saving...'))
                         : (isEditing ? strings.saveChanges : strings.save),
                   ),
                 ),

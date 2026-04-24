@@ -9,6 +9,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/localization/app_locale_mode.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../budgets/presentation/screens/budgets_screen.dart';
 import '../../domain/entities/app_theme_preference.dart';
@@ -31,7 +32,7 @@ class SettingsScreen extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final password = await _requestBackupPassword(
       context,
-      title: strings.isEnglish ? 'Protect backup' : 'Proteger backup',
+      title: strings.localized(es: 'Proteger backup', en: 'Protect backup'),
       description: strings.isEnglish
           ? 'Add an optional password. If you leave it empty, the backup will be exported as readable JSON.'
           : 'Agregá una contraseña opcional. Si la dejás vacía, el backup se exportará como JSON legible.',
@@ -102,7 +103,7 @@ class SettingsScreen extends ConsumerWidget {
       }
       final password = await _requestBackupPassword(
         context,
-        title: strings.isEnglish ? 'Import backup' : 'Importar backup',
+        title: strings.localized(es: 'Importar backup', en: 'Import backup'),
         description: strings.isEnglish
             ? 'If this backup was protected with a password, enter it now. Leave it empty for plain JSON backups.'
             : 'Si este backup fue protegido con contraseña, ingresala ahora. Si es un JSON plano, dejala vacía.',
@@ -145,11 +146,13 @@ class SettingsScreen extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final confirmed = await showConfirmActionDialog(
       context: context,
-      title: strings.isEnglish ? 'Delete all data' : 'Borrar todos los datos',
+      title: strings.localized(
+          es: 'Borrar todos los datos', en: 'Delete all data'),
       message: strings.isEnglish
           ? 'This will remove the full local database, PIN, recovery data and biometric flags, leaving the app as a clean install.'
           : 'Esto eliminará la base local completa, el PIN, los datos de recuperación y las banderas de biometría, dejando la app como una instalación limpia.',
-      confirmLabel: strings.isEnglish ? 'Delete everything' : 'Borrar todo',
+      confirmLabel:
+          strings.localized(es: 'Borrar todo', en: 'Delete everything'),
       cancelLabel: strings.cancel,
     );
 
@@ -372,23 +375,23 @@ class SettingsScreen extends ConsumerWidget {
                       items: [
                         DropdownMenuItem(
                           value: 1,
-                          child:
-                              Text(strings.isEnglish ? '1 minute' : '1 minuto'),
+                          child: Text(strings.localized(
+                              es: '1 minuto', en: '1 minute')),
                         ),
                         DropdownMenuItem(
                           value: 5,
-                          child: Text(
-                              strings.isEnglish ? '5 minutes' : '5 minutos'),
+                          child: Text(strings.localized(
+                              es: '5 minutos', en: '5 minutes')),
                         ),
                         DropdownMenuItem(
                           value: 15,
-                          child: Text(
-                              strings.isEnglish ? '15 minutes' : '15 minutos'),
+                          child: Text(strings.localized(
+                              es: '15 minutos', en: '15 minutes')),
                         ),
                         DropdownMenuItem(
                           value: 30,
-                          child: Text(
-                              strings.isEnglish ? '30 minutes' : '30 minutos'),
+                          child: Text(strings.localized(
+                              es: '30 minutos', en: '30 minutes')),
                         ),
                       ],
                       onChanged: (value) {
@@ -461,20 +464,20 @@ class SettingsScreen extends ConsumerWidget {
                       decoration: InputDecoration(labelText: strings.language),
                       items: [
                         DropdownMenuItem(
-                          value: AppConstants.defaultLocalePreferenceCode,
-                          child: Text(
-                            strings.isEnglish
-                                ? 'Use device language'
-                                : 'Usar idioma del dispositivo',
-                          ),
+                          value: AppLocaleMode.system.preferenceCode,
+                          child: Text(strings.useDeviceLanguage),
                         ),
                         DropdownMenuItem(
-                          value: 'es',
+                          value: AppLocaleMode.spanish.preferenceCode,
                           child: Text(strings.spanish),
                         ),
                         DropdownMenuItem(
-                          value: 'en',
+                          value: AppLocaleMode.english.preferenceCode,
                           child: Text(strings.english),
+                        ),
+                        DropdownMenuItem(
+                          value: AppLocaleMode.portugueseBrazil.preferenceCode,
+                          child: Text(strings.portugueseBrazil),
                         ),
                       ],
                       onChanged: (value) {
@@ -491,7 +494,7 @@ class SettingsScreen extends ConsumerWidget {
                     DropdownButtonFormField<AppThemePreference>(
                       initialValue: settings.themePreference,
                       decoration: InputDecoration(
-                        labelText: strings.isEnglish ? 'Theme' : 'Tema',
+                        labelText: strings.localized(es: 'Tema', en: 'Theme'),
                       ),
                       items: [
                         DropdownMenuItem(
@@ -504,11 +507,13 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         DropdownMenuItem(
                           value: AppThemePreference.light,
-                          child: Text(strings.isEnglish ? 'Light' : 'Claro'),
+                          child:
+                              Text(strings.localized(es: 'Claro', en: 'Light')),
                         ),
                         DropdownMenuItem(
                           value: AppThemePreference.dark,
-                          child: Text(strings.isEnglish ? 'Dark' : 'Oscuro'),
+                          child:
+                              Text(strings.localized(es: 'Oscuro', en: 'Dark')),
                         ),
                       ],
                       onChanged: (value) {
@@ -523,7 +528,8 @@ class SettingsScreen extends ConsumerWidget {
                     DropdownButtonFormField<String>(
                       initialValue: settings.currencyCode,
                       decoration: InputDecoration(
-                        labelText: strings.isEnglish ? 'Currency' : 'Moneda',
+                        labelText:
+                            strings.localized(es: 'Moneda', en: 'Currency'),
                       ),
                       items: const [
                         DropdownMenuItem(value: 'ARS', child: Text('ARS (\$)')),
@@ -572,7 +578,8 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish ? 'Notifications' : 'Notificaciones',
+                      strings.localized(
+                          es: 'Notificaciones', en: 'Notifications'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
@@ -648,7 +655,7 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish ? 'Organization' : 'Organización',
+                      strings.localized(es: 'Organización', en: 'Organization'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),

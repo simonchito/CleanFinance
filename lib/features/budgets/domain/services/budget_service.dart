@@ -13,9 +13,9 @@ class BudgetService {
     required BudgetRepository budgetRepository,
     required CategoriesRepository categoriesRepository,
     required MovementsRepository movementsRepository,
-  }) : _budgetRepository = budgetRepository,
-       _categoriesRepository = categoriesRepository,
-       _movementsRepository = movementsRepository;
+  })  : _budgetRepository = budgetRepository,
+        _categoriesRepository = categoriesRepository,
+        _movementsRepository = movementsRepository;
 
   final BudgetRepository _budgetRepository;
   final CategoriesRepository _categoriesRepository;
@@ -52,16 +52,15 @@ class BudgetService {
         .map(
           (budget) => _buildStatus(
             budget: budget,
-            categoryName:
-                categoryNames[budget.categoryId] ?? 'Sin categoría',
+            categoryName: categoryNames[budget.categoryId] ?? 'Sin categoría',
             movements: movements,
           ),
         )
         .toList()
       ..sort(
         (a, b) => a.categoryName.toLowerCase().compareTo(
-          b.categoryName.toLowerCase(),
-        ),
+              b.categoryName.toLowerCase(),
+            ),
       );
 
     return statuses;

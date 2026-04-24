@@ -7,7 +7,7 @@ import 'auth_state.dart';
 String localizeAuthError(BuildContext context, AuthErrorState? error) {
   final strings = AppStrings.of(context);
   if (error == null) {
-    return strings.isEnglish ? 'Unexpected error.' : 'Error inesperado.';
+    return strings.localized(es: 'Error inesperado.', en: 'Unexpected error.');
   }
 
   switch (error.code) {
@@ -20,7 +20,7 @@ String localizeAuthError(BuildContext context, AuthErrorState? error) {
           ? 'Check your recovery data and try again.'
           : 'Revisá tus datos de recuperación e intentá nuevamente.';
     case AuthErrorCode.incorrectPin:
-      return strings.isEnglish ? 'Incorrect PIN.' : 'PIN incorrecto.';
+      return strings.localized(es: 'PIN incorrecto.', en: 'Incorrect PIN.');
     case AuthErrorCode.biometricUnavailable:
       return strings.isEnglish
           ? 'Biometrics are not available on this device.'

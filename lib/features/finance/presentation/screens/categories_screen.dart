@@ -83,12 +83,14 @@ class _CategoryTab extends ConsumerWidget {
                 child: ExpansionTile(
                   leading: Icon(IconMapper.getIcon(category.iconKey)),
                   title: Text(
-                    DefaultCategoryNameLocalizer.localize(category.name, strings),
+                    DefaultCategoryNameLocalizer.localize(
+                        category.name, strings),
                   ),
                   subtitle: Text(
                     category.isDefault
-                        ? (strings.isEnglish ? 'Default' : 'Predefinida')
-                        : (strings.isEnglish ? 'Custom' : 'Personalizada'),
+                        ? (strings.localized(es: 'Predefinida', en: 'Default'))
+                        : (strings.localized(
+                            es: 'Personalizada', en: 'Custom')),
                   ),
                   children: [
                     for (final child in children)
@@ -166,7 +168,8 @@ class _CategoryTab extends ConsumerWidget {
             ? (strings.isEnglish
                 ? 'Delete subcategory'
                 : 'Eliminar subcategoría')
-            : (strings.isEnglish ? 'Delete category' : 'Eliminar categoría'),
+            : (strings.localized(
+                es: 'Eliminar categoría', en: 'Delete category')),
         message: category.isSubcategory
             ? (strings.isEnglish
                 ? 'The subcategory "${DefaultCategoryNameLocalizer.localize(category.name, strings)}" will be deleted. If there are linked movements or dependencies, the app will block deletion.'
@@ -174,7 +177,7 @@ class _CategoryTab extends ConsumerWidget {
             : (strings.isEnglish
                 ? 'The category "${DefaultCategoryNameLocalizer.localize(category.name, strings)}" will be deleted. If there are linked movements, subcategories or budgets, the app will block deletion.'
                 : 'Se eliminará la categoría "${category.name}". Si tiene movimientos, subcategorías o presupuestos asociados, la app lo bloqueará antes de borrar.'),
-        confirmLabel: strings.isEnglish ? 'Delete' : 'Eliminar',
+        confirmLabel: strings.localized(es: 'Eliminar', en: 'Delete'),
         cancelLabel: strings.cancel,
       );
       if (!confirmed) {
@@ -239,8 +242,9 @@ class _CategoryTab extends ConsumerWidget {
         return AlertDialog(
           title: Text(
             initial == null
-                ? (strings.isEnglish ? 'New category' : 'Nueva categoría')
-                : (strings.isEnglish ? 'Edit category' : 'Editar categoría'),
+                ? (strings.localized(es: 'Nueva categoría', en: 'New category'))
+                : (strings.localized(
+                    es: 'Editar categoría', en: 'Edit category')),
           ),
           content: StatefulBuilder(
             builder: (context, setState) {
@@ -251,7 +255,7 @@ class _CategoryTab extends ConsumerWidget {
                     TextField(
                       controller: nameController,
                       decoration: InputDecoration(
-                        labelText: strings.isEnglish ? 'Name' : 'Nombre',
+                        labelText: strings.localized(es: 'Nombre', en: 'Name'),
                       ),
                     ),
                     const SizedBox(height: 12),

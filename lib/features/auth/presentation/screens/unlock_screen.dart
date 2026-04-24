@@ -201,8 +201,10 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                           _loading || isPinLocked ? null : _unlockWithPin,
                       child: Text(
                         _loading
-                            ? (strings.isEnglish ? 'Validating...' : 'Validando...')
-                            : (strings.isEnglish ? 'Unlock' : 'Desbloquear'),
+                            ? (strings.localized(
+                                es: 'Validando...', en: 'Validating...'))
+                            : (strings.localized(
+                                es: 'Desbloquear', en: 'Unlock')),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -214,9 +216,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                           : _unlockWithBiometrics,
                       icon: const Icon(Icons.fingerprint_rounded),
                       label: Text(
-                        strings.isEnglish
-                            ? 'Use biometrics'
-                            : 'Usar biometría',
+                        strings.isEnglish ? 'Use biometrics' : 'Usar biometría',
                       ),
                     ),
                     if (authState.recoveryConfigured) ...[

@@ -3,6 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/app_constants.dart';
+import '../core/localization/app_locale_mode.dart';
+import '../core/localization/generated/app_localizations.dart';
 import '../features/auth/presentation/screens/auth_gate_screen.dart';
 import '../features/finance/domain/entities/app_theme_preference.dart';
 import '../features/finance/presentation/mappers/theme_mode_mapper.dart';
@@ -17,13 +19,27 @@ class CleanFinanceApp extends ConsumerStatefulWidget {
   ConsumerState<CleanFinanceApp> createState() => _CleanFinanceAppState();
 }
 
-class _CleanFinanceAppState extends ConsumerState<CleanFinanceApp> {
+class _CleanFinanceAppState extends ConsumerState<CleanFinanceApp>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future.microtask(
       () => ref.read(notificationSettingsControllerProvider).initialize(),
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeLocales(List<Locale>? locales) {
+    ref.read(systemLocaleProvider.notifier).state = locales?.firstOrNull ??
+        WidgetsBinding.instance.platformDispatcher.locale;
   }
 
   @override
@@ -42,12 +58,10 @@ class _CleanFinanceAppState extends ConsumerState<CleanFinanceApp> {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       locale: _resolveManualLocale(localePreferenceCode),
-      localeListResolutionCallback: _resolveSystemLocale,
-      supportedLocales: const [
-        Locale('es'),
-        Locale('en'),
-      ],
+      localeListResolutionCallback: AppLocaleMode.resolveSystemLocale,
+      supportedLocales: AppLocaleMode.supportedLocales,
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -57,27 +71,10 @@ class _CleanFinanceAppState extends ConsumerState<CleanFinanceApp> {
   }
 
   Locale? _resolveManualLocale(String localePreferenceCode) {
-    final normalized =
-        AppConstants.normalizeLocalePreferenceCode(localePreferenceCode);
-    if (normalized == AppConstants.defaultLocalePreferenceCode) {
+    final mode = AppLocaleMode.fromPreferenceCode(localePreferenceCode);
+    if (mode == AppLocaleMode.system) {
       return null;
     }
-    return Locale(normalized);
-  }
-
-  Locale _resolveSystemLocale(
-    List<Locale>? locales,
-    Iterable<Locale> supportedLocales,
-  ) {
-    final requestedLocales = locales ?? const <Locale>[];
-    for (final locale in requestedLocales) {
-      if (locale.languageCode == 'es') {
-        return const Locale('es');
-      }
-      if (locale.languageCode == 'en') {
-        return const Locale('en');
-      }
-    }
-    return const Locale('es');
+    return mode.locale;
   }
 }

@@ -46,9 +46,8 @@ class EndOfMonthProjectionService {
       return ProjectionRiskLevel.high;
     }
 
-    final weakMarginThreshold = incomeSoFar <= 0
-        ? 0
-        : incomeSoFar * weakMarginRatio;
+    final weakMarginThreshold =
+        incomeSoFar <= 0 ? 0 : incomeSoFar * weakMarginRatio;
 
     if (projectedNet <= weakMarginThreshold) {
       return ProjectionRiskLevel.medium;

@@ -21,7 +21,7 @@ class IconPickerField extends StatelessWidget {
     final strings = AppStrings.of(context);
     final normalizedKey = IconOptions.normalize(selectedIconKey);
     final selectedLabel = IconOptions.labelFor(normalizedKey);
-    final resolvedLabel = label ?? (strings.isEnglish ? 'Icon' : 'Ícono');
+    final resolvedLabel = label ?? (strings.localized(es: 'Ícono', en: 'Icon'));
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -69,10 +69,11 @@ class IconPickerField extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    strings.isEnglish ? 'Tap to change' : 'Tocá para cambiar',
+                    strings.localized(
+                        es: 'Tocá para cambiar', en: 'Tap to change'),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                   ),
                 ],
               ),
@@ -129,7 +130,8 @@ class _IconPickerSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      strings.isEnglish ? 'Choose an icon' : 'Elegí un ícono',
+                      strings.localized(
+                          es: 'Elegí un ícono', en: 'Choose an icon'),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
@@ -138,8 +140,8 @@ class _IconPickerSheet extends StatelessWidget {
                           ? 'Use a clear option to recognize the category faster.'
                           : 'Usá una opción clara para reconocer más rápido la categoría.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
+                            color: scheme.onSurfaceVariant,
+                          ),
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -174,9 +176,12 @@ class _IconPickerSheet extends StatelessWidget {
                                   strings.isEnglish
                                       ? 'Selected icon'
                                       : 'Ícono seleccionado',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: scheme.onSurfaceVariant,
+                                      ),
                                 ),
                               ],
                             ),
@@ -189,7 +194,8 @@ class _IconPickerSheet extends StatelessWidget {
                       child: GridView.builder(
                         shrinkWrap: true,
                         itemCount: IconOptions.all.length,
-                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 132,
                           mainAxisExtent: 98,
                           crossAxisSpacing: 10,
@@ -262,9 +268,9 @@ class _IconOptionTile extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: foreground,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                ),
+                      color: foreground,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                    ),
               ),
             ],
           ),

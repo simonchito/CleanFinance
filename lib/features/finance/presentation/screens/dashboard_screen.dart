@@ -92,9 +92,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final strings = AppStrings.of(context);
     final symbol = settings?.currencySymbol ?? r'$';
     final localeCode = ref.watch(appLocaleCodeProvider);
-    final monthLabel = DateFormat.yMMMM(localeCode)
-        .format(DateTime.now())
-        .replaceFirstMapped(
+    final monthLabel =
+        DateFormat.yMMMM(localeCode).format(DateTime.now()).replaceFirstMapped(
               RegExp(r'^[a-z]'),
               (match) => match.group(0)!.toUpperCase(),
             );
@@ -375,7 +374,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 const SizedBox(height: 22),
                 Text(
-                  strings.isEnglish ? 'Insights' : 'Recomendaciones',
+                  strings.localized(es: 'Recomendaciones', en: 'Insights'),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 12),
@@ -503,7 +502,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 const SizedBox(height: 22),
                 Text(
-                  strings.isEnglish ? 'Recent movements' : 'Movimientos recientes',
+                  strings.localized(
+                      es: 'Movimientos recientes', en: 'Recent movements'),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 12),
@@ -549,7 +549,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ? 'Could not load home'
                     : 'No pudimos cargar el inicio',
                 message: '$error',
-                actionLabel: strings.isEnglish ? 'Retry' : 'Reintentar',
+                actionLabel: strings.localized(es: 'Reintentar', en: 'Retry'),
                 onAction: _refresh,
               ),
             ],
@@ -672,7 +672,9 @@ class _MovementTile extends StatelessWidget {
       ),
       title: Text(
         movement.categoryName == null
-            ? (AppStrings.of(context).isEnglish ? 'Uncategorized' : 'Sin categoría')
+            ? (AppStrings.of(context).isEnglish
+                ? 'Uncategorized'
+                : 'Sin categoría')
             : DefaultCategoryNameLocalizer.localize(
                 movement.categoryName!,
                 AppStrings.of(context),

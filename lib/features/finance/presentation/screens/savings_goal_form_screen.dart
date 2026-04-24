@@ -170,7 +170,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
               controller: _nameController,
               decoration: InputDecoration(
                 labelText:
-                    strings.isEnglish ? 'Goal name' : 'Nombre de la meta',
+                    strings.localized(es: 'Nombre de la meta', en: 'Goal name'),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -189,8 +189,8 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
                 WholeAmountInputFormatter(localeCode: _localeCode),
               ],
               decoration: InputDecoration(
-                labelText:
-                    strings.isEnglish ? 'Target amount' : 'Monto objetivo',
+                labelText: strings.localized(
+                    es: 'Monto objetivo', en: 'Target amount'),
               ),
               validator: (value) {
                 final parsed = CurrencyFormatter.tryParseWholeAmount(
@@ -260,7 +260,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             FilledButton(
               onPressed: _save,
               child: Text(
-                strings.isEnglish ? 'Save goal' : 'Guardar meta',
+                strings.localized(es: 'Guardar meta', en: 'Save goal'),
               ),
             ),
           ],

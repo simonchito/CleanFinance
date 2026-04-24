@@ -71,7 +71,7 @@ class SelectionSheetField<T> extends StatelessWidget {
     final selectedItem = _findSelectedItem();
     final scheme = Theme.of(context).colorScheme;
     final resolvedPlaceholder =
-        placeholder ?? (strings.isEnglish ? 'Select' : 'Seleccionar');
+        placeholder ?? (strings.localized(es: 'Seleccionar', en: 'Select'));
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
