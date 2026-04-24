@@ -326,29 +326,50 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 if (_type == MovementType.saving) ...[
                   const SizedBox(height: 12),
                   goalsState.when(
-                    data: (goals) => SelectionSheetField<String?>(
-                      label: strings.savingGoal,
-                      value: _goalId,
-                      placeholder: strings.noGoal,
-                      sheetTitle: strings.savingGoal,
-                      sheetDescription: strings.isEnglish
-                          ? 'Link the movement to one of your savings goals.'
-                          : 'Vinculá el movimiento con una de tus metas de ahorro.',
-                      items: [
-                        SelectionSheetItem<String?>(
-                          value: null,
-                          label: strings.noGoal,
-                          iconData: Icons.remove_circle_outline_rounded,
+                    data: (goals) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SelectionSheetField<String?>(
+                          label: strings.savingGoal,
+                          value: _goalId,
+                          placeholder: strings.noGoal,
+                          sheetTitle: strings.savingGoal,
+                          sheetDescription: strings.isEnglish
+                              ? 'Link the movement to one of your savings goals.'
+                              : 'Vinculá el movimiento con una de tus metas de ahorro.',
+                          items: [
+                            SelectionSheetItem<String?>(
+                              value: null,
+                              label: strings.noGoal,
+                              iconData: Icons.remove_circle_outline_rounded,
+                            ),
+                            ...goals.map(
+                              (goal) => SelectionSheetItem<String?>(
+                                value: goal.goal.id,
+                                label: goal.goal.name,
+                                iconData: Icons.savings_outlined,
+                              ),
+                            ),
+                          ],
+                          onChanged: (value) => setState(() => _goalId = value),
                         ),
-                        ...goals.map(
-                          (goal) => SelectionSheetItem<String?>(
-                            value: goal.goal.id,
-                            label: goal.goal.name,
-                            iconData: Icons.savings_outlined,
-                          ),
+                        const SizedBox(height: 8),
+                        Text(
+                          goals.isEmpty
+                              ? (strings.isEnglish
+                                  ? 'If you save now, it will appear as General savings and you can create a goal later.'
+                                  : 'Si guardás ahora, quedará en Ahorro general y podés crear una meta después.')
+                              : (strings.isEnglish
+                                  ? 'Tip: if you pick a goal, you can track progress faster in Savings.'
+                                  : 'Tip: si elegís una meta, vas a seguir el progreso más fácil en Ahorros.'),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
-                      onChanged: (value) => setState(() => _goalId = value),
                     ),
                     loading: () => const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),

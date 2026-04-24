@@ -71,6 +71,9 @@ class MovementFormController {
     _ref.invalidate(recentMovementsProvider);
     _ref.invalidate(reportsSnapshotProvider);
     _ref.invalidate(savingsGoalsProvider);
+    _ref.invalidate(savingMovementsProvider);
+    _ref.invalidate(unassignedSavingsProvider);
+    _ref.invalidate(savingsSummaryProvider);
     _ref.invalidate(movementsProvider);
     _ref.invalidate(monthlyDueRemindersProvider);
     _ref.invalidate(categoryBudgetStatusProvider);

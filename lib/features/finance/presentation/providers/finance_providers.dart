@@ -16,17 +16,19 @@ import '../../domain/entities/reports_snapshot.dart';
 import '../../domain/entities/savings_goal.dart';
 import '../controllers/settings_controller.dart';
 import '../models/finance_overview.dart';
+import '../models/savings_summary.dart';
 
 final settingsControllerProvider =
     StateNotifierProvider<SettingsController, AsyncValue<AppSettings>>((ref) {
-      final controller = SettingsController(
-        settingsRepository: ref.watch(settingsRepositoryProvider),
-      );
-      Future.microtask(controller.load);
-      return controller;
-    });
+  final controller = SettingsController(
+    settingsRepository: ref.watch(settingsRepositoryProvider),
+  );
+  Future.microtask(controller.load);
+  return controller;
+});
 
-final showSensitiveAmountsOverrideProvider = StateProvider<bool?>((ref) => null);
+final showSensitiveAmountsOverrideProvider =
+    StateProvider<bool?>((ref) => null);
 
 final showSensitiveAmountsProvider = Provider<bool>((ref) {
   final override = ref.watch(showSensitiveAmountsOverrideProvider);
@@ -69,9 +71,70 @@ final movementsProvider =
 
 final savingsGoalsProvider =
     FutureProvider<List<SavingsGoalProgress>>((ref) async {
-      final repo = ref.watch(savingsGoalsRepositoryProvider);
-      return repo.getSavingsGoals();
-    });
+  final repo = ref.watch(savingsGoalsRepositoryProvider);
+  return repo.getSavingsGoals();
+});
+
+final savingMovementsProvider = FutureProvider<List<Movement>>((ref) async {
+  final repo = ref.watch(movementsRepositoryProvider);
+  return repo.getMovements(
+    filter: const MovementFilter(type: MovementType.saving),
+  );
+});
+
+final unassignedSavingsProvider =
+    FutureProvider<UnassignedSavingsSummary>((ref) async {
+  final goals = await ref.watch(savingsGoalsProvider.future);
+  final validGoalIds = goals.map((item) => item.goal.id).toSet();
+  final savingsMovements = await ref.watch(savingMovementsProvider.future);
+  final unassignedMovements = savingsMovements.where((movement) {
+    final goalId = movement.goalId?.trim();
+    if (goalId == null || goalId.isEmpty) {
+      return true;
+    }
+    return !validGoalIds.contains(goalId);
+  }).toList();
+
+  final totalAmount = unassignedMovements.fold<double>(
+    0,
+    (sum, item) => sum + item.amount,
+  );
+  final lastContributionDate = unassignedMovements.isEmpty
+      ? null
+      : unassignedMovements.map((movement) => movement.occurredOn).reduce(
+            (current, next) => current.isAfter(next) ? current : next,
+          );
+
+  return UnassignedSavingsSummary(
+    totalAmount: totalAmount,
+    movementsCount: unassignedMovements.length,
+    lastContributionDate: lastContributionDate,
+  );
+});
+
+final savingsSummaryProvider = FutureProvider<SavingsSummary>((ref) async {
+  final goals = await ref.watch(savingsGoalsProvider.future);
+  final unassigned = await ref.watch(unassignedSavingsProvider.future);
+
+  final goalsSavedAmount = goals.fold<double>(
+    0,
+    (sum, item) => sum + item.savedAmount,
+  );
+  final totalGoalTargetAmount = goals.fold<double>(
+    0,
+    (sum, item) => sum + item.goal.targetAmount,
+  );
+  final completedGoalsCount = goals.where((item) => item.completed).length;
+
+  return SavingsSummary(
+    totalSavedAmount: goalsSavedAmount + unassigned.totalAmount,
+    goalsSavedAmount: goalsSavedAmount,
+    totalGoalTargetAmount: totalGoalTargetAmount,
+    goalsCount: goals.length,
+    completedGoalsCount: completedGoalsCount,
+    unassignedSavings: unassigned,
+  );
+});
 
 final reportsSnapshotProvider = FutureProvider<ReportsSnapshot>((ref) async {
   final overview = await ref.watch(financeOverviewProvider.future);
@@ -80,57 +143,58 @@ final reportsSnapshotProvider = FutureProvider<ReportsSnapshot>((ref) async {
 
 final monthlyDueRemindersProvider =
     FutureProvider<List<MonthlyPaymentReminder>>((ref) async {
-      final service = ref.watch(monthlyPaymentReminderServiceProvider);
-      final movementsRepo = ref.watch(movementsRepositoryProvider);
-      final referenceDate = DateTime.now();
-      final currentMonth = MonthContext.forDate(referenceDate);
-      final expenseCategories = await ref.watch(
-        categoriesProvider(CategoryScope.expense).future,
-      );
-      final savingsGoals = await ref.watch(savingsGoalsProvider.future);
-      final currentMonthMovements = await movementsRepo.getMovements(
-        filter: MovementFilter(
-          startDate: currentMonth.startDate,
-          endDate: currentMonth.endDateInclusive,
-        ),
-      );
+  final service = ref.watch(monthlyPaymentReminderServiceProvider);
+  final movementsRepo = ref.watch(movementsRepositoryProvider);
+  final referenceDate = DateTime.now();
+  final currentMonth = MonthContext.forDate(referenceDate);
+  final expenseCategories = await ref.watch(
+    categoriesProvider(CategoryScope.expense).future,
+  );
+  final savingsGoals = await ref.watch(savingsGoalsProvider.future);
+  final currentMonthMovements = await movementsRepo.getMovements(
+    filter: MovementFilter(
+      startDate: currentMonth.startDate,
+      endDate: currentMonth.endDateInclusive,
+    ),
+  );
 
-      return service.buildDueReminders(
-        expenseCategories: expenseCategories,
-        savingsGoals: savingsGoals,
-        currentMonthMovements: currentMonthMovements,
-        referenceDate: referenceDate,
-      );
-    });
+  return service.buildDueReminders(
+    expenseCategories: expenseCategories,
+    savingsGoals: savingsGoals,
+    currentMonthMovements: currentMonthMovements,
+    referenceDate: referenceDate,
+  );
+});
 
 final expenseReminderSubcategoriesProvider =
     FutureProvider<List<Category>>((ref) async {
-      final categories = await ref.watch(
-        categoriesProvider(CategoryScope.expense).future,
-      );
-      return categories
-          .where((category) => category.isSubcategory && category.reminderEnabled)
-          .toList();
-    });
+  final categories = await ref.watch(
+    categoriesProvider(CategoryScope.expense).future,
+  );
+  return categories
+      .where((category) => category.isSubcategory && category.reminderEnabled)
+      .toList();
+});
 
 final savingsGoalRemindersProvider =
     FutureProvider<List<SavingsGoalProgress>>((ref) async {
-      final goals = await ref.watch(savingsGoalsProvider.future);
-      return goals.where((progress) => progress.goal.reminderEnabled).toList();
-    });
+  final goals = await ref.watch(savingsGoalsProvider.future);
+  return goals.where((progress) => progress.goal.reminderEnabled).toList();
+});
 
 final endOfMonthProjectionProvider =
     FutureProvider<EndOfMonthProjection>((ref) async {
-      final overview = await ref.watch(financeOverviewProvider.future);
-      return overview.endOfMonthProjection;
-    });
+  final overview = await ref.watch(financeOverviewProvider.future);
+  return overview.endOfMonthProjection;
+});
 
 final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
   final movementsRepo = ref.watch(movementsRepositoryProvider);
   final savingsGoalsRepo = ref.watch(savingsGoalsRepositoryProvider);
   final insightService = ref.watch(financeInsightsServiceProvider);
   final monthlyTrendService = ref.watch(monthlyTrendServiceProvider);
-  final categoryComparisonService = ref.watch(categoryComparisonServiceProvider);
+  final categoryComparisonService =
+      ref.watch(categoryComparisonServiceProvider);
   final cashflowSnapshotService = ref.watch(cashflowSnapshotServiceProvider);
   final spendingPaceService = ref.watch(spendingPaceServiceProvider);
   final endOfMonthProjectionService =
@@ -249,7 +313,8 @@ List<Category> _sortCategoriesAlphabetically(List<Category> categories) {
   }
 
   for (final category in categories.where((item) => item.parentId != null)) {
-    final parentExists = sortedTopLevel.any((parent) => parent.id == category.parentId);
+    final parentExists =
+        sortedTopLevel.any((parent) => parent.id == category.parentId);
     if (!parentExists) {
       orphanSubcategories.add(category);
     }
@@ -268,10 +333,3 @@ List<Category> _sortCategoriesAlphabetically(List<Category> categories) {
 int _compareByName(Category left, Category right) {
   return left.name.toLowerCase().compareTo(right.name.toLowerCase());
 }
-
-
-
-
-
-
-

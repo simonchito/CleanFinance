@@ -41,6 +41,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ref.invalidate(recentMovementsProvider);
     ref.invalidate(reportsSnapshotProvider);
     ref.invalidate(savingsGoalsProvider);
+    ref.invalidate(savingMovementsProvider);
+    ref.invalidate(unassignedSavingsProvider);
+    ref.invalidate(savingsSummaryProvider);
     ref.invalidate(movementsProvider);
     ref.invalidate(monthlyDueRemindersProvider);
   }
@@ -188,7 +191,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           IconButton(
                             onPressed: () {
                               ref
-                                  .read(showSensitiveAmountsOverrideProvider.notifier)
+                                  .read(showSensitiveAmountsOverrideProvider
+                                      .notifier)
                                   .state = !showSensitiveAmounts;
                             },
                             tooltip: showSensitiveAmounts
@@ -205,7 +209,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ),
                       const SizedBox(height: 10),
                       TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: overview.summary.availableBalance),
+                        tween: Tween(
+                            begin: 0, end: overview.summary.availableBalance),
                         duration: const Duration(milliseconds: 900),
                         curve: Curves.easeOutCubic,
                         builder: (context, value, _) {
@@ -237,9 +242,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           overview.monthRemaining >= 0
                               ? 'Te quedan ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining, symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} este mes.'
                               : 'Este mes vas ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining.abs(), symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} por encima de tu margen.',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: Colors.white,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Colors.white,
+                                  ),
                         ),
                       ),
                       const SizedBox(height: 18),
@@ -314,7 +320,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           child: MetricChip(
                             icon: Icons.auto_graph_rounded,
                             label: 'Movimientos',
-                            value: '${overview.summary.currentMonthMovementCount}',
+                            value:
+                                '${overview.summary.currentMonthMovementCount}',
                             color: Theme.of(context).colorScheme.secondary,
                           ),
                         ),
@@ -322,9 +329,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         Expanded(
                           child: MetricChip(
                             icon: Icons.savings_rounded,
-                            label: 'Ahorros',
+                            label: 'Ahorro total',
                             value: AmountVisibilityFormatter.formatCurrency(
-                              amount: overview.summary.savingsMonth,
+                              amount: overview.summary.savingsAccumulated,
                               symbol: symbol,
                               isVisible: showSensitiveAmounts,
                               localeCode: localeCode,
@@ -392,7 +399,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       Text(
                         'Una lectura rápida de cómo viene el mes.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                       ),
                       const SizedBox(height: 16),
@@ -419,7 +428,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       Text(
                         'Compará tus ingresos y gastos de los últimos 6 meses.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                       ),
                       const SizedBox(height: 18),
@@ -440,7 +451,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       Text(
                         'Simple, claro y fácil de leer.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                       ),
                       const SizedBox(height: 18),
@@ -448,7 +461,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         EmptyStateView(
                           icon: Icons.pie_chart_outline_rounded,
                           title: 'Todavía no hay gastos suficientes',
-                          message: 'Cuando registres gastos, vas a ver tus categorías principales acá.',
+                          message:
+                              'Cuando registres gastos, vas a ver tus categorías principales acá.',
                           actionLabel: 'Agregar gasto',
                           onAction: () => _openForm(MovementType.expense),
                         )
@@ -470,7 +484,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   EmptyStateView(
                     icon: Icons.receipt_long_outlined,
                     title: 'Empezá con tu primer movimiento',
-                    message: 'Cargar gastos e ingresos te va a permitir ver resumen, alertas y gráficos.',
+                    message:
+                        'Cargar gastos e ingresos te va a permitir ver resumen, alertas y gráficos.',
                     actionLabel: 'Agregar movimiento',
                     onAction: () => _openForm(),
                   )
@@ -633,5 +648,3 @@ class _MovementTile extends StatelessWidget {
     );
   }
 }
-
-

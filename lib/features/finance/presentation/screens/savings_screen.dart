@@ -6,6 +6,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/savings_goal.dart';
+import '../models/savings_summary.dart';
 import '../providers/finance_providers.dart';
 import '../widgets/confirm_action_dialog.dart';
 import '../widgets/empty_state_view.dart';
@@ -53,9 +54,26 @@ class SavingsScreen extends ConsumerWidget {
     _refresh(ref);
   }
 
+  Future<void> _openGeneralContribution(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const MovementFormScreen(
+          initialType: MovementType.saving,
+        ),
+      ),
+    );
+    _refresh(ref);
+  }
+
   void _refresh(WidgetRef ref) {
     ref.invalidate(financeOverviewProvider);
     ref.invalidate(savingsGoalsProvider);
+    ref.invalidate(savingMovementsProvider);
+    ref.invalidate(unassignedSavingsProvider);
+    ref.invalidate(savingsSummaryProvider);
     ref.invalidate(dashboardSummaryProvider);
     ref.invalidate(recentMovementsProvider);
     ref.invalidate(reportsSnapshotProvider);
@@ -86,6 +104,7 @@ class SavingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final goalsState = ref.watch(savingsGoalsProvider);
+    final savingsSummaryState = ref.watch(savingsSummaryProvider);
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final symbol = settings?.currencySymbol ?? r'$';
     final localeCode = settings?.localeCode ?? 'es';
@@ -101,172 +120,181 @@ class SavingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
         children: [
-          SectionCard(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.secondaryContainer,
-                Theme.of(context).colorScheme.surface,
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Tus metas visibles y simples',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Seguí tu progreso con una lectura rápida y agregá aportes en pocos pasos.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          goalsState.when(
-            data: (goals) {
-              if (goals.isEmpty) {
-                return EmptyStateView(
-                  icon: Icons.savings_outlined,
-                  title: 'Todavía no tenés metas',
-                  message: 'Creá una meta simple y empezá a ver el progreso de tu ahorro.',
-                  actionLabel: 'Crear meta',
-                  onAction: () => _openGoalEditor(context, ref),
-                );
-              }
+          savingsSummaryState.when(
+            data: (summary) {
+              return goalsState.when(
+                data: (goals) {
+                  if (!summary.hasAnySavingsData) {
+                    return EmptyStateView(
+                      icon: Icons.savings_outlined,
+                      title: 'Todavía no tenés ahorro registrado',
+                      message:
+                          'Creá una meta o registrá un aporte para empezar a ordenar tus ahorros.',
+                      actionLabel: 'Crear meta',
+                      onAction: () => _openGoalEditor(context, ref),
+                    );
+                  }
 
-              final savedTotal = goals.fold<double>(
-                0,
-                (sum, item) => sum + item.savedAmount,
-              );
-              final targetTotal = goals.fold<double>(
-                0,
-                (sum, item) => sum + item.goal.targetAmount,
-              );
-              final activeGoals =
-                  goals.where((goal) => !goal.completed).toList();
-              final completedGoals =
-                  goals.where((goal) => goal.completed).toList();
+                  final activeGoals =
+                      goals.where((goal) => !goal.completed).toList();
+                  final completedGoals =
+                      goals.where((goal) => goal.completed).toList();
+                  final unassigned = summary.unassignedSavings;
 
-              return Column(
-                children: [
-                  SectionCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Podés ahorrar en varias metas al mismo tiempo',
-                          style: Theme.of(context).textTheme.titleMedium,
+                  return Column(
+                    children: [
+                      SectionCard(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Theme.of(context).colorScheme.secondaryContainer,
+                            Theme.of(context).colorScheme.surface,
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Organizá objetivos distintos como viaje, fondo de emergencia o compras grandes.',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                        ),
-                        const SizedBox(height: 18),
-                        Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: _SummaryStat(
-                                label: 'Ahorrado',
-                                value: CurrencyFormatter.format(
-                                  savedTotal,
-                                  symbol: symbol,
-                                  localeCode: localeCode,
-                                ),
-                              ),
+                            Text(
+                              'Total ahorrado',
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
-                            Expanded(
-                              child: _SummaryStat(
-                                label: 'Objetivo',
-                                value: CurrencyFormatter.format(
-                                  targetTotal,
-                                  symbol: symbol,
-                                  localeCode: localeCode,
-                                ),
+                            const SizedBox(height: 8),
+                            Text(
+                              CurrencyFormatter.format(
+                                summary.totalSavedAmount,
+                                symbol: symbol,
+                                localeCode: localeCode,
                               ),
+                              style: Theme.of(context).textTheme.headlineSmall,
                             ),
-                            Expanded(
-                              child: _SummaryStat(
-                                label: 'Completadas',
-                                value: '${completedGoals.length}',
-                              ),
+                            const SizedBox(height: 8),
+                            Text(
+                              unassigned.hasSavings
+                                  ? 'Incluye ${CurrencyFormatter.format(unassigned.totalAmount, symbol: symbol, localeCode: localeCode)} en ahorro general.'
+                                  : 'Todo lo que ahorraste está organizado en metas.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                            ),
+                            const SizedBox(height: 18),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _SummaryStat(
+                                    label: 'Metas',
+                                    value: '${summary.goalsCount}',
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _SummaryStat(
+                                    label: 'Objetivo',
+                                    value: CurrencyFormatter.format(
+                                      summary.totalGoalTargetAmount,
+                                      symbol: symbol,
+                                      localeCode: localeCode,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _SummaryStat(
+                                    label: 'Logradas',
+                                    value: '${summary.completedGoalsCount}',
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
+                      ),
+                      if (unassigned.hasSavings) ...[
+                        const SizedBox(height: 14),
+                        _GeneralSavingsCard(
+                          summary: unassigned,
+                          symbol: symbol,
+                          localeCode: localeCode,
+                          onContribute: () =>
+                              _openGeneralContribution(context, ref),
+                          onCreateGoal: () => _openGoalEditor(context, ref),
+                        ),
                       ],
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  if (activeGoals.isNotEmpty) ...[
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Metas activas',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...activeGoals.map(
-                      (progress) => Padding(
-                        padding: const EdgeInsets.only(bottom: 14),
-                        child: _GoalCard(
-                          progress: progress,
-                          symbol: symbol,
-                          localeCode: localeCode,
-                          onEdit: () => _openGoalEditor(
-                            context,
-                            ref,
-                            goal: progress.goal,
+                      if (activeGoals.isNotEmpty) ...[
+                        const SizedBox(height: 14),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Metas activas',
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          onContribute: () =>
-                              _openContribution(context, ref, progress),
-                          onDelete: () =>
-                              _deleteGoal(context, ref, progress.goal),
                         ),
-                      ),
-                    ),
-                  ],
-                  if (completedGoals.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Metas logradas',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...completedGoals.map(
-                      (progress) => Padding(
-                        padding: const EdgeInsets.only(bottom: 14),
-                        child: _GoalCard(
-                          progress: progress,
-                          symbol: symbol,
-                          localeCode: localeCode,
-                          onEdit: () => _openGoalEditor(
-                            context,
-                            ref,
-                            goal: progress.goal,
+                        const SizedBox(height: 10),
+                        ...activeGoals.map(
+                          (progress) => Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: _GoalCard(
+                              progress: progress,
+                              symbol: symbol,
+                              localeCode: localeCode,
+                              onEdit: () => _openGoalEditor(
+                                context,
+                                ref,
+                                goal: progress.goal,
+                              ),
+                              onContribute: () =>
+                                  _openContribution(context, ref, progress),
+                              onDelete: () =>
+                                  _deleteGoal(context, ref, progress.goal),
+                            ),
                           ),
-                          onContribute: () =>
-                              _openContribution(context, ref, progress),
-                          onDelete: () =>
-                              _deleteGoal(context, ref, progress.goal),
                         ),
-                      ),
-                    ),
-                  ],
-                ],
+                      ],
+                      if (completedGoals.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Metas logradas',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ...completedGoals.map(
+                          (progress) => Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: _GoalCard(
+                              progress: progress,
+                              symbol: symbol,
+                              localeCode: localeCode,
+                              onEdit: () => _openGoalEditor(
+                                context,
+                                ref,
+                                goal: progress.goal,
+                              ),
+                              onContribute: () =>
+                                  _openContribution(context, ref, progress),
+                              onDelete: () =>
+                                  _deleteGoal(context, ref, progress.goal),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  );
+                },
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                error: (error, _) => EmptyStateView(
+                  icon: Icons.error_outline_rounded,
+                  title: 'No pudimos cargar tus metas',
+                  message: '$error',
+                ),
               );
             },
             loading: () => const Padding(
@@ -275,9 +303,102 @@ class SavingsScreen extends ConsumerWidget {
             ),
             error: (error, _) => EmptyStateView(
               icon: Icons.error_outline_rounded,
-              title: 'No pudimos cargar tus metas',
+              title: 'No pudimos cargar ahorros',
               message: '$error',
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GeneralSavingsCard extends StatelessWidget {
+  const _GeneralSavingsCard({
+    required this.summary,
+    required this.symbol,
+    required this.localeCode,
+    required this.onContribute,
+    required this.onCreateGoal,
+  });
+
+  final UnassignedSavingsSummary summary;
+  final String symbol;
+  final String localeCode;
+  final VoidCallback onContribute;
+  final VoidCallback onCreateGoal;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final lastContributionDate = summary.lastContributionDate == null
+        ? null
+        : DateFormat('d MMM y', 'es').format(summary.lastContributionDate!);
+
+    return SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.account_balance_wallet_outlined),
+              const SizedBox(width: 8),
+              Text(
+                'Ahorro general',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            CurrencyFormatter.format(
+              summary.totalAmount,
+              symbol: symbol,
+              localeCode: localeCode,
+            ),
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Dinero guardado sin una meta específica.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            lastContributionDate == null
+                ? '${summary.movementsCount} aporte${summary.movementsCount == 1 ? '' : 's'} registrado${summary.movementsCount == 1 ? '' : 's'}.'
+                : '${summary.movementsCount} aporte${summary.movementsCount == 1 ? '' : 's'} · último: $lastContributionDate.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Creá una meta para organizar mejor tus ahorros.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: onContribute,
+                  icon: const Icon(Icons.add_rounded),
+                  label: const Text('Aportar'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onCreateGoal,
+                  child: const Text('Crear meta'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -324,7 +445,8 @@ class _GoalCard extends StatelessWidget {
               ),
               if (progress.completed)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
                     color: scheme.primary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(999),
