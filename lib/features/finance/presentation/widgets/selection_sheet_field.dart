@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../core/utils/icon_mapper.dart';
 
 class SelectionSheetItem<T> {
@@ -46,7 +47,7 @@ class SelectionSheetField<T> extends StatelessWidget {
     required this.items,
     required this.onChanged,
     this.value,
-    this.placeholder = 'Seleccionar',
+    this.placeholder,
     this.sheetTitle,
     this.sheetDescription,
     this.enabled = true,
@@ -58,7 +59,7 @@ class SelectionSheetField<T> extends StatelessWidget {
   final List<SelectionSheetItem<T>> items;
   final ValueChanged<T> onChanged;
   final T? value;
-  final String placeholder;
+  final String? placeholder;
   final String? sheetTitle;
   final String? sheetDescription;
   final bool enabled;
@@ -66,8 +67,11 @@ class SelectionSheetField<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final selectedItem = _findSelectedItem();
     final scheme = Theme.of(context).colorScheme;
+    final resolvedPlaceholder =
+        placeholder ?? (strings.isEnglish ? 'Select' : 'Seleccionar');
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -99,7 +103,7 @@ class SelectionSheetField<T> extends StatelessWidget {
         ),
         child: selectedItem == null
             ? Text(
-                placeholder,
+                resolvedPlaceholder,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),

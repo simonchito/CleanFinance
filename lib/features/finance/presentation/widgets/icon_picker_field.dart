@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../core/constants/icon_options.dart';
 import '../../../../core/utils/icon_mapper.dart';
 
@@ -7,18 +8,20 @@ class IconPickerField extends StatelessWidget {
   const IconPickerField({
     required this.selectedIconKey,
     required this.onChanged,
-    this.label = 'Ícono',
+    this.label,
     super.key,
   });
 
   final String selectedIconKey;
   final ValueChanged<String> onChanged;
-  final String label;
+  final String? label;
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final normalizedKey = IconOptions.normalize(selectedIconKey);
     final selectedLabel = IconOptions.labelFor(normalizedKey);
+    final resolvedLabel = label ?? (strings.isEnglish ? 'Icon' : 'Ícono');
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -40,7 +43,7 @@ class IconPickerField extends StatelessWidget {
       },
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: label,
+          labelText: resolvedLabel,
           suffixIcon: const Icon(Icons.expand_more_rounded),
         ),
         child: Row(
@@ -66,7 +69,7 @@ class IconPickerField extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Tocá para cambiar',
+                    strings.isEnglish ? 'Tap to change' : 'Tocá para cambiar',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -90,6 +93,7 @@ class _IconPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final scheme = Theme.of(context).colorScheme;
     final selectedLabel = IconOptions.labelFor(selectedIconKey);
 
@@ -125,12 +129,14 @@ class _IconPickerSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Elegí un ícono',
+                      strings.isEnglish ? 'Choose an icon' : 'Elegí un ícono',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Usá una opción clara para reconocer más rápido la categoría.',
+                      strings.isEnglish
+                          ? 'Use a clear option to recognize the category faster.'
+                          : 'Usá una opción clara para reconocer más rápido la categoría.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
@@ -165,7 +171,9 @@ class _IconPickerSheet extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Ícono seleccionado',
+                                  strings.isEnglish
+                                      ? 'Selected icon'
+                                      : 'Ícono seleccionado',
                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: scheme.onSurfaceVariant,
                                   ),

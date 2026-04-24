@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/notifications/notification_permission_service.dart';
 import '../../../../core/notifications/notification_providers.dart';
 import '../../../../core/notifications/notification_service.dart';
@@ -20,6 +23,11 @@ class MonthlyReminderNotificationScheduler {
 
   Future<void> syncScheduledReminders() async {
     final settings = await _ref.read(settingsRepositoryProvider).getSettings();
+    final localeCode = AppConstants.resolveLocaleCodeFromPreference(
+      localePreferenceCode: settings.localeCode,
+      deviceLocaleCode: PlatformDispatcher.instance.locale.languageCode,
+    );
+    final isEnglish = localeCode == 'en';
     final notificationService = _ref.read(notificationServiceProvider);
 
     if (!settings.notificationsEnabled) {
@@ -82,8 +90,8 @@ class MonthlyReminderNotificationScheduler {
         );
         desiredNotifications[notificationId] = ScheduledLocalNotification(
           id: notificationId,
-          title: _titleFor(item),
-          body: _bodyFor(item),
+          title: _titleFor(item, isEnglish: isEnglish),
+          body: _bodyFor(item, isEnglish: isEnglish),
           scheduledDate: scheduledDate,
           payload: _payloadFor(
             item: item,
@@ -131,22 +139,34 @@ class MonthlyReminderNotificationScheduler {
     return DateTime(month.year, month.month + 1, 0).day;
   }
 
-  String _titleFor(MonthlyReminderScheduleItem item) {
+  String _titleFor(
+    MonthlyReminderScheduleItem item, {
+    required bool isEnglish,
+  }) {
     switch (item.source) {
       case MonthlyReminderSource.expenseSubcategory:
-        return 'Recordatorio de pago';
+        return isEnglish ? 'Payment reminder' : 'Recordatorio de pago';
       case MonthlyReminderSource.savingsGoal:
-        return 'Recordatorio de ahorro';
+        return isEnglish ? 'Savings reminder' : 'Recordatorio de ahorro';
     }
   }
 
-  String _bodyFor(MonthlyReminderScheduleItem item) {
+  String _bodyFor(
+    MonthlyReminderScheduleItem item, {
+    required bool isEnglish,
+  }) {
     switch (item.source) {
       case MonthlyReminderSource.expenseSubcategory:
-        final context = item.subtitle == null ? '' : ' de ${item.subtitle}';
-        return 'Hoy toca registrar ${item.title}$context.';
+        final context = item.subtitle == null
+            ? ''
+            : (isEnglish ? ' from ${item.subtitle}' : ' de ${item.subtitle}');
+        return isEnglish
+            ? 'Time to register ${item.title}$context today.'
+            : 'Hoy toca registrar ${item.title}$context.';
       case MonthlyReminderSource.savingsGoal:
-        return 'Hoy toca revisar el aporte para ${item.title}.';
+        return isEnglish
+            ? 'Time to review your contribution for ${item.title} today.'
+            : 'Hoy toca revisar el aporte para ${item.title}.';
     }
   }
 

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
@@ -19,6 +20,7 @@ class DonutChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final colors = _palette(context);
     final total = items.fold<double>(0, (sum, item) => sum + item.amount);
 
@@ -37,7 +39,7 @@ class DonutChart extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Total',
+                    strings.isEnglish ? 'Total' : 'Total',
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                   Text(
@@ -127,6 +129,7 @@ class IncomeExpenseComparison extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final total = math.max(income, expense);
     final scheme = Theme.of(context).colorScheme;
 
@@ -165,9 +168,9 @@ class IncomeExpenseComparison extends StatelessWidget {
 
     return Column(
       children: [
-        buildBar('Ingresos', income, scheme.primary),
+        buildBar(strings.income, income, scheme.primary),
         const SizedBox(height: 14),
-        buildBar('Gastos', expense, scheme.error),
+        buildBar(strings.expense, expense, scheme.error),
       ],
     );
   }
