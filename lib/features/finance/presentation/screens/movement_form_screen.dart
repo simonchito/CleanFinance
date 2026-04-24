@@ -115,9 +115,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     } on MovementFormValidationException catch (error) {
       if (error.error == MovementFormValidationError.missingCategory) {
         setState(() {
-          _categoryErrorText = AppStrings.of(context).isEnglish
-              ? 'Select a category before saving.'
-              : 'Seleccioná una categoría antes de guardar.';
+          _categoryErrorText = AppStrings.of(context).localized(
+            es: 'Seleccioná una categoría antes de guardar.',
+            en: 'Select a category before saving.',
+            pt: 'Selecione uma categoria antes de salvar.',
+          );
         });
       }
     }
@@ -176,19 +178,25 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                     children: [
                       Text(
                         isEditing
-                            ? (strings.isEnglish
-                                ? 'Update your movement'
-                                : 'Actualizá tu registro')
-                            : (strings.isEnglish
-                                ? 'Add a movement in seconds'
-                                : 'Registrá un movimiento en segundos'),
+                            ? strings.localized(
+                                es: 'Actualizá tu registro',
+                                en: 'Update your movement',
+                                pt: 'Atualize seu registro',
+                              )
+                            : strings.localized(
+                                es: 'Registrá un movimiento en segundos',
+                                en: 'Add a movement in seconds',
+                                pt: 'Registre uma movimentação em segundos',
+                              ),
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        strings.isEnglish
-                            ? 'Use simple language and keep only what matters.'
-                            : 'Usá lenguaje simple y dejá solo la información necesaria.',
+                        strings.localized(
+                          es: 'Usá lenguaje simple y dejá solo la información necesaria.',
+                          en: 'Use simple language and keep only what matters.',
+                          pt: 'Use uma linguagem simples e mantenha só o necessário.',
+                        ),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -203,9 +211,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   label: strings.type,
                   value: _type,
                   sheetTitle: strings.type,
-                  sheetDescription: strings.isEnglish
-                      ? 'Choose the kind of movement you want to register.'
-                      : 'Elegí qué tipo de movimiento querés registrar.',
+                  sheetDescription: strings.localized(
+                    es: 'Elegí qué tipo de movimiento querés registrar.',
+                    en: 'Choose the kind of movement you want to register.',
+                    pt: 'Escolha o tipo de movimentação que deseja registrar.',
+                  ),
                   items: [
                     SelectionSheetItem(
                       value: MovementType.income,
@@ -249,9 +259,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       localeCode: _localeCode,
                     );
                     if (parsed == null || parsed <= 0) {
-                      return strings.isEnglish
-                          ? 'Enter a valid amount.'
-                          : 'Ingresá un monto válido.';
+                      return strings.localized(
+                        es: 'Ingresá un monto válido.',
+                        en: 'Enter a valid amount.',
+                        pt: 'Informe um valor válido.',
+                      );
                     }
                     return null;
                   },
@@ -260,13 +272,17 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 SelectionSheetField<String>(
                   label: strings.category,
                   value: _categoryId,
-                  placeholder: strings.isEnglish
-                      ? 'Choose a category'
-                      : 'Elegí una categoría',
+                  placeholder: strings.localized(
+                    es: 'Elegí una categoría',
+                    en: 'Choose a category',
+                    pt: 'Escolha uma categoria',
+                  ),
                   sheetTitle: strings.category,
-                  sheetDescription: strings.isEnglish
-                      ? 'Choose the main category.'
-                      : 'Elegí la categoría principal.',
+                  sheetDescription: strings.localized(
+                    es: 'Elegí la categoría principal.',
+                    en: 'Choose the main category.',
+                    pt: 'Escolha a categoria principal.',
+                  ),
                   items: topLevel
                       .map(
                         (category) => SelectionSheetItem(
@@ -302,15 +318,19 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 if (subcategories.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   SelectionSheetField<String?>(
-                    label: strings.isEnglish
-                        ? 'Subcategory (optional)'
-                        : 'Subcategoría (opcional)',
+                    label: strings.localized(
+                      es: 'Subcategoría (opcional)',
+                      en: 'Subcategory (optional)',
+                      pt: 'Subcategoria (opcional)',
+                    ),
                     value: _subcategoryId,
                     placeholder: strings.noSubcategory,
                     sheetTitle: strings.subcategory,
-                    sheetDescription: strings.isEnglish
-                        ? 'If it applies, choose a more specific detail.'
-                        : 'Si aplica, elegí un detalle más específico.',
+                    sheetDescription: strings.localized(
+                      es: 'Si aplica, elegí un detalle más específico.',
+                      en: 'If it applies, choose a more specific detail.',
+                      pt: 'Se fizer sentido, escolha um detalhe mais específico.',
+                    ),
                     items: [
                       SelectionSheetItem<String?>(
                         value: null,
@@ -343,9 +363,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                           value: _goalId,
                           placeholder: strings.noGoal,
                           sheetTitle: strings.savingGoal,
-                          sheetDescription: strings.isEnglish
-                              ? 'Link the movement to one of your savings goals.'
-                              : 'Vinculá el movimiento con una de tus metas de ahorro.',
+                          sheetDescription: strings.localized(
+                            es: 'Vinculá el movimiento con una de tus metas de ahorro.',
+                            en: 'Link the movement to one of your savings goals.',
+                            pt: 'Vincule a movimentação a uma das suas metas de economia.',
+                          ),
                           items: [
                             SelectionSheetItem<String?>(
                               value: null,
@@ -365,12 +387,16 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                         const SizedBox(height: 8),
                         Text(
                           goals.isEmpty
-                              ? (strings.isEnglish
-                                  ? 'If you save now, it will appear as General savings and you can create a goal later.'
-                                  : 'Si guardás ahora, quedará en Ahorro general y podés crear una meta después.')
-                              : (strings.isEnglish
-                                  ? 'Tip: if you pick a goal, you can track progress faster in Savings.'
-                                  : 'Tip: si elegís una meta, vas a seguir el progreso más fácil en Ahorros.'),
+                              ? strings.localized(
+                                  es: 'Si guardás ahora, quedará en Ahorro general y podés crear una meta después.',
+                                  en: 'If you save now, it will appear as General savings and you can create a goal later.',
+                                  pt: 'Se economizar agora, isso aparecerá em Economias gerais e você poderá criar uma meta depois.',
+                                )
+                              : strings.localized(
+                                  es: 'Tip: si elegís una meta, vas a seguir el progreso más fácil en Ahorros.',
+                                  en: 'Tip: if you pick a goal, you can track progress faster in Savings.',
+                                  pt: 'Dica: se escolher uma meta, você acompanha o progresso mais rápido em Economias.',
+                                ),
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: Theme.of(context)
@@ -402,9 +428,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   value: _paymentMethodController.text.isEmpty
                       ? null
                       : _paymentMethodController.text,
-                  placeholder: strings.isEnglish
-                      ? 'Choose a payment method'
-                      : 'Elegí un medio de pago',
+                  placeholder: strings.localized(
+                    es: 'Elegí un medio de pago',
+                    en: 'Choose a payment method',
+                    pt: 'Escolha um meio de pagamento',
+                  ),
                   sheetTitle: strings.movementPaymentMethod,
                   items: paymentMethods
                       .map(
@@ -429,9 +457,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                   maxLines: 3,
                   decoration: InputDecoration(
                     labelText: strings.note,
-                    hintText: strings.isEnglish
-                        ? 'Example: weekly groceries or utility bill'
-                        : 'Ejemplo: compra semanal o pago de servicio',
+                    hintText: strings.localized(
+                      es: 'Ejemplo: compra semanal o pago de servicio',
+                      en: 'Example: weekly groceries or utility bill',
+                      pt: 'Exemplo: compras da semana ou conta de serviço',
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -449,9 +479,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Text(
-              strings.isEnglish
-                  ? 'Could not load categories: $error'
-                  : 'No se pudieron cargar categorías: $error',
+              strings.localized(
+                es: 'No se pudieron cargar categorías: $error',
+                en: 'Could not load categories: $error',
+                pt: 'Não foi possível carregar as categorias: $error',
+              ),
             ),
           ),
         ),

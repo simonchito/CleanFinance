@@ -32,10 +32,16 @@ class SettingsScreen extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final password = await _requestBackupPassword(
       context,
-      title: strings.localized(es: 'Proteger backup', en: 'Protect backup'),
-      description: strings.isEnglish
-          ? 'Add an optional password. If you leave it empty, the backup will be exported as readable JSON.'
-          : 'Agregá una contraseña opcional. Si la dejás vacía, el backup se exportará como JSON legible.',
+      title: strings.localized(
+        es: 'Proteger backup',
+        en: 'Protect backup',
+        pt: 'Proteger backup',
+      ),
+      description: strings.localized(
+        es: 'Agregá una contraseña opcional. Si la dejás vacía, el backup se exportará como JSON legible.',
+        en: 'Add an optional password. If you leave it empty, the backup will be exported as readable JSON.',
+        pt: 'Adicione uma senha opcional. Se deixar vazio, o backup será exportado como JSON legível.',
+      ),
       confirmLabel: strings.exportBackup,
     );
     if (password == null) {
@@ -53,9 +59,11 @@ class SettingsScreen extends ConsumerWidget {
 
     await Share.shareXFiles(
       [XFile(file.path)],
-      text: strings.isEnglish
-          ? 'Local backup from CleanFinance'
-          : 'Backup local de CleanFinance',
+      text: strings.localized(
+        es: 'Backup local de CleanFinance',
+        en: 'Local backup from CleanFinance',
+        pt: 'Backup local do CleanFinance',
+      ),
     );
 
     if (context.mounted) {
@@ -63,7 +71,7 @@ class SettingsScreen extends ConsumerWidget {
         SnackBar(
           content: Text(
             password.trim().isEmpty
-                ? '${strings.exportBackup}: ${file.path}. Advertencia: el archivo no está cifrado.'
+                ? '${strings.exportBackup}: ${file.path}. ${strings.localized(es: 'Advertencia: el archivo no está cifrado.', en: 'Warning: the file is not encrypted.', pt: 'Aviso: o arquivo não está criptografado.')}'
                 : '${strings.exportBackup}: ${file.path}',
           ),
         ),
@@ -85,9 +93,11 @@ class SettingsScreen extends ConsumerWidget {
     final confirmed = await showConfirmActionDialog(
       context: context,
       title: strings.importBackup,
-      message: strings.isEnglish
-          ? 'This will replace your current local data. The file will be validated before importing so your existing data stays untouched if something is wrong.'
-          : 'Esta acción reemplazará tus datos locales actuales. El archivo se validará antes de importar para no tocar tus datos si encuentra problemas.',
+      message: strings.localized(
+        es: 'Esta acción reemplazará tus datos locales actuales. El archivo se validará antes de importar para no tocar tus datos si encuentra problemas.',
+        en: 'This will replace your current local data. The file will be validated before importing so your existing data stays untouched if something is wrong.',
+        pt: 'Esta ação substituirá seus dados locais atuais. O arquivo será validado antes da importação para manter seus dados intactos se algo estiver errado.',
+      ),
       confirmLabel: strings.importBackup,
       cancelLabel: strings.cancel,
     );
@@ -103,10 +113,16 @@ class SettingsScreen extends ConsumerWidget {
       }
       final password = await _requestBackupPassword(
         context,
-        title: strings.localized(es: 'Importar backup', en: 'Import backup'),
-        description: strings.isEnglish
-            ? 'If this backup was protected with a password, enter it now. Leave it empty for plain JSON backups.'
-            : 'Si este backup fue protegido con contraseña, ingresala ahora. Si es un JSON plano, dejala vacía.',
+        title: strings.localized(
+          es: 'Importar backup',
+          en: 'Import backup',
+          pt: 'Importar backup',
+        ),
+        description: strings.localized(
+          es: 'Si este backup fue protegido con contraseña, ingresala ahora. Si es un JSON plano, dejala vacía.',
+          en: 'If this backup was protected with a password, enter it now. Leave it empty for plain JSON backups.',
+          pt: 'Se este backup foi protegido com senha, informe agora. Deixe vazio para backups em JSON simples.',
+        ),
         confirmLabel: strings.importBackup,
       );
       if (!context.mounted) {
@@ -124,9 +140,11 @@ class SettingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              strings.isEnglish
-                  ? 'Data imported successfully.'
-                  : 'Datos importados correctamente.',
+              strings.localized(
+                es: 'Datos importados correctamente.',
+                en: 'Data imported successfully.',
+                pt: 'Dados importados com sucesso.',
+              ),
             ),
           ),
         );
@@ -147,12 +165,20 @@ class SettingsScreen extends ConsumerWidget {
     final confirmed = await showConfirmActionDialog(
       context: context,
       title: strings.localized(
-          es: 'Borrar todos los datos', en: 'Delete all data'),
-      message: strings.isEnglish
-          ? 'This will remove the full local database, PIN, recovery data and biometric flags, leaving the app as a clean install.'
-          : 'Esto eliminará la base local completa, el PIN, los datos de recuperación y las banderas de biometría, dejando la app como una instalación limpia.',
-      confirmLabel:
-          strings.localized(es: 'Borrar todo', en: 'Delete everything'),
+        es: 'Borrar todos los datos',
+        en: 'Delete all data',
+        pt: 'Excluir todos os dados',
+      ),
+      message: strings.localized(
+        es: 'Esto eliminará la base local completa, el PIN, los datos de recuperación y las banderas de biometría, dejando la app como una instalación limpia.',
+        en: 'This will remove the full local database, PIN, recovery data and biometric flags, leaving the app as a clean install.',
+        pt: 'Isso removerá todo o banco local, PIN, dados de recuperação e biometria, deixando o app como uma instalação limpa.',
+      ),
+      confirmLabel: strings.localized(
+        es: 'Borrar todo',
+        en: 'Delete everything',
+        pt: 'Excluir tudo',
+      ),
       cancelLabel: strings.cancel,
     );
 
@@ -166,9 +192,11 @@ class SettingsScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            strings.isEnglish
-                ? 'All local data was deleted. The app is now in clean-install state.'
-                : 'Se borraron todos los datos locales. La app quedó en estado de instalación limpia.',
+            strings.localized(
+              es: 'Se borraron todos los datos locales. La app quedó en estado de instalación limpia.',
+              en: 'All local data was deleted. The app is now in clean-install state.',
+              pt: 'Todos os dados locais foram excluídos. O app voltou ao estado inicial.',
+            ),
           ),
         ),
       );
@@ -201,9 +229,11 @@ class SettingsScreen extends ConsumerWidget {
                     controller: controller,
                     obscureText: obscureText,
                     decoration: InputDecoration(
-                      labelText: strings.isEnglish
-                          ? 'Password (optional)'
-                          : 'Contraseña (opcional)',
+                      labelText: strings.localized(
+                        es: 'Contraseña (opcional)',
+                        en: 'Password (optional)',
+                        pt: 'Senha (opcional)',
+                      ),
                       suffixIcon: IconButton(
                         onPressed: () =>
                             setState(() => obscureText = !obscureText),
@@ -293,16 +323,20 @@ class SettingsScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            strings.isEnglish
-                                ? 'A simple, private and clear app'
-                                : 'Una app simple, privada y clara',
+                            strings.localized(
+                              es: 'Una app simple, privada y clara',
+                              en: 'A simple, private and clear app',
+                              pt: 'Um app simples, privado e claro',
+                            ),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            strings.isEnglish
-                                ? 'Adjust the experience so it really feels like yours.'
-                                : 'Configurá la experiencia para que se sienta realmente tuya.',
+                            strings.localized(
+                              es: 'Configurá la experiencia para que se sienta realmente tuya.',
+                              en: 'Adjust the experience so it really feels like yours.',
+                              pt: 'Ajuste a experiência para que ela fique do seu jeito.',
+                            ),
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -329,9 +363,11 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.isEnglish
-                          ? 'Keep fast access without losing privacy.'
-                          : 'Mantené acceso rápido sin perder privacidad.',
+                      strings.localized(
+                        es: 'Mantené acceso rápido sin perder privacidad.',
+                        en: 'Keep fast access without losing privacy.',
+                        pt: 'Mantenha o acesso rápido sem perder privacidade.',
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -343,12 +379,16 @@ class SettingsScreen extends ConsumerWidget {
                       title: Text(strings.biometric),
                       subtitle: Text(
                         authState.biometricAvailable
-                            ? (strings.isEnglish
-                                ? 'Use fingerprint or face unlock if available.'
-                                : 'Usá huella o reconocimiento facial si está disponible.')
-                            : (strings.isEnglish
-                                ? 'This device does not support biometrics.'
-                                : 'Este dispositivo no tiene biometría disponible.'),
+                            ? strings.localized(
+                                es: 'Usá huella o reconocimiento facial si está disponible.',
+                                en: 'Use fingerprint or face unlock if available.',
+                                pt: 'Use digital ou reconhecimento facial se estiver disponível.',
+                              )
+                            : strings.localized(
+                                es: 'Este dispositivo no tiene biometría disponible.',
+                                en: 'This device does not support biometrics.',
+                                pt: 'Este dispositivo não tem biometria disponível.',
+                              ),
                       ),
                       value: authState.biometricEnabled,
                       onChanged: authState.biometricAvailable
@@ -368,9 +408,11 @@ class SettingsScreen extends ConsumerWidget {
                     DropdownButtonFormField<int>(
                       initialValue: settings.autoLockMinutes,
                       decoration: InputDecoration(
-                        labelText: strings.isEnglish
-                            ? 'Auto lock'
-                            : 'Bloqueo automático',
+                        labelText: strings.localized(
+                          es: 'Bloqueo automático',
+                          en: 'Auto lock',
+                          pt: 'Bloqueio automático',
+                        ),
                       ),
                       items: [
                         DropdownMenuItem(
@@ -424,9 +466,11 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.isEnglish
-                          ? 'Review what CleanFinance stores locally, how backups work, and what is never sent to servers.'
-                          : 'Revisá qué guarda CleanFinance de forma local, cómo funcionan los backups y qué datos nunca se envían a servidores.',
+                      strings.localized(
+                        es: 'Revisá qué guarda CleanFinance de forma local, cómo funcionan los backups y qué datos nunca se envían a servidores.',
+                        en: 'Review what CleanFinance stores locally, how backups work, and what is never sent to servers.',
+                        pt: 'Veja o que o CleanFinance guarda localmente, como os backups funcionam e o que nunca é enviado a servidores.',
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -500,9 +544,11 @@ class SettingsScreen extends ConsumerWidget {
                         DropdownMenuItem(
                           value: AppThemePreference.system,
                           child: Text(
-                            strings.isEnglish
-                                ? 'Follow system'
-                                : 'Seguir sistema',
+                            strings.localized(
+                              es: 'Seguir sistema',
+                              en: 'Follow system',
+                              pt: 'Seguir sistema',
+                            ),
                           ),
                         ),
                         DropdownMenuItem(
@@ -584,9 +630,11 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.isEnglish
-                          ? 'Receive monthly reminders on this device.'
-                          : 'Recibí recordatorios mensuales en este teléfono.',
+                      strings.localized(
+                        es: 'Recibí recordatorios mensuales en este teléfono.',
+                        en: 'Receive monthly reminders on this device.',
+                        pt: 'Receba lembretes mensais neste dispositivo.',
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -596,12 +644,14 @@ class SettingsScreen extends ConsumerWidget {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(
-                        strings.isEnglish
-                            ? 'System notifications'
-                            : 'Notificaciones del sistema',
+                        strings.localized(
+                          es: 'Notificaciones del sistema',
+                          en: 'System notifications',
+                          pt: 'Notificações do sistema',
+                        ),
                       ),
                       subtitle: _NotificationStatusText(
-                        isEnglish: strings.isEnglish,
+                        strings: strings,
                       ),
                       value: settings.notificationsEnabled,
                       onChanged: (value) => ref
@@ -613,9 +663,11 @@ class SettingsScreen extends ConsumerWidget {
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.schedule_outlined),
                       title: Text(
-                        strings.isEnglish
-                            ? 'Reminder time'
-                            : 'Hora de recordatorio',
+                        strings.localized(
+                          es: 'Hora de recordatorio',
+                          en: 'Reminder time',
+                          pt: 'Hora do lembrete',
+                        ),
                       ),
                       subtitle: Text(
                         MaterialLocalizations.of(context).formatTimeOfDay(
@@ -660,9 +712,11 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.isEnglish
-                          ? 'Customize the lists you use every day so adding data stays quick and clear.'
-                          : 'Personalizá las listas que usás todos los días para que cargar datos siga siendo rápido y claro.',
+                      strings.localized(
+                        es: 'Personalizá las listas que usás todos los días para que cargar datos siga siendo rápido y claro.',
+                        en: 'Customize the lists you use every day so adding data stays quick and clear.',
+                        pt: 'Personalize as listas que você usa todos os dias para registrar dados com rapidez e clareza.',
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -717,9 +771,11 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.isEnglish
-                          ? 'Your data lives on your device. You can export or restore it whenever you need.'
-                          : 'Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.',
+                      strings.localized(
+                        es: 'Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.',
+                        en: 'Your data lives on your device. You can export or restore it whenever you need.',
+                        pt: 'Seus dados ficam no dispositivo. Você pode exportar ou restaurar quando precisar.',
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -736,9 +792,11 @@ class SettingsScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: Text(
-                        strings.isEnglish
-                            ? 'Security note: local backups can be exported as plain JSON. You can now add an optional password, but data stored in SQLite on the device is still not database-encrypted.'
-                            : 'Nota de seguridad: los backups locales pueden exportarse como JSON plano. Ahora podés agregar una contraseña opcional, pero los datos guardados en SQLite dentro del dispositivo siguen sin cifrado de base.',
+                        strings.localized(
+                          es: 'Nota de seguridad: los backups locales pueden exportarse como JSON plano. Ahora podés agregar una contraseña opcional, pero los datos guardados en SQLite dentro del dispositivo siguen sin cifrado de base.',
+                          en: 'Security note: local backups can be exported as plain JSON. You can now add an optional password, but data stored in SQLite on the device is still not database-encrypted.',
+                          pt: 'Nota de segurança: backups locais podem ser exportados como JSON simples. Agora você pode adicionar uma senha opcional, mas os dados no SQLite do dispositivo ainda não têm criptografia de banco.',
+                        ),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -762,9 +820,11 @@ class SettingsScreen extends ConsumerWidget {
                     TextButton(
                       onPressed: () => _clearAllData(context, ref),
                       child: Text(
-                        strings.isEnglish
-                            ? 'Delete all data'
-                            : 'Borrar todos los datos',
+                        strings.localized(
+                          es: 'Borrar todos los datos',
+                          en: 'Delete all data',
+                          pt: 'Excluir todos os dados',
+                        ),
                       ),
                     ),
                   ],
@@ -773,9 +833,11 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               SectionCard(
                 child: Text(
-                  strings.isEnglish
-                      ? 'Privacy first: no tracking, no financial data uploads and everything stays under your local control.'
-                      : 'Privacidad primero: no hay tracking, no se suben datos financieros y todo queda bajo tu control local.',
+                  strings.localized(
+                    es: 'Privacidad primero: no hay tracking, no se suben datos financieros y todo queda bajo tu control local.',
+                    en: 'Privacy first: no tracking, no financial data uploads and everything stays under your local control.',
+                    pt: 'Privacidade em primeiro lugar: sem rastreamento, sem envio de dados financeiros e tudo sob seu controle local.',
+                  ),
                 ),
               ),
             ],
@@ -787,9 +849,11 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             EmptyStateView(
               icon: Icons.error_outline_rounded,
-              title: strings.isEnglish
-                  ? 'Could not load settings'
-                  : 'No se pudieron cargar los ajustes',
+              title: strings.localized(
+                es: 'No se pudieron cargar los ajustes',
+                en: 'Could not load settings',
+                pt: 'Não foi possível carregar as configurações',
+              ),
               message: '$error',
             ),
           ],
@@ -800,9 +864,9 @@ class SettingsScreen extends ConsumerWidget {
 }
 
 class _NotificationStatusText extends ConsumerWidget {
-  const _NotificationStatusText({required this.isEnglish});
+  const _NotificationStatusText({required this.strings});
 
-  final bool isEnglish;
+  final AppStrings strings;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -814,13 +878,19 @@ class _NotificationStatusText extends ConsumerWidget {
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
       ),
       loading: () => Text(
-        isEnglish ? 'Checking permission...' : 'Revisando permiso...',
+        strings.localized(
+          es: 'Revisando permiso...',
+          en: 'Checking permission...',
+          pt: 'Verificando permissão...',
+        ),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
       ),
       error: (_, __) => Text(
-        isEnglish
-            ? 'Permission status unavailable'
-            : 'No se pudo revisar el permiso',
+        strings.localized(
+          es: 'No se pudo revisar el permiso',
+          en: 'Permission status unavailable',
+          pt: 'Não foi possível verificar a permissão',
+        ),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
       ),
     );
@@ -829,19 +899,35 @@ class _NotificationStatusText extends ConsumerWidget {
   String _labelFor(CleanFinanceNotificationStatus status) {
     switch (status) {
       case CleanFinanceNotificationStatus.disabled:
-        return isEnglish
-            ? 'Notifications are off'
-            : 'Notificaciones desactivadas';
+        return strings.localized(
+          es: 'Notificaciones desactivadas',
+          en: 'Notifications are off',
+          pt: 'Notificações desativadas',
+        );
       case CleanFinanceNotificationStatus.active:
-        return isEnglish ? 'Notifications enabled' : 'Notificaciones activadas';
+        return strings.localized(
+          es: 'Notificaciones activadas',
+          en: 'Notifications enabled',
+          pt: 'Notificações ativadas',
+        );
       case CleanFinanceNotificationStatus.permissionPending:
-        return isEnglish ? 'Permission pending' : 'Permiso pendiente';
+        return strings.localized(
+          es: 'Permiso pendiente',
+          en: 'Permission pending',
+          pt: 'Permissão pendente',
+        );
       case CleanFinanceNotificationStatus.permissionDenied:
-        return isEnglish ? 'Permission denied' : 'Permiso denegado';
+        return strings.localized(
+          es: 'Permiso denegado',
+          en: 'Permission denied',
+          pt: 'Permissão negada',
+        );
       case CleanFinanceNotificationStatus.unsupported:
-        return isEnglish
-            ? 'Not available on this platform'
-            : 'No disponible en esta plataforma';
+        return strings.localized(
+          es: 'No disponible en esta plataforma',
+          en: 'Not available on this platform',
+          pt: 'Não disponível nesta plataforma',
+        );
     }
   }
 }
