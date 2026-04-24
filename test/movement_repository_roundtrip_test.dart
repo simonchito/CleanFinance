@@ -72,7 +72,7 @@ void main() {
     expect(storedMovementRow['category_id'], 'food');
     expect(storedMovementRow['subcategory_id'], 'groceries');
     expect(storedMovementRow['note'], 'Compra semanal');
-    expect(storedMovementRow['payment_method'], 'QR');
+    expect(storedMovementRow['payment_method'], 'qr');
     expect(storedMovementRow['monthly_reminder_enabled'], 1);
     expect(storedMovementRow['reminder_day'], 17);
 
@@ -84,7 +84,7 @@ void main() {
     expect(restored.categoryId, movement.categoryId);
     expect(restored.subcategoryId, movement.subcategoryId);
     expect(restored.note, movement.note);
-    expect(restored.paymentMethod, 'QR');
+    expect(restored.paymentMethod, 'qr');
     expect(restored.monthlyReminderEnabled, isTrue);
     expect(restored.reminderDay, 17);
     expect(restored.categoryName, 'Alimentos');

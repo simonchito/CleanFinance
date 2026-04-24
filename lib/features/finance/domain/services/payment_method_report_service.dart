@@ -24,7 +24,7 @@ class PaymentMethodReportService {
 
       final method = movement.paymentMethod?.trim();
       final normalizedMethod = method == null || method.isEmpty
-          ? 'Sin definir'
+          ? PaymentMethodUtils.unspecified
           : PaymentMethodUtils.canonicalizeLabel(method);
       totals.update(
         normalizedMethod,

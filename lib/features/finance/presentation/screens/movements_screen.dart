@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../core/utils/payment_method_utils.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/movement_filter.dart';
+import '../mappers/default_category_name_localizer.dart';
 import '../providers/finance_providers.dart';
 import '../utils/payment_method_icon_resolver.dart';
 import '../widgets/confirm_action_dialog.dart';
@@ -164,7 +164,10 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                       ...topLevelCategories.map(
                         (category) => SelectionSheetItem<String?>(
                           value: category.id,
-                          label: category.name,
+                          label: DefaultCategoryNameLocalizer.localize(
+                            category.name,
+                            strings,
+                          ),
                           iconKey: category.iconKey,
                         ),
                       ),
@@ -350,9 +353,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                   message: strings.isEnglish
                       ? 'Try changing the filters or adding a new record.'
                       : 'Probá cambiando el filtro o agregando un nuevo registro.',
-                  actionLabel: strings.isEnglish
-                      ? 'Add movement'
-                      : 'Agregar movimiento',
+                  actionLabel:
+                      strings.isEnglish ? 'Add movement' : 'Agregar movimiento',
                   onAction: _openEditor,
                 );
               }
@@ -360,6 +362,14 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
               return Column(
                 children: movements.map((movement) {
                   final scheme = Theme.of(context).colorScheme;
+                  final displayCategoryName =
+                      movement.subcategoryName ?? movement.categoryName;
+                  final localizedCategoryName = displayCategoryName == null
+                      ? null
+                      : DefaultCategoryNameLocalizer.localize(
+                          displayCategoryName,
+                          strings,
+                        );
                   final (icon, color, prefix) = switch (movement.type) {
                     MovementType.income => (
                         Icons.arrow_upward_rounded,
@@ -400,8 +410,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  movement.subcategoryName ??
-                                      movement.categoryName ??
+                                  localizedCategoryName ??
                                       (strings.isEnglish
                                           ? 'Uncategorized'
                                           : 'Sin categoría'),
@@ -413,7 +422,10 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                                   [
                                     if (movement.subcategoryName != null &&
                                         movement.categoryName != null)
-                                      movement.categoryName!,
+                                      DefaultCategoryNameLocalizer.localize(
+                                        movement.categoryName!,
+                                        strings,
+                                      ),
                                     DateFormat('d MMM yyyy', localeCode)
                                         .format(movement.occurredOn),
                                     if (movement.note?.isNotEmpty == true)
@@ -433,7 +445,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                                     icon: PaymentMethodIconResolver.resolve(
                                       movement.paymentMethod!,
                                     ),
-                                    label: PaymentMethodUtils.canonicalizeLabel(
+                                    label: strings.paymentMethodDisplayName(
                                       movement.paymentMethod!,
                                     ),
                                   ),

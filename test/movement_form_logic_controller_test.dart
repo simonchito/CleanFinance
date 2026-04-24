@@ -9,7 +9,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  test('MovementFormController builds and saves a normalized movement', () async {
+  test('MovementFormController builds and saves a normalized movement',
+      () async {
     final movementsRepository = _CapturingMovementsRepository();
     final container = ProviderContainer(
       overrides: [
@@ -40,7 +41,7 @@ void main() {
     expect(saved.categoryId, 'food');
     expect(saved.subcategoryId, 'weekly');
     expect(saved.note, 'Compra grande');
-    expect(saved.paymentMethod, 'QR');
+    expect(saved.paymentMethod, 'qr');
   });
 
   test('MovementFormController keeps id and createdAt when editing', () async {
@@ -84,7 +85,7 @@ void main() {
     expect(saved.createdAt, original.createdAt);
     expect(saved.goalId, isNull);
     expect(saved.note, 'Actualizado');
-    expect(saved.paymentMethod, 'Efectivo');
+    expect(saved.paymentMethod, 'cash');
   });
 
   test('MovementFormController rejects missing category without saving',

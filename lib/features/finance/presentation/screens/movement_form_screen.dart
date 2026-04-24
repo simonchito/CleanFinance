@@ -7,8 +7,10 @@ import '../../../../app/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/payment_method_utils.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
+import '../../domain/entities/category.dart';
 import '../../domain/entities/movement.dart';
 import '../controllers/movement_form_controller.dart';
+import '../mappers/default_category_name_localizer.dart';
 import '../providers/finance_providers.dart';
 import '../utils/payment_method_icon_resolver.dart';
 import '../widgets/section_card.dart';
@@ -147,9 +149,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
               .where((category) => category.parentId == null)
               .toList();
 
-          final subcategories = categories
-              .where((category) => category.parentId == _categoryId)
-              .toList();
+          final subcategories = _categoryId == null
+              ? <Category>[]
+              : categories
+                  .where((category) => category.parentId == _categoryId)
+                  .toList();
 
           if (_subcategoryId != null &&
               subcategories.every((item) => item.id != _subcategoryId)) {
@@ -267,7 +271,10 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       .map(
                         (category) => SelectionSheetItem(
                           value: category.id,
-                          label: category.name,
+                          label: DefaultCategoryNameLocalizer.localize(
+                            category.name,
+                            strings,
+                          ),
                           iconKey: category.iconKey,
                         ),
                       )
@@ -313,7 +320,10 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       ...subcategories.map(
                         (category) => SelectionSheetItem<String?>(
                           value: category.id,
-                          label: category.name,
+                          label: DefaultCategoryNameLocalizer.localize(
+                            category.name,
+                            strings,
+                          ),
                           iconKey: category.iconKey,
                         ),
                       ),
@@ -400,7 +410,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       .map(
                         (method) => SelectionSheetItem<String?>(
                           value: method,
-                          label: PaymentMethodUtils.canonicalizeLabel(method),
+                          label: strings.paymentMethodDisplayName(method),
                           iconData: PaymentMethodIconResolver.resolve(method),
                         ),
                       )

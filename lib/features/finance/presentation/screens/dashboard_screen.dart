@@ -8,6 +8,7 @@ import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/monthly_payment_reminder.dart';
 import '../../domain/entities/movement.dart';
+import '../mappers/default_category_name_localizer.dart';
 import '../providers/finance_providers.dart';
 import '../widgets/empty_state_view.dart';
 import '../widgets/end_of_month_projection_card.dart';
@@ -670,8 +671,12 @@ class _MovementTile extends StatelessWidget {
         child: Icon(icon, color: color),
       ),
       title: Text(
-        movement.categoryName ??
-            (AppStrings.of(context).isEnglish ? 'Uncategorized' : 'Sin categoría'),
+        movement.categoryName == null
+            ? (AppStrings.of(context).isEnglish ? 'Uncategorized' : 'Sin categoría')
+            : DefaultCategoryNameLocalizer.localize(
+                movement.categoryName!,
+                AppStrings.of(context),
+              ),
       ),
       subtitle: Text(
         DateFormat('dd MMM', localeCode).format(movement.occurredOn) +

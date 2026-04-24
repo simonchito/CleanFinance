@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
-import '../../../../core/utils/payment_method_utils.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../mappers/finance_text_mapper.dart';
 import '../providers/finance_providers.dart';
@@ -150,8 +149,9 @@ class ReportsScreen extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _MetricBox(
-                            label:
-                                strings.isEnglish ? 'Net balance' : 'Saldo neto',
+                            label: strings.isEnglish
+                                ? 'Net balance'
+                                : 'Saldo neto',
                             value: CurrencyFormatter.format(
                               overview.cashflow.netBalance,
                               symbol: symbol,
@@ -180,9 +180,7 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish
-                          ? 'Monthly trend'
-                          : 'Evolución mensual',
+                      strings.isEnglish ? 'Monthly trend' : 'Evolución mensual',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 6),
@@ -317,7 +315,8 @@ class ReportsScreen extends ConsumerWidget {
                         Expanded(
                           child: _MetricBox(
                             label: strings.isEnglish ? 'Status' : 'Estado',
-                            value: _paceLabel(strings, overview.spendingPace.status),
+                            value: _paceLabel(
+                                strings, overview.spendingPace.status),
                             color: _paceColor(
                                 context, overview.spendingPace.status),
                           ),
@@ -485,12 +484,9 @@ class ReportsScreen extends ConsumerWidget {
 
   String _paceLabel(AppStrings strings, SpendingPaceStatus status) {
     return switch (status) {
-      SpendingPaceStatus.onTrack =>
-        strings.isEnglish ? 'On track' : 'En rango',
-      SpendingPaceStatus.watch =>
-        strings.isEnglish ? 'Watch' : 'Atención',
-      SpendingPaceStatus.risk =>
-        strings.isEnglish ? 'Risk' : 'Riesgo',
+      SpendingPaceStatus.onTrack => strings.isEnglish ? 'On track' : 'En rango',
+      SpendingPaceStatus.watch => strings.isEnglish ? 'Watch' : 'Atención',
+      SpendingPaceStatus.risk => strings.isEnglish ? 'Risk' : 'Riesgo',
     };
   }
 
@@ -668,9 +664,7 @@ class _GoalForecastTile extends StatelessWidget {
     final strings = AppStrings.of(context);
     final scheme = Theme.of(context).colorScheme;
     final estimatedDate = goal.estimatedCompletionDate == null
-        ? (strings.isEnglish
-            ? 'No estimate yet'
-            : 'Sin estimación todavía')
+        ? (strings.isEnglish ? 'No estimate yet' : 'Sin estimación todavía')
         : DateFormat('MMM yyyy', strings.languageCode)
             .format(goal.estimatedCompletionDate!);
 
@@ -750,6 +744,7 @@ class _PaymentMethodTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -775,7 +770,7 @@ class _PaymentMethodTile extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              PaymentMethodUtils.canonicalizeLabel(item.name),
+              strings.paymentMethodDisplayName(item.name),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ),

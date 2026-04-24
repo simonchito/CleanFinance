@@ -14,6 +14,7 @@ import 'package:clean_finance/features/finance/presentation/screens/movement_for
 import 'package:clean_finance/features/finance/presentation/widgets/selection_sheet_field.dart';
 import 'package:clean_finance/shared/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -22,6 +23,7 @@ void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
     await initializeDateFormatting('es');
+    await initializeDateFormatting('en');
   });
 
   testWidgets(
@@ -68,6 +70,8 @@ void main() {
           ],
           child: const MaterialApp(
             locale: Locale('es'),
+            supportedLocales: [Locale('es'), Locale('en')],
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
             home: MovementFormScreen(initialType: MovementType.expense),
           ),
         ),
@@ -79,8 +83,9 @@ void main() {
       final selectionFields = tester
           .widgetList(
             find.byWidgetPredicate(
-              (widget) =>
-                  widget.runtimeType.toString().startsWith('SelectionSheetField'),
+              (widget) => widget.runtimeType
+                  .toString()
+                  .startsWith('SelectionSheetField'),
             ),
           )
           .toList();
@@ -133,6 +138,8 @@ void main() {
           ],
           child: MaterialApp(
             locale: const Locale('es'),
+            supportedLocales: const [Locale('es'), Locale('en')],
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
             home: MovementFormScreen(
               initialMovement: Movement(
                 id: 'movement-1',
@@ -190,6 +197,8 @@ void main() {
           ],
           child: const MaterialApp(
             locale: Locale('es'),
+            supportedLocales: [Locale('es'), Locale('en')],
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
             home: MovementFormScreen(initialType: MovementType.expense),
           ),
         ),
@@ -255,6 +264,8 @@ void main() {
           ],
           child: const MaterialApp(
             locale: Locale('es'),
+            supportedLocales: [Locale('es'), Locale('en')],
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
             home: MovementFormScreen(initialType: MovementType.expense),
           ),
         ),
@@ -270,12 +281,81 @@ void main() {
 
       expect(selectionFields, findsAtLeastNWidgets(3));
 
+      await tester.ensureVisible(selectionFields.last);
       await tester.tap(selectionFields.last);
       await tester.pumpAndSettle();
       await tester.tap(find.text('QR').last);
       await tester.pumpAndSettle();
 
       expect(find.text('QR'), findsWidgets);
+    },
+  );
+
+  testWidgets(
+    'localizes default payment method options when the app is in English',
+    (tester) async {
+      final now = DateTime(2026, 4, 17);
+      final categories = [
+        Category(
+          id: 'food',
+          name: 'Alimentos',
+          iconKey: 'restaurant',
+          scope: CategoryScope.expense,
+          isDefault: true,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            categoriesRepositoryProvider.overrideWithValue(
+              _FakeCategoriesRepository(categories),
+            ),
+            movementsRepositoryProvider.overrideWithValue(
+              _FakeMovementsRepository(),
+            ),
+            settingsRepositoryProvider.overrideWithValue(
+              _FakeSettingsRepository(
+                localeCode: 'en',
+                paymentMethods: const [
+                  'Transferencia',
+                  'Tarjeta débito',
+                  'Efectivo',
+                  'QR',
+                ],
+              ),
+            ),
+            savingsGoalsRepositoryProvider.overrideWithValue(
+              _FakeSavingsGoalsRepository(),
+            ),
+          ],
+          child: const MaterialApp(
+            locale: Locale('en'),
+            supportedLocales: [Locale('es'), Locale('en')],
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
+            home: MovementFormScreen(initialType: MovementType.expense),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final selectionFields = find.byWidgetPredicate(
+        (widget) =>
+            widget.runtimeType.toString().startsWith('SelectionSheetField'),
+      );
+      await tester.tap(selectionFields.last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Bank transfer'), findsOneWidget);
+      expect(find.text('Debit card'), findsOneWidget);
+      expect(find.text('Cash'), findsOneWidget);
+      expect(find.text('Transferencia'), findsNothing);
+      expect(find.text('Tarjeta débito'), findsNothing);
+      expect(find.text('Efectivo'), findsNothing);
     },
   );
 }
@@ -358,9 +438,11 @@ class _FakeSavingsGoalsRepository implements SavingsGoalsRepository {
 class _FakeSettingsRepository implements SettingsRepository {
   _FakeSettingsRepository({
     this.paymentMethods = const [],
+    this.localeCode = 'es',
   });
 
   final List<String> paymentMethods;
+  final String localeCode;
 
   @override
   Future<AppSettings> getSettings() async {
@@ -371,7 +453,7 @@ class _FakeSettingsRepository implements SettingsRepository {
       themePreference: AppThemePreference.system,
       biometricEnabled: false,
       autoLockMinutes: 0,
-      localeCode: 'es',
+      localeCode: localeCode,
       paymentMethods: paymentMethods,
     );
   }

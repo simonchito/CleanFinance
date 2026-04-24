@@ -1,11 +1,12 @@
 import '../constants/app_constants.dart';
 
 abstract final class PaymentMethodUtils {
-  static const String transfer = 'Transferencia';
-  static const String debitCard = 'Tarjeta débito';
-  static const String creditCard = 'Tarjeta crédito';
-  static const String cash = 'Efectivo';
-  static const String qr = 'QR';
+  static const String transfer = 'transfer';
+  static const String debitCard = 'debit_card';
+  static const String creditCard = 'credit_card';
+  static const String cash = 'cash';
+  static const String qr = 'qr';
+  static const String unspecified = 'unspecified';
 
   static List<String> normalizeMethods(Iterable<String> methods) {
     final normalized = <String>[];
@@ -40,22 +41,39 @@ abstract final class PaymentMethodUtils {
     }
 
     switch (_normalize(trimmed)) {
+      case 'transfer':
       case 'transferencia':
+      case 'banktransfer':
+      case 'wiretransfer':
         return transfer;
+      case 'debitcard':
       case 'tarjetadebito':
       case 'tarjetadedebito':
       case 'debito':
+      case 'cartao-debito':
+      case 'cartaodebito':
+      case 'cartaodedebito':
         return debitCard;
+      case 'creditcard':
       case 'tarjetacredito':
       case 'tarjetadecredito':
       case 'credito':
+      case 'cartao-credito':
+      case 'cartaocredito':
+      case 'cartaodecredito':
         return creditCard;
       case 'efectivo':
       case 'cash':
+      case 'dinheiro':
         return cash;
       case 'qr':
       case 'codigoqr':
         return qr;
+      case 'sindefinir':
+      case 'unspecified':
+      case 'undefined':
+      case 'naodefinido':
+        return unspecified;
       default:
         return trimmed;
     }
@@ -63,14 +81,23 @@ abstract final class PaymentMethodUtils {
 
   static String normalizedKey(String raw) => _normalize(raw);
 
+  static bool isKnownDefault(String raw) {
+    return switch (canonicalizeLabel(raw)) {
+      transfer || debitCard || creditCard || cash || qr || unspecified => true,
+      _ => false,
+    };
+  }
+
   static bool _matchesLegacyDefaultBundle(List<String> methods) {
     if (methods.length != AppConstants.legacyDefaultPaymentMethods.length) {
       return false;
     }
 
     final normalized = methods.map(_normalize).toSet();
-    final legacy =
-        AppConstants.legacyDefaultPaymentMethods.map(_normalize).toSet();
+    final legacy = AppConstants.legacyDefaultPaymentMethods
+        .map(canonicalizeLabel)
+        .map(_normalize)
+        .toSet();
     final currentWithoutQr = AppConstants.defaultPaymentMethods
         .where((method) => method != qr)
         .map(_normalize)
@@ -92,6 +119,12 @@ abstract final class PaymentMethodUtils {
         .replaceAll('í', 'i')
         .replaceAll('ó', 'o')
         .replaceAll('ú', 'u')
+        .replaceAll('à', 'a')
+        .replaceAll('ã', 'a')
+        .replaceAll('â', 'a')
+        .replaceAll('ê', 'e')
+        .replaceAll('ô', 'o')
+        .replaceAll('ç', 'c')
         .replaceAll(RegExp(r'[^a-z0-9]'), '');
   }
 }

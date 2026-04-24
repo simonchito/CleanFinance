@@ -97,7 +97,7 @@ void main() {
 
       expect(movementsRepository.savedMovement, isNotNull);
       expect(movementsRepository.savedMovement!.categoryId, 'food');
-      expect(movementsRepository.savedMovement!.paymentMethod, 'QR');
+      expect(movementsRepository.savedMovement!.paymentMethod, 'qr');
     },
   );
 }

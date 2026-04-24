@@ -24,6 +24,10 @@ void main() {
       PaymentMethodUtils.canonicalizeLabel('codigo qr'),
       PaymentMethodUtils.qr,
     );
+    expect(
+      PaymentMethodUtils.canonicalizeLabel('Bank transfer'),
+      PaymentMethodUtils.transfer,
+    );
   });
 
   test('keeps custom payment methods untouched', () {

@@ -46,7 +46,7 @@ void main() {
     expect(movements.single.type, MovementType.expense);
     expect(movements.single.categoryName, 'Alimentos');
     expect(movements.single.subcategoryName, 'Supermercado');
-    expect(movements.single.paymentMethod, 'QR');
+    expect(movements.single.paymentMethod, 'qr');
   });
 
   test('maps canonical card labels when reading from DB', () async {
@@ -74,7 +74,7 @@ void main() {
 
     final movements = await repository.getMovements();
 
-    expect(movements.single.paymentMethod, 'Tarjeta débito');
+    expect(movements.single.paymentMethod, 'debit_card');
   });
 }
 

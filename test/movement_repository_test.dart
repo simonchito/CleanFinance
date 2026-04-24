@@ -51,7 +51,7 @@ void main() {
       ),
     ).captured.single as Map<String, Object?>;
 
-    expect(captured['payment_method'], 'QR');
+    expect(captured['payment_method'], 'qr');
     expect(captured['type'], 'expense');
     expect(captured['amount'], 1500);
   });

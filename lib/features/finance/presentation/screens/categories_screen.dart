@@ -8,6 +8,7 @@ import '../../../../core/utils/icon_mapper.dart';
 import '../../../../shared/providers.dart';
 import '../../../budgets/presentation/providers/budget_providers.dart';
 import '../../domain/entities/category.dart';
+import '../mappers/default_category_name_localizer.dart';
 import '../providers/finance_providers.dart';
 import '../providers/monthly_reminder_notification_providers.dart';
 import '../widgets/confirm_action_dialog.dart';
@@ -81,7 +82,9 @@ class _CategoryTab extends ConsumerWidget {
               return Card(
                 child: ExpansionTile(
                   leading: Icon(IconMapper.getIcon(category.iconKey)),
-                  title: Text(category.name),
+                  title: Text(
+                    DefaultCategoryNameLocalizer.localize(category.name, strings),
+                  ),
                   subtitle: Text(
                     category.isDefault
                         ? (strings.isEnglish ? 'Default' : 'Predefinida')
@@ -91,7 +94,10 @@ class _CategoryTab extends ConsumerWidget {
                     for (final child in children)
                       _CategoryEntryRow(
                         icon: IconMapper.getIcon(child.iconKey),
-                        title: child.name,
+                        title: DefaultCategoryNameLocalizer.localize(
+                          child.name,
+                          strings,
+                        ),
                         onEdit: () => _showCategoryDialog(
                           context,
                           ref,
@@ -104,7 +110,10 @@ class _CategoryTab extends ConsumerWidget {
                       ),
                     _CategoryEntryRow(
                       icon: IconMapper.getIcon(category.iconKey),
-                      title: category.name,
+                      title: DefaultCategoryNameLocalizer.localize(
+                        category.name,
+                        strings,
+                      ),
                       subtitle: strings.isEnglish
                           ? 'Main category'
                           : 'Categoría principal',
@@ -160,10 +169,10 @@ class _CategoryTab extends ConsumerWidget {
             : (strings.isEnglish ? 'Delete category' : 'Eliminar categoría'),
         message: category.isSubcategory
             ? (strings.isEnglish
-                ? 'The subcategory "${category.name}" will be deleted. If there are linked movements or dependencies, the app will block deletion.'
+                ? 'The subcategory "${DefaultCategoryNameLocalizer.localize(category.name, strings)}" will be deleted. If there are linked movements or dependencies, the app will block deletion.'
                 : 'Se eliminará la subcategoría "${category.name}". Si tiene movimientos o dependencias, la app lo bloqueará antes de borrar.')
             : (strings.isEnglish
-                ? 'The category "${category.name}" will be deleted. If there are linked movements, subcategories or budgets, the app will block deletion.'
+                ? 'The category "${DefaultCategoryNameLocalizer.localize(category.name, strings)}" will be deleted. If there are linked movements, subcategories or budgets, the app will block deletion.'
                 : 'Se eliminará la categoría "${category.name}". Si tiene movimientos, subcategorías o presupuestos asociados, la app lo bloqueará antes de borrar.'),
         confirmLabel: strings.isEnglish ? 'Delete' : 'Eliminar',
         cancelLabel: strings.cancel,
@@ -277,7 +286,10 @@ class _CategoryTab extends ConsumerWidget {
                         ...parents.where((item) => item.id != initial?.id).map(
                               (item) => SelectionSheetItem<String?>(
                                 value: item.id,
-                                label: item.name,
+                                label: DefaultCategoryNameLocalizer.localize(
+                                  item.name,
+                                  strings,
+                                ),
                                 iconKey: item.iconKey,
                               ),
                             ),

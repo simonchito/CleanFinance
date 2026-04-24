@@ -1,11 +1,28 @@
 import 'package:flutter/widgets.dart';
 
+import '../core/utils/payment_method_utils.dart';
+
 class AppStrings {
   AppStrings._(this.languageCode);
 
   final String languageCode;
 
   bool get isEnglish => languageCode == 'en';
+
+  String localized({
+    required String es,
+    required String en,
+    String? pt,
+  }) {
+    switch (languageCode) {
+      case 'en':
+        return en;
+      case 'pt':
+        return pt ?? en;
+      default:
+        return es;
+    }
+  }
 
   static AppStrings of(BuildContext context) {
     final code = Localizations.localeOf(context).languageCode;
@@ -34,23 +51,59 @@ class AppStrings {
       isEnglish ? 'Add payment method' : 'Agregar medio de pago';
   String get movementPaymentMethod =>
       isEnglish ? 'Payment method' : 'Medio de pago';
+  String get paymentMethodTransfer => localized(
+        es: 'Transferencia',
+        en: 'Bank transfer',
+        pt: 'Transferência',
+      );
+  String get paymentMethodDebitCard => localized(
+        es: 'Tarjeta débito',
+        en: 'Debit card',
+        pt: 'Cartão de débito',
+      );
+  String get paymentMethodCreditCard => localized(
+        es: 'Tarjeta crédito',
+        en: 'Credit card',
+        pt: 'Cartão de crédito',
+      );
+  String get paymentMethodCash => localized(
+        es: 'Efectivo',
+        en: 'Cash',
+        pt: 'Dinheiro',
+      );
+  String get paymentMethodQr => 'QR';
+  String get paymentMethodUnspecified => localized(
+        es: 'Sin definir',
+        en: 'Unspecified',
+        pt: 'Não definido',
+      );
+  String paymentMethodDisplayName(String value) {
+    final canonical = PaymentMethodUtils.canonicalizeLabel(value);
+    return switch (canonical) {
+      PaymentMethodUtils.transfer => paymentMethodTransfer,
+      PaymentMethodUtils.debitCard => paymentMethodDebitCard,
+      PaymentMethodUtils.creditCard => paymentMethodCreditCard,
+      PaymentMethodUtils.cash => paymentMethodCash,
+      PaymentMethodUtils.qr => paymentMethodQr,
+      PaymentMethodUtils.unspecified => paymentMethodUnspecified,
+      _ => value.trim(),
+    };
+  }
+
   String get monthlyReminder =>
       isEnglish ? 'Monthly reminder' : 'Recordatorio mensual';
   String get monthlyReminderDescription => isEnglish
       ? 'Use this for recurring monthly expenses so they appear as pending until you register the payment.'
       : 'Usalo para gastos mensuales recurrentes y verlos como pendientes hasta registrar el pago.';
-  String get reminderDay =>
-      isEnglish ? 'Reminder day' : 'Día de recordatorio';
+  String get reminderDay => isEnglish ? 'Reminder day' : 'Día de recordatorio';
   String get pendingThisMonth =>
       isEnglish ? 'Pending this month' : 'Pendientes este mes';
-  String get reminderDayPrefix =>
-      isEnglish ? 'Day' : 'Día';
+  String get reminderDayPrefix => isEnglish ? 'Day' : 'Día';
   String get reminderRegisterPayment =>
       isEnglish ? 'Register payment' : 'Registrar pago';
   String get reminderLastRegistered =>
       isEnglish ? 'Last registered' : 'Último registro';
-  String get noSubcategory =>
-      isEnglish ? 'No subcategory' : 'Sin subcategoría';
+  String get noSubcategory => isEnglish ? 'No subcategory' : 'Sin subcategoría';
   String get noGoal => isEnglish ? 'No goal' : 'Sin meta';
   String get category => isEnglish ? 'Category' : 'Categoría';
   String get subcategory => isEnglish ? 'Subcategory' : 'Subcategoría';
@@ -60,14 +113,10 @@ class AppStrings {
   String get date => isEnglish ? 'Date' : 'Fecha';
   String get savingGoal => isEnglish ? 'Savings goal' : 'Meta de ahorro';
   String get movement => isEnglish ? 'Movement' : 'Movimiento';
-  String get newMovement =>
-      isEnglish ? 'New movement' : 'Nuevo movimiento';
-  String get editMovement =>
-      isEnglish ? 'Edit movement' : 'Editar movimiento';
-  String get saveMovement =>
-      isEnglish ? 'Save movement' : 'Guardar movimiento';
-  String get saveChanges =>
-      isEnglish ? 'Save changes' : 'Guardar cambios';
+  String get newMovement => isEnglish ? 'New movement' : 'Nuevo movimiento';
+  String get editMovement => isEnglish ? 'Edit movement' : 'Editar movimiento';
+  String get saveMovement => isEnglish ? 'Save movement' : 'Guardar movimiento';
+  String get saveChanges => isEnglish ? 'Save changes' : 'Guardar cambios';
   String get income => isEnglish ? 'Income' : 'Ingreso';
   String get expense => isEnglish ? 'Expense' : 'Gasto';
   String get saving => isEnglish ? 'Saving' : 'Ahorro';
@@ -83,14 +132,11 @@ class AppStrings {
   String get activeGoals => isEnglish ? 'Active goals' : 'Metas activas';
   String get achieved => isEnglish ? 'Achieved' : 'Lograda';
   String get contribute => isEnglish ? 'Contribute' : 'Aportar';
-  String get unlimitedDate =>
-      isEnglish ? 'No deadline' : 'Sin fecha límite';
+  String get unlimitedDate => isEnglish ? 'No deadline' : 'Sin fecha límite';
   String get biometric =>
       isEnglish ? 'Biometric unlock' : 'Desbloqueo con biometría';
-  String get exportBackup =>
-      isEnglish ? 'Export backup' : 'Exportar backup';
-  String get importBackup =>
-      isEnglish ? 'Import backup' : 'Importar backup';
+  String get exportBackup => isEnglish ? 'Export backup' : 'Exportar backup';
+  String get importBackup => isEnglish ? 'Import backup' : 'Importar backup';
   String get manageCategories =>
       isEnglish ? 'Manage categories' : 'Gestionar categorías';
   String get noCategories =>
@@ -113,8 +159,7 @@ class AppStrings {
       : 'Ocultá saldos y resúmenes cuando usás la app en público.';
   String get newBudget => isEnglish ? 'New budget' : 'Nuevo presupuesto';
   String get editBudget => isEnglish ? 'Edit budget' : 'Editar presupuesto';
-  String get monthlyLimit =>
-      isEnglish ? 'Monthly limit' : 'Límite mensual';
+  String get monthlyLimit => isEnglish ? 'Monthly limit' : 'Límite mensual';
   String get spent => isEnglish ? 'Spent' : 'Gastado';
   String get remaining => isEnglish ? 'Remaining' : 'Disponible';
   String get lockNow => isEnglish ? 'Lock now' : 'Bloquear ahora';
@@ -127,18 +172,16 @@ class AppStrings {
   String get clear => isEnglish ? 'Clear' : 'Limpiar';
   String get apply => isEnglish ? 'Apply' : 'Aplicar';
   String get filters => isEnglish ? 'Filters' : 'Filtros';
-  String get searchByNote =>
-      isEnglish ? 'Search by note or reference' : 'Buscar por nota o referencia';
-  String get setupTitle =>
-      isEnglish ? 'Your money, clear and under control' : 'Tu dinero, claro y bajo control';
-  String get unlockTitle =>
-      isEnglish ? 'Welcome back' : 'Bienvenido otra vez';
-  String get forgotPin =>
-      isEnglish ? 'I forgot my PIN' : 'Olvidé mi PIN';
-  String get recoverAccess =>
-      isEnglish ? 'Recover access' : 'Recuperar acceso';
-  String get birthDate =>
-      isEnglish ? 'Birth date' : 'Fecha de nacimiento';
+  String get searchByNote => isEnglish
+      ? 'Search by note or reference'
+      : 'Buscar por nota o referencia';
+  String get setupTitle => isEnglish
+      ? 'Your money, clear and under control'
+      : 'Tu dinero, claro y bajo control';
+  String get unlockTitle => isEnglish ? 'Welcome back' : 'Bienvenido otra vez';
+  String get forgotPin => isEnglish ? 'I forgot my PIN' : 'Olvidé mi PIN';
+  String get recoverAccess => isEnglish ? 'Recover access' : 'Recuperar acceso';
+  String get birthDate => isEnglish ? 'Birth date' : 'Fecha de nacimiento';
   String get documentId =>
       isEnglish ? 'Personal document' : 'Documento personal';
 }

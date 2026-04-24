@@ -18,7 +18,11 @@ class PaymentMethodsScreen extends ConsumerWidget {
     int? index,
   }) async {
     final strings = AppStrings.of(context);
-    final controller = TextEditingController(text: initialValue ?? '');
+    final controller = TextEditingController(
+      text: initialValue == null
+          ? ''
+          : strings.paymentMethodDisplayName(initialValue),
+    );
     final currentMethods = List<String>.from(
         ref.read(settingsControllerProvider).valueOrNull?.paymentMethods ?? []);
 
@@ -156,7 +160,7 @@ class PaymentMethodsScreen extends ConsumerWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              PaymentMethodUtils.canonicalizeLabel(entry.value),
+                              strings.paymentMethodDisplayName(entry.value),
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                           ),

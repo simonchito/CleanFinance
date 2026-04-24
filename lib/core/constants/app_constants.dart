@@ -12,11 +12,11 @@ class AppConstants {
   static const supportedLocaleCodes = ['es', 'en'];
   static const supportedLocalePreferenceCodes = ['system', 'es', 'en'];
   static const defaultPaymentMethods = [
-    'Transferencia',
-    'Tarjeta débito',
-    'Tarjeta crédito',
-    'Efectivo',
-    'QR',
+    'transfer',
+    'debit_card',
+    'credit_card',
+    'cash',
+    'qr',
   ];
 
   static const legacyDefaultPaymentMethods = [
