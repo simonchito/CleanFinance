@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
+import '../auth_error_localizer.dart';
 import '../providers/auth_providers.dart';
 import 'recover_access_screen.dart';
 
@@ -51,7 +53,9 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
         .unlockWithPin(_pinController.text.trim());
     setState(() => _loading = false);
     if (!success && mounted) {
-      _showMessage(ref.read(authControllerProvider).errorMessage ?? 'Error.');
+      _showMessage(
+        localizeAuthError(context, ref.read(authControllerProvider).error),
+      );
     }
   }
 
@@ -61,7 +65,9 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
         await ref.read(authControllerProvider.notifier).unlockWithBiometrics();
     setState(() => _loading = false);
     if (!success && mounted) {
-      _showMessage(ref.read(authControllerProvider).errorMessage ?? 'Error.');
+      _showMessage(
+        localizeAuthError(context, ref.read(authControllerProvider).error),
+      );
     }
   }
 
@@ -100,6 +106,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final authState = ref.watch(authControllerProvider);
     final scheme = Theme.of(context).colorScheme;
     final remainingLock = authState.pinSecurityState.remainingLockDuration;
@@ -126,13 +133,15 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
               const Center(child: BrandLogo(size: 74)),
               const SizedBox(height: 28),
               Text(
-                'Bienvenido otra vez',
+                strings.unlockTitle,
                 style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 10),
               Text(
-                'Entrá con tu PIN o usá biometría para acceder rápido a tus finanzas.',
+                strings.isEnglish
+                    ? 'Sign in with your PIN or use biometrics for faster access.'
+                    : 'Entrá con tu PIN o usá biometría para acceder rápido a tus finanzas.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
@@ -152,23 +161,25 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                       keyboardType: TextInputType.number,
                       obscureText: true,
                       enabled: !_loading && !isPinLocked,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'PIN',
-                        prefixIcon: Icon(Icons.lock_outline_rounded),
+                        prefixIcon: const Icon(Icons.lock_outline_rounded),
                       ),
                       onSubmitted: (_) => _unlockWithPin(),
                     ),
                     if (isPinLocked) ...[
                       const SizedBox(height: 12),
                       Text(
-                        'Esperá ${remainingLock.inSeconds.ceil()}s para volver a intentar.',
+                        strings.isEnglish
+                            ? 'Wait ${remainingLock.inSeconds.ceil()}s before trying again.'
+                            : 'Esperá ${remainingLock.inSeconds.ceil()}s para volver a intentar.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: scheme.error,
                             ),
                         textAlign: TextAlign.center,
                       ),
                     ],
-                    if (authState.errorMessage != null) ...[
+                    if (authState.error != null) ...[
                       const SizedBox(height: 12),
                       Container(
                         width: double.infinity,
@@ -178,7 +189,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
-                          authState.errorMessage!,
+                          localizeAuthError(context, authState.error),
                           style: Theme.of(context).textTheme.bodyMedium,
                           textAlign: TextAlign.center,
                         ),
@@ -188,7 +199,11 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                     FilledButton(
                       onPressed:
                           _loading || isPinLocked ? null : _unlockWithPin,
-                      child: Text(_loading ? 'Validando...' : 'Desbloquear'),
+                      child: Text(
+                        _loading
+                            ? (strings.isEnglish ? 'Validating...' : 'Validando...')
+                            : (strings.isEnglish ? 'Unlock' : 'Desbloquear'),
+                      ),
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
@@ -198,7 +213,11 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                           ? null
                           : _unlockWithBiometrics,
                       icon: const Icon(Icons.fingerprint_rounded),
-                      label: const Text('Usar biometría'),
+                      label: Text(
+                        strings.isEnglish
+                            ? 'Use biometrics'
+                            : 'Usar biometría',
+                      ),
                     ),
                     if (authState.recoveryConfigured) ...[
                       const SizedBox(height: 10),
@@ -212,7 +231,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                                   ),
                                 );
                               },
-                        child: const Text('Olvidé mi PIN'),
+                        child: Text(strings.forgotPin),
                       ),
                     ],
                   ],
@@ -227,8 +246,12 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                 ),
                 child: Text(
                   authState.biometricAvailable
-                      ? 'Tip: si activaste biometría, entrar te lleva un toque.'
-                      : 'La biometría no está disponible en este dispositivo, pero tu PIN sigue protegido localmente.',
+                      ? (strings.isEnglish
+                          ? 'Tip: if biometrics are enabled, sign-in takes just one touch.'
+                          : 'Tip: si activaste biometría, entrar te lleva un toque.')
+                      : (strings.isEnglish
+                          ? 'Biometrics are not available on this device, but your PIN remains locally protected.'
+                          : 'La biometría no está disponible en este dispositivo, pero tu PIN sigue protegido localmente.'),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),

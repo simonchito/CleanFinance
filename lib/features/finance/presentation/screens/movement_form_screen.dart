@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/payment_method_utils.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
@@ -48,9 +47,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     super.initState();
     final movement = widget.initialMovement;
     _type = movement?.type ?? widget.initialType ?? MovementType.expense;
-    _localeCode =
-        ref.read(settingsControllerProvider).valueOrNull?.localeCode ??
-            AppConstants.defaultLocaleCode;
+    _localeCode = ref.read(appLocaleCodeProvider);
     _selectedDate = movement?.occurredOn ?? DateTime.now();
     _amountController.text = movement != null && movement.amount > 0
         ? CurrencyFormatter.formatWholeNumber(
@@ -248,7 +245,9 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       localeCode: _localeCode,
                     );
                     if (parsed == null || parsed <= 0) {
-                      return 'Ingresá un monto válido.';
+                      return strings.isEnglish
+                          ? 'Enter a valid amount.'
+                          : 'Ingresá un monto válido.';
                     }
                     return null;
                   },
@@ -439,7 +438,11 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Text('No se pudieron cargar categorías: $error'),
+            child: Text(
+              strings.isEnglish
+                  ? 'Could not load categories: $error'
+                  : 'No se pudieron cargar categorías: $error',
+            ),
           ),
         ),
       ),

@@ -5,6 +5,7 @@ import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../finance/presentation/providers/finance_providers.dart';
+import '../auth_error_localizer.dart';
 import '../providers/auth_providers.dart';
 
 class SetupPinScreen extends ConsumerStatefulWidget {
@@ -37,16 +38,26 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
     final birthDate = _birthDateController.text.trim();
     final document = _documentController.text.trim();
     if (pin != confirm) {
-      _showMessage('Los PIN no coinciden.');
+      _showMessage(
+        AppStrings.of(context).isEnglish
+            ? 'PIN values do not match.'
+            : 'Los PIN no coinciden.',
+      );
       return;
     }
     if (birthDate.isEmpty || document.isEmpty) {
-      _showMessage('Completá tus dos preguntas de recuperación.');
+      _showMessage(
+        AppStrings.of(context).isEnglish
+            ? 'Complete both recovery answers.'
+            : 'Completá tus dos preguntas de recuperación.',
+      );
       return;
     }
     if (!_isValidBirthDate(birthDate) || !_isValidDocument(document)) {
       _showMessage(
-        'Usá una fecha válida y un documento con al menos 6 caracteres.',
+        AppStrings.of(context).isEnglish
+            ? 'Use a valid date and a document with at least 6 characters.'
+            : 'Usá una fecha válida y un documento con al menos 6 caracteres.',
       );
       return;
     }
@@ -61,7 +72,9 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
     setState(() => _isSubmitting = false);
 
     if (!success && mounted) {
-      _showMessage(ref.read(authControllerProvider).errorMessage ?? 'Error.');
+      _showMessage(
+        localizeAuthError(context, ref.read(authControllerProvider).error),
+      );
       return;
     }
 
@@ -167,7 +180,9 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       keyboardType: TextInputType.datetime,
                       decoration: InputDecoration(
                         labelText: strings.birthDate,
-                        hintText: 'Ejemplo: 10/02/1996',
+                        hintText: strings.isEnglish
+                            ? 'Example: 02/10/1996'
+                            : 'Ejemplo: 10/02/1996',
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -176,11 +191,13 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         labelText: strings.documentId,
-                        hintText: 'Ejemplo: 12345678',
+                        hintText: strings.isEnglish
+                            ? 'Example: 12345678'
+                            : 'Ejemplo: 12345678',
                       ),
                     ),
                     const SizedBox(height: 8),
-                    if (authState.errorMessage != null) ...[
+                    if (authState.error != null) ...[
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
@@ -189,7 +206,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
-                          authState.errorMessage!,
+                          localizeAuthError(context, authState.error),
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ),

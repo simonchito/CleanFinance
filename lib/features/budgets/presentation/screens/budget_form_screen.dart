@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../finance/domain/entities/category.dart';
@@ -43,9 +42,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
   @override
   void initState() {
     super.initState();
-    _localeCode =
-        ref.read(settingsControllerProvider).valueOrNull?.localeCode ??
-            AppConstants.defaultLocaleCode;
+    _localeCode = ref.read(appLocaleCodeProvider);
     _limitController.text = widget.initialBudget == null
         ? ''
         : CurrencyFormatter.formatWholeNumber(

@@ -18,6 +18,9 @@ class CleanFinanceApp extends ConsumerWidget {
     final themeMode = ThemeModeMapper.toFlutter(
       settingsState.valueOrNull?.themePreference ?? AppThemePreference.system,
     );
+    final localePreferenceCode =
+        settingsState.valueOrNull?.localeCode ??
+            AppConstants.defaultLocalePreferenceCode;
 
     return MaterialApp(
       title: 'CleanFinance',
@@ -25,9 +28,8 @@ class CleanFinanceApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
-      locale: Locale(
-        settingsState.valueOrNull?.localeCode ?? AppConstants.defaultLocaleCode,
-      ),
+      locale: _resolveManualLocale(localePreferenceCode),
+      localeListResolutionCallback: _resolveSystemLocale,
       supportedLocales: const [
         Locale('es'),
         Locale('en'),
@@ -39,6 +41,31 @@ class CleanFinanceApp extends ConsumerWidget {
       ],
       home: const AuthGateScreen(),
     );
+  }
+
+  Locale? _resolveManualLocale(String localePreferenceCode) {
+    final normalized =
+        AppConstants.normalizeLocalePreferenceCode(localePreferenceCode);
+    if (normalized == AppConstants.defaultLocalePreferenceCode) {
+      return null;
+    }
+    return Locale(normalized);
+  }
+
+  Locale _resolveSystemLocale(
+    List<Locale>? locales,
+    Iterable<Locale> supportedLocales,
+  ) {
+    final requestedLocales = locales ?? const <Locale>[];
+    for (final locale in requestedLocales) {
+      if (locale.languageCode == 'es') {
+        return const Locale('es');
+      }
+      if (locale.languageCode == 'en') {
+        return const Locale('en');
+      }
+    }
+    return const Locale('es');
   }
 }
 

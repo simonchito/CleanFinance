@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/app_settings.dart';
 import '../../domain/entities/app_theme_preference.dart';
 import '../../domain/repositories/settings_repository.dart';
+import '../../../../core/constants/app_constants.dart';
 
 class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
   SettingsController({
@@ -58,11 +59,18 @@ class SettingsController extends StateNotifier<AsyncValue<AppSettings>> {
     state = AsyncData(updated);
   }
 
-  Future<void> setLocaleCode(String localeCode) async {
+  Future<void> setLocalePreferenceCode(String localePreferenceCode) async {
     final current = state.valueOrNull ?? await _settingsRepository.getSettings();
-    final updated = current.copyWith(localeCode: localeCode);
+    final updated = current.copyWith(
+      localeCode:
+          AppConstants.normalizeLocalePreferenceCode(localePreferenceCode),
+    );
     await _settingsRepository.saveSettings(updated);
     state = AsyncData(updated);
+  }
+
+  Future<void> setLocaleCode(String localeCode) {
+    return setLocalePreferenceCode(localeCode);
   }
 
   Future<void> setPaymentMethods(List<String> paymentMethods) async {

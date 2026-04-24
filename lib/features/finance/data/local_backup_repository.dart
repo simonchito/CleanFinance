@@ -532,8 +532,9 @@ class LocalBackupRepository implements BackupRepository {
           : 0,
       'auto_lock_minutes': _readNullableInt(row, 'auto_lock_minutes') ??
           AppConstants.defaultAutoLockMinutes,
-      'locale_code': _optionalTrimmedString(row, 'locale_code') ??
-          AppConstants.defaultLocaleCode,
+      'locale_code': AppConstants.normalizeLocalePreferenceCode(
+        _optionalTrimmedString(row, 'locale_code'),
+      ),
       'payment_methods': jsonEncode(paymentMethods),
     };
   }
@@ -548,7 +549,7 @@ class LocalBackupRepository implements BackupRepository {
       'theme_mode': 'system',
       'biometric_enabled': 0,
       'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,
-      'locale_code': AppConstants.defaultLocaleCode,
+      'locale_code': AppConstants.defaultLocalePreferenceCode,
       'payment_methods': jsonEncode(AppConstants.defaultPaymentMethods),
     };
   }

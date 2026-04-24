@@ -113,7 +113,7 @@ class AppDatabase {
             theme_mode TEXT NOT NULL,
             biometric_enabled INTEGER NOT NULL DEFAULT 0,
             auto_lock_minutes INTEGER NOT NULL DEFAULT 5,
-            locale_code TEXT NOT NULL DEFAULT 'es',
+            locale_code TEXT NOT NULL DEFAULT 'system',
             payment_methods TEXT NOT NULL
           )
         ''');
@@ -127,7 +127,7 @@ class AppDatabase {
           'theme_mode': 'system',
           'biometric_enabled': 0,
           'auto_lock_minutes': AppConstants.defaultAutoLockMinutes,
-          'locale_code': AppConstants.defaultLocaleCode,
+          'locale_code': AppConstants.defaultLocalePreferenceCode,
           'payment_methods': jsonEncode(AppConstants.defaultPaymentMethods),
         });
 
@@ -210,6 +210,13 @@ class AppDatabase {
         if (oldVersion < 7) {
           await db.execute(
             "ALTER TABLE categories ADD COLUMN icon_key TEXT NOT NULL DEFAULT 'category'",
+          );
+        }
+        if (oldVersion < 8) {
+          await db.execute(
+            "UPDATE app_settings SET locale_code = 'system' "
+            "WHERE locale_code IS NULL OR TRIM(locale_code) = '' "
+            "OR LOWER(locale_code) NOT IN ('system', 'es', 'en')",
           );
         }
       },

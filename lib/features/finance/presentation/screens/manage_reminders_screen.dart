@@ -58,10 +58,14 @@ class ManageRemindersScreen extends ConsumerWidget {
           expenseRemindersState.when(
             data: (subcategories) {
               if (subcategories.isEmpty) {
-                return const EmptyStateView(
+                return EmptyStateView(
                   icon: Icons.receipt_long_outlined,
-                  title: 'No hay recordatorios de gasto activos',
-                  message: 'Activá recordatorios al crear o editar una subcategoría de gastos.',
+                  title: strings.isEnglish
+                      ? 'No active expense reminders'
+                      : 'No hay recordatorios de gasto activos',
+                  message: strings.isEnglish
+                      ? 'Enable reminders when creating or editing an expense subcategory.'
+                      : 'Activá recordatorios al crear o editar una subcategoría de gastos.',
                 );
               }
 
@@ -117,10 +121,14 @@ class ManageRemindersScreen extends ConsumerWidget {
           savingsRemindersState.when(
             data: (goals) {
               if (goals.isEmpty) {
-                return const EmptyStateView(
+                return EmptyStateView(
                   icon: Icons.savings_outlined,
-                  title: 'No hay recordatorios de ahorro activos',
-                  message: 'Activá recordatorios al crear o editar una meta de ahorro.',
+                  title: strings.isEnglish
+                      ? 'No active savings reminders'
+                      : 'No hay recordatorios de ahorro activos',
+                  message: strings.isEnglish
+                      ? 'Enable reminders when creating or editing a savings goal.'
+                      : 'Activá recordatorios al crear o editar una meta de ahorro.',
                 );
               }
 
@@ -132,7 +140,9 @@ class ManageRemindersScreen extends ConsumerWidget {
                         child: _ReminderRow(
                           title: progress.goal.name,
                           subtitle: progress.completed
-                              ? 'Meta completada'
+                              ? (strings.isEnglish
+                                  ? 'Completed goal'
+                                  : 'Meta completada')
                               : null,
                           reminderDay: progress.goal.reminderDay ?? 1,
                           icon: Icons.savings_outlined,
@@ -237,17 +247,20 @@ class ManageRemindersScreen extends ConsumerWidget {
     BuildContext context, {
     required int initialDay,
   }) async {
+    final strings = AppStrings.of(context);
     return showSelectionSheet<int>(
       context: context,
-      title: 'Día de recordatorio',
-      description: 'Elegí el día del mes para el recordatorio.',
+      title: strings.reminderDay,
+      description: strings.isEnglish
+          ? 'Choose the day of month for the reminder.'
+          : 'Elegí el día del mes para el recordatorio.',
       selectedValue: initialDay,
       maxHeight: 360,
       items: List.generate(
         31,
         (index) => SelectionSheetItem(
           value: index + 1,
-          label: 'Día ${index + 1}',
+          label: '${strings.reminderDayPrefix} ${index + 1}',
           iconData: Icons.calendar_month_outlined,
         ),
       ),
@@ -283,6 +296,7 @@ class _ReminderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final scheme = Theme.of(context).colorScheme;
 
     return SectionCard(
@@ -306,7 +320,9 @@ class _ReminderRow extends StatelessWidget {
                 Text(title, style: Theme.of(context).textTheme.titleSmall),
                 const SizedBox(height: 4),
                 Text(
-                  subtitle == null ? 'Día $reminderDay' : '$subtitle · Día $reminderDay',
+                  subtitle == null
+                      ? '${strings.reminderDayPrefix} $reminderDay'
+                      : '$subtitle · ${strings.reminderDayPrefix} $reminderDay',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),

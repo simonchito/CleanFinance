@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../finance/presentation/providers/finance_providers.dart';
+import '../auth_error_localizer.dart';
 import '../providers/auth_providers.dart';
 
 class RecoverAccessScreen extends ConsumerStatefulWidget {
@@ -38,17 +40,27 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
     final confirmPin = _confirmPinController.text.trim();
 
     if (birthDate.isEmpty || document.isEmpty) {
-      _showMessage('Completá ambas respuestas de recuperación.');
+      _showMessage(
+        AppStrings.of(context).isEnglish
+            ? 'Complete both recovery answers.'
+            : 'Completá ambas respuestas de recuperación.',
+      );
       return;
     }
     if (!_isValidBirthDate(birthDate) || !_isValidDocument(document)) {
       _showMessage(
-        'Usá una fecha válida y un documento con al menos 6 caracteres.',
+        AppStrings.of(context).isEnglish
+            ? 'Use a valid date and a document with at least 6 characters.'
+            : 'Usá una fecha válida y un documento con al menos 6 caracteres.',
       );
       return;
     }
     if (newPin != confirmPin) {
-      _showMessage('Los PIN no coinciden.');
+      _showMessage(
+        AppStrings.of(context).isEnglish
+            ? 'PIN values do not match.'
+            : 'Los PIN no coinciden.',
+      );
       return;
     }
 
@@ -63,7 +75,9 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
     setState(() => _loading = false);
 
     if (!success && mounted) {
-      _showMessage(ref.read(authControllerProvider).errorMessage ?? 'Error.');
+      _showMessage(
+        localizeAuthError(context, ref.read(authControllerProvider).error),
+      );
       return;
     }
 
@@ -92,24 +106,29 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final biometricAvailable =
         ref.watch(authControllerProvider).biometricAvailable;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Recuperar acceso')),
+      appBar: AppBar(title: Text(strings.recoverAccess)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(24, 10, 24, 32),
         children: [
           const Center(child: BrandLogo(size: 64)),
           const SizedBox(height: 20),
           Text(
-            'Recuperá tu acceso sin complicarte',
+            strings.isEnglish
+                ? 'Recover access without complications'
+                : 'Recuperá tu acceso sin complicarte',
             style: Theme.of(context).textTheme.headlineSmall,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
           Text(
-            'Respondé tus dos preguntas personales y elegí un PIN nuevo.',
+            strings.isEnglish
+                ? 'Answer your two personal questions and choose a new PIN.'
+                : 'Respondé tus dos preguntas personales y elegí un PIN nuevo.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -126,7 +145,9 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              'La recuperación local es menos robusta que tu PIN. Si alguien conoce estos datos y tiene el dispositivo, podría intentar restablecer el acceso.',
+              strings.isEnglish
+                  ? 'Local recovery is less robust than your PIN. If someone knows this data and has the device, they could try to reset access.'
+                  : 'La recuperación local es menos robusta que tu PIN. Si alguien conoce estos datos y tiene el dispositivo, podría intentar restablecer el acceso.',
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -135,18 +156,22 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
           TextField(
             controller: _birthDateController,
             keyboardType: TextInputType.datetime,
-            decoration: const InputDecoration(
-              labelText: 'Fecha de nacimiento',
-              hintText: 'Ejemplo: 10/02/1996',
+            decoration: InputDecoration(
+              labelText: strings.birthDate,
+              hintText: strings.isEnglish
+                  ? 'Example: 02/10/1996'
+                  : 'Ejemplo: 10/02/1996',
             ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _documentController,
             keyboardType: TextInputType.text,
-            decoration: const InputDecoration(
-              labelText: 'Documento personal',
-              hintText: 'Ejemplo: 12345678',
+            decoration: InputDecoration(
+              labelText: strings.documentId,
+              hintText: strings.isEnglish
+                  ? 'Example: 12345678'
+                  : 'Ejemplo: 12345678',
             ),
           ),
           const SizedBox(height: 12),
@@ -155,7 +180,9 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             keyboardType: TextInputType.number,
             obscureText: true,
             maxLength: AppConstants.defaultPinLength,
-            decoration: const InputDecoration(labelText: 'Nuevo PIN'),
+            decoration: InputDecoration(
+              labelText: strings.isEnglish ? 'New PIN' : 'Nuevo PIN',
+            ),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -163,7 +190,9 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             keyboardType: TextInputType.number,
             obscureText: true,
             maxLength: AppConstants.defaultPinLength,
-            decoration: const InputDecoration(labelText: 'Confirmar PIN'),
+            decoration: InputDecoration(
+              labelText: strings.isEnglish ? 'Confirm PIN' : 'Confirmar PIN',
+            ),
           ),
           const SizedBox(height: 8),
           SwitchListTile(
@@ -172,17 +201,29 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             onChanged: biometricAvailable
                 ? (value) => setState(() => _enableBiometrics = value)
                 : null,
-            title: const Text('Activar huella para próximos accesos'),
+            title: Text(
+              strings.isEnglish
+                  ? 'Enable biometrics for next unlocks'
+                  : 'Activar huella para próximos accesos',
+            ),
             subtitle: Text(
               biometricAvailable
-                  ? 'Así vas a poder entrar más rápido después de recuperar tu cuenta.'
-                  : 'La biometría no está disponible en este dispositivo.',
+                  ? (strings.isEnglish
+                      ? 'This lets you sign in faster after recovery.'
+                      : 'Así vas a poder entrar más rápido después de recuperar tu cuenta.')
+                  : (strings.isEnglish
+                      ? 'Biometrics are not available on this device.'
+                      : 'La biometría no está disponible en este dispositivo.'),
             ),
           ),
           const SizedBox(height: 20),
           FilledButton(
             onPressed: _loading ? null : _recover,
-            child: Text(_loading ? 'Validando...' : 'Recuperar acceso'),
+            child: Text(
+              _loading
+                  ? (strings.isEnglish ? 'Validating...' : 'Validando...')
+                  : strings.recoverAccess,
+            ),
           ),
         ],
       ),

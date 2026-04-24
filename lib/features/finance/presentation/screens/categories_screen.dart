@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../core/constants/icon_options.dart';
 import '../../../../core/utils/icon_mapper.dart';
 import '../../../../shared/providers.dart';
@@ -17,16 +18,17 @@ class CategoriesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = AppStrings.of(context);
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Categorías'),
-          bottom: const TabBar(
+          title: Text(strings.manageCategories),
+          bottom: TabBar(
             tabs: [
-              Tab(text: 'Ingresos'),
-              Tab(text: 'Gastos'),
-              Tab(text: 'Ahorros'),
+              Tab(text: strings.income),
+              Tab(text: strings.expense),
+              Tab(text: strings.savings),
             ],
           ),
         ),
@@ -49,6 +51,7 @@ class _CategoryTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final strings = AppStrings.of(context);
     final categoriesState = ref.watch(categoriesProvider(scope));
 
     return Scaffold(
@@ -60,7 +63,7 @@ class _CategoryTab extends ConsumerWidget {
       body: categoriesState.when(
         data: (categories) {
           if (categories.isEmpty) {
-            return const Center(child: Text('No hay categorías.'));
+            return Center(child: Text(strings.noCategories));
           }
 
           final topLevel =
@@ -78,7 +81,9 @@ class _CategoryTab extends ConsumerWidget {
                   leading: Icon(IconMapper.getIcon(category.iconKey)),
                   title: Text(category.name),
                   subtitle: Text(
-                    category.isDefault ? 'Predefinida' : 'Personalizada',
+                    category.isDefault
+                        ? (strings.isEnglish ? 'Default' : 'Predefinida')
+                        : (strings.isEnglish ? 'Custom' : 'Personalizada'),
                   ),
                   children: [
                     for (final child in children)
@@ -98,7 +103,9 @@ class _CategoryTab extends ConsumerWidget {
                     _CategoryEntryRow(
                       icon: IconMapper.getIcon(category.iconKey),
                       title: category.name,
-                      subtitle: 'Categoría principal',
+                      subtitle: strings.isEnglish
+                          ? 'Main category'
+                          : 'Categoría principal',
                       onEdit: () => _showCategoryDialog(
                         context,
                         ref,
@@ -111,7 +118,11 @@ class _CategoryTab extends ConsumerWidget {
                     ),
                     ListTile(
                       leading: const Icon(Icons.add),
-                      title: const Text('Agregar subcategoría'),
+                      title: Text(
+                        strings.isEnglish
+                            ? 'Add subcategory'
+                            : 'Agregar subcategoría',
+                      ),
                       onTap: () => _showCategoryDialog(
                         context,
                         ref,
@@ -136,16 +147,24 @@ class _CategoryTab extends ConsumerWidget {
     WidgetRef ref,
     Category category,
   ) async {
+    final strings = AppStrings.of(context);
     try {
       final confirmed = await showConfirmActionDialog(
         context: context,
         title: category.isSubcategory
-            ? 'Eliminar subcategoría'
-            : 'Eliminar categoría',
+            ? (strings.isEnglish
+                ? 'Delete subcategory'
+                : 'Eliminar subcategoría')
+            : (strings.isEnglish ? 'Delete category' : 'Eliminar categoría'),
         message: category.isSubcategory
-            ? 'Se eliminará la subcategoría "${category.name}". Si tiene movimientos o dependencias, la app lo bloqueará antes de borrar.'
-            : 'Se eliminará la categoría "${category.name}". Si tiene movimientos, subcategorías o presupuestos asociados, la app lo bloqueará antes de borrar.',
-        confirmLabel: 'Eliminar',
+            ? (strings.isEnglish
+                ? 'The subcategory "${category.name}" will be deleted. If there are linked movements or dependencies, the app will block deletion.'
+                : 'Se eliminará la subcategoría "${category.name}". Si tiene movimientos o dependencias, la app lo bloqueará antes de borrar.')
+            : (strings.isEnglish
+                ? 'The category "${category.name}" will be deleted. If there are linked movements, subcategories or budgets, the app will block deletion.'
+                : 'Se eliminará la categoría "${category.name}". Si tiene movimientos, subcategorías o presupuestos asociados, la app lo bloqueará antes de borrar.'),
+        confirmLabel: strings.isEnglish ? 'Delete' : 'Eliminar',
+        cancelLabel: strings.cancel,
       );
       if (!confirmed) {
         return;
@@ -173,6 +192,7 @@ class _CategoryTab extends ConsumerWidget {
     Category? initial,
     String? parentId,
   }) async {
+    final strings = AppStrings.of(context);
     final nameController = TextEditingController(text: initial?.name ?? '');
     String? selectedParentId = initial?.parentId ?? parentId;
     var reminderEnabled =
@@ -205,7 +225,11 @@ class _CategoryTab extends ConsumerWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text(initial == null ? 'Nueva categoría' : 'Editar categoría'),
+          title: Text(
+            initial == null
+                ? (strings.isEnglish ? 'New category' : 'Nueva categoría')
+                : (strings.isEnglish ? 'Edit category' : 'Editar categoría'),
+          ),
           content: StatefulBuilder(
             builder: (context, setState) {
               return SingleChildScrollView(
@@ -214,7 +238,9 @@ class _CategoryTab extends ConsumerWidget {
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: 'Nombre'),
+                      decoration: InputDecoration(
+                        labelText: strings.isEnglish ? 'Name' : 'Nombre',
+                      ),
                     ),
                     const SizedBox(height: 12),
                     IconPickerField(
@@ -224,16 +250,25 @@ class _CategoryTab extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     SelectionSheetField<String?>(
-                      label: 'Categoría padre',
+                      label: strings.isEnglish
+                          ? 'Parent category'
+                          : 'Categoría padre',
                       value: selectedParentId,
-                      placeholder: 'Sin categoría padre',
-                      sheetTitle: 'Categoría padre',
-                      sheetDescription:
-                          'Elegí una categoría principal solo si querés crear una subcategoría.',
+                      placeholder: strings.isEnglish
+                          ? 'No parent category'
+                          : 'Sin categoría padre',
+                      sheetTitle: strings.isEnglish
+                          ? 'Parent category'
+                          : 'Categoría padre',
+                      sheetDescription: strings.isEnglish
+                          ? 'Choose a top-level category only if you want a subcategory.'
+                          : 'Elegí una categoría principal solo si querés crear una subcategoría.',
                       items: [
-                        const SelectionSheetItem<String?>(
+                        SelectionSheetItem<String?>(
                           value: null,
-                          label: 'Sin categoría padre',
+                          label: strings.isEnglish
+                              ? 'No parent category'
+                              : 'Sin categoría padre',
                           iconData: Icons.account_tree_outlined,
                         ),
                         ...parents
@@ -260,9 +295,11 @@ class _CategoryTab extends ConsumerWidget {
                       const SizedBox(height: 12),
                       SwitchListTile.adaptive(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Recordatorio mensual'),
-                        subtitle: const Text(
-                          'Usá esta subcategoría para servicios o gastos recurrentes.',
+                        title: Text(strings.monthlyReminder),
+                        subtitle: Text(
+                          strings.isEnglish
+                              ? 'Use this subcategory for recurring services or expenses.'
+                              : 'Usá esta subcategoría para servicios o gastos recurrentes.',
                         ),
                         value: reminderEnabled,
                         onChanged: (value) => setState(() {
@@ -273,14 +310,15 @@ class _CategoryTab extends ConsumerWidget {
                       if (reminderEnabled) ...[
                         const SizedBox(height: 8),
                         SelectionSheetField<int>(
-                          label: 'Día de recordatorio',
+                          label: strings.reminderDay,
                           value: reminderDay,
-                          sheetTitle: 'Día de recordatorio',
+                          sheetTitle: strings.reminderDay,
                           items: List.generate(
                             31,
                             (index) => SelectionSheetItem(
                               value: index + 1,
-                              label: 'Día ${index + 1}',
+                              label:
+                                  '${strings.reminderDayPrefix} ${index + 1}',
                               iconData: Icons.calendar_month_outlined,
                             ),
                           ),
@@ -298,7 +336,7 @@ class _CategoryTab extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancelar'),
+              child: Text(strings.cancel),
             ),
             FilledButton(
               onPressed: () async {
@@ -335,7 +373,7 @@ class _CategoryTab extends ConsumerWidget {
                   Navigator.of(dialogContext).pop();
                 }
               },
-              child: const Text('Guardar'),
+              child: Text(strings.save),
             ),
           ],
         );

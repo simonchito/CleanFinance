@@ -71,16 +71,18 @@ class AuthController extends StateNotifier<AuthState> {
   }) async {
     if (pin.length != AppConstants.defaultPinLength) {
       state = state.copyWith(
-        errorMessage:
-            'El PIN debe tener ${AppConstants.defaultPinLength} dígitos.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.pinLengthInvalid,
+        ),
       );
       return false;
     }
     if (!_isValidRecoveryBirthDate(birthDate) ||
         !_isValidRecoveryDocument(documentId)) {
       state = state.copyWith(
-        errorMessage:
-            'Revisá los datos de recuperación. Usá una fecha real y un documento con al menos 6 caracteres.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.recoveryDataInvalid,
+        ),
       );
       return false;
     }
@@ -108,9 +110,11 @@ class AuthController extends StateNotifier<AuthState> {
     if (!result.isSuccess) {
       state = state.copyWith(
         pinSecurityState: result.securityState,
-        errorMessage: result.isLocked
-            ? _lockoutMessage(result.securityState)
-            : 'PIN incorrecto.',
+        error: result.isLocked
+            ? _lockoutError(result.securityState)
+            : const AuthErrorState(
+                code: AuthErrorCode.incorrectPin,
+              ),
       );
       return false;
     }
@@ -128,7 +132,9 @@ class AuthController extends StateNotifier<AuthState> {
     final available = await _authRepository.isBiometricAvailable();
     if (!available) {
       state = state.copyWith(
-        errorMessage: 'La biometría no está disponible en este dispositivo.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.biometricUnavailable,
+        ),
       );
       return false;
     }
@@ -138,15 +144,17 @@ class AuthController extends StateNotifier<AuthState> {
       authenticated = await _authRepository.authenticateWithBiometrics();
     } catch (_) {
       state = state.copyWith(
-        errorMessage:
-            'No se pudo usar la biometría. Configurá una huella o bloqueo de pantalla en Android.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.biometricAuthUnavailable,
+        ),
       );
       return false;
     }
     if (!authenticated) {
       state = state.copyWith(
-        errorMessage:
-            'No se pudo validar la biometría. Verificá que tengas una huella y bloqueo de pantalla configurados.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.biometricAuthFailed,
+        ),
       );
       return false;
     }
@@ -160,7 +168,9 @@ class AuthController extends StateNotifier<AuthState> {
     final available = await _authRepository.isBiometricAvailable();
     if (enabled && !available) {
       state = state.copyWith(
-        errorMessage: 'La biometría no está disponible en este dispositivo.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.biometricUnavailable,
+        ),
       );
       return false;
     }
@@ -182,15 +192,18 @@ class AuthController extends StateNotifier<AuthState> {
   }) async {
     if (newPin.length != AppConstants.defaultPinLength) {
       state = state.copyWith(
-        errorMessage:
-            'El PIN debe tener ${AppConstants.defaultPinLength} dígitos.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.pinLengthInvalid,
+        ),
       );
       return false;
     }
     if (!_isValidRecoveryBirthDate(birthDate) ||
         !_isValidRecoveryDocument(documentId)) {
       state = state.copyWith(
-        errorMessage: 'Revisá los datos de recuperación antes de continuar.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.recoveryDataInvalid,
+        ),
       );
       return false;
     }
@@ -201,8 +214,9 @@ class AuthController extends StateNotifier<AuthState> {
     );
     if (!valid) {
       state = state.copyWith(
-        errorMessage:
-            'No se pudo verificar la recuperación. Revisá tus datos e intentá nuevamente.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.recoveryVerificationFailed,
+        ),
       );
       return false;
     }
@@ -268,8 +282,9 @@ class AuthController extends StateNotifier<AuthState> {
       debugPrintStack(stackTrace: stackTrace);
 
       state = state.copyWith(
-        errorMessage:
-            'Algunas validaciones de seguridad no pudieron inicializarse. La app sigue disponible con un modo seguro.',
+        error: const AuthErrorState(
+          code: AuthErrorCode.startupSafetyMode,
+        ),
       );
       return fallback;
     }
@@ -286,9 +301,12 @@ class AuthController extends StateNotifier<AuthState> {
     return normalized.length >= 6 && normalized.length <= 16;
   }
 
-  String _lockoutMessage(PinSecurityState securityState) {
+  AuthErrorState _lockoutError(PinSecurityState securityState) {
     final seconds = securityState.remainingLockDuration.inSeconds.ceil();
     final safeSeconds = seconds <= 0 ? 1 : seconds;
-    return 'Demasiados intentos fallidos. Esperá $safeSeconds segundos antes de volver a intentar.';
+    return AuthErrorState(
+      code: AuthErrorCode.lockoutActive,
+      lockSeconds: safeSeconds,
+    );
   }
 }

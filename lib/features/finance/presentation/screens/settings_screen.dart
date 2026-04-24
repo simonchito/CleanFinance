@@ -337,9 +337,19 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 14),
                     DropdownButtonFormField<String>(
-                      initialValue: settings.localeCode,
+                      initialValue: AppConstants.normalizeLocalePreferenceCode(
+                        settings.localeCode,
+                      ),
                       decoration: InputDecoration(labelText: strings.language),
                       items: [
+                        DropdownMenuItem(
+                          value: AppConstants.defaultLocalePreferenceCode,
+                          child: Text(
+                            strings.isEnglish
+                                ? 'Use device language'
+                                : 'Usar idioma del dispositivo',
+                          ),
+                        ),
                         DropdownMenuItem(
                           value: 'es',
                           child: Text(strings.spanish),
@@ -351,10 +361,11 @@ class SettingsScreen extends ConsumerWidget {
                       ],
                       onChanged: (value) {
                         if (value != null &&
-                            AppConstants.supportedLocaleCodes.contains(value)) {
+                            AppConstants.supportedLocalePreferenceCodes
+                                .contains(value)) {
                           ref
                               .read(settingsControllerProvider.notifier)
-                              .setLocaleCode(value);
+                              .setLocalePreferenceCode(value);
                         }
                       },
                     ),

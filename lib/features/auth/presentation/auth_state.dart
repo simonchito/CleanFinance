@@ -2,6 +2,28 @@ import '../domain/entities/pin_security_state.dart';
 
 enum AuthStatus { checking, setupRequired, locked, unlocked }
 
+enum AuthErrorCode {
+  pinLengthInvalid,
+  recoveryDataInvalid,
+  incorrectPin,
+  biometricUnavailable,
+  biometricAuthUnavailable,
+  biometricAuthFailed,
+  recoveryVerificationFailed,
+  startupSafetyMode,
+  lockoutActive,
+}
+
+class AuthErrorState {
+  const AuthErrorState({
+    required this.code,
+    this.lockSeconds,
+  });
+
+  final AuthErrorCode code;
+  final int? lockSeconds;
+}
+
 class AuthState {
   const AuthState({
     required this.status,
@@ -9,7 +31,7 @@ class AuthState {
     required this.biometricEnabled,
     required this.recoveryConfigured,
     required this.pinSecurityState,
-    this.errorMessage,
+    this.error,
   });
 
   const AuthState.initial()
@@ -18,14 +40,14 @@ class AuthState {
         biometricEnabled = false,
         recoveryConfigured = false,
         pinSecurityState = const PinSecurityState.initial(),
-        errorMessage = null;
+        error = null;
 
   final AuthStatus status;
   final bool biometricAvailable;
   final bool biometricEnabled;
   final bool recoveryConfigured;
   final PinSecurityState pinSecurityState;
-  final String? errorMessage;
+  final AuthErrorState? error;
 
   AuthState copyWith({
     AuthStatus? status,
@@ -33,7 +55,7 @@ class AuthState {
     bool? biometricEnabled,
     bool? recoveryConfigured,
     PinSecurityState? pinSecurityState,
-    String? errorMessage,
+    AuthErrorState? error,
     bool clearError = false,
   }) {
     return AuthState(
@@ -42,7 +64,7 @@ class AuthState {
       biometricEnabled: biometricEnabled ?? this.biometricEnabled,
       recoveryConfigured: recoveryConfigured ?? this.recoveryConfigured,
       pinSecurityState: pinSecurityState ?? this.pinSecurityState,
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      error: clearError ? null : (error ?? this.error),
     );
   }
 }

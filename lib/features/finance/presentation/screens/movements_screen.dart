@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../app/app_strings.dart';
 import '../../../../core/utils/payment_method_utils.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/providers.dart';
@@ -57,12 +58,15 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
   }
 
   Future<void> _deleteMovement(Movement movement) async {
+    final strings = AppStrings.of(context);
     final confirmed = await showConfirmActionDialog(
       context: context,
-      title: 'Eliminar movimiento',
-      message:
-          'Se eliminará este movimiento de forma permanente. Verificá los datos antes de continuar.',
-      confirmLabel: 'Eliminar',
+      title: strings.isEnglish ? 'Delete movement' : 'Eliminar movimiento',
+      message: strings.isEnglish
+          ? 'This movement will be permanently deleted. Verify the details before continuing.'
+          : 'Se eliminará este movimiento de forma permanente. Verificá los datos antes de continuar.',
+      confirmLabel: strings.isEnglish ? 'Delete' : 'Eliminar',
+      cancelLabel: strings.cancel,
     );
     if (!confirmed) {
       return;
@@ -73,6 +77,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
   }
 
   Future<void> _openFilters() async {
+    final localeCode = ref.read(appLocaleCodeProvider);
+    final strings = AppStrings.of(context);
     DateTime? startDate = _filter.startDate;
     DateTime? endDate = _filter.endDate;
     String? selectedCategoryId = _filter.categoryId;
@@ -100,7 +106,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
               Future<void> pickStart() async {
                 final picked = await showDatePicker(
                   context: context,
-                  locale: const Locale('es'),
+                  locale: Locale(localeCode),
                   firstDate: DateTime(2020),
                   lastDate: DateTime(2100),
                   initialDate: startDate ?? DateTime.now(),
@@ -113,7 +119,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
               Future<void> pickEnd() async {
                 final picked = await showDatePicker(
                   context: context,
-                  locale: const Locale('es'),
+                  locale: Locale(localeCode),
                   firstDate: DateTime(2020),
                   lastDate: DateTime(2100),
                   initialDate: endDate ?? DateTime.now(),
@@ -128,28 +134,31 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Filtrar movimientos',
+                    strings.filters,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Elegí solo lo necesario para encontrar rápido lo que buscás.',
+                    strings.isEnglish
+                        ? 'Choose only what you need to quickly find what you are looking for.'
+                        : 'Elegí solo lo necesario para encontrar rápido lo que buscás.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   ),
                   const SizedBox(height: 18),
                   SelectionSheetField<String?>(
-                    label: 'Categoría',
+                    label: strings.category,
                     value: selectedCategoryId,
-                    placeholder: 'Todas',
-                    sheetTitle: 'Categoría',
-                    sheetDescription:
-                        'Filtrá por una categoría principal para acotar la búsqueda.',
+                    placeholder: strings.all,
+                    sheetTitle: strings.category,
+                    sheetDescription: strings.isEnglish
+                        ? 'Filter by a main category to narrow the search.'
+                        : 'Filtrá por una categoría principal para acotar la búsqueda.',
                     items: [
-                      const SelectionSheetItem<String?>(
+                      SelectionSheetItem<String?>(
                         value: null,
-                        label: 'Todas',
+                        label: strings.all,
                         iconData: Icons.layers_clear_outlined,
                       ),
                       ...topLevelCategories.map(
@@ -172,7 +181,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                           onPressed: pickStart,
                           child: Text(
                             startDate == null
-                                ? 'Desde'
+                                ? strings.from
                                 : DateFormat('dd/MM/yyyy').format(startDate!),
                           ),
                         ),
@@ -183,7 +192,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                           onPressed: pickEnd,
                           child: Text(
                             endDate == null
-                                ? 'Hasta'
+                                ? strings.to
                                 : DateFormat('dd/MM/yyyy').format(endDate!),
                           ),
                         ),
@@ -202,7 +211,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                             });
                             Navigator.of(context).pop();
                           },
-                          child: const Text('Limpiar'),
+                          child: Text(strings.clear),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -221,7 +230,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                             });
                             Navigator.of(context).pop();
                           },
-                          child: const Text('Aplicar'),
+                          child: Text(strings.apply),
                         ),
                       ),
                     ],
@@ -237,14 +246,15 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     final movementsState = ref.watch(movementsProvider(_filter));
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final symbol = settings?.currencySymbol ?? r'$';
-    final localeCode = settings?.localeCode ?? 'es';
+    final localeCode = ref.watch(appLocaleCodeProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Movimientos'),
+        title: Text(strings.movements),
         actions: [
           IconButton(
             onPressed: _openFilters,
@@ -264,7 +274,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
         heroTag: 'movements-fab',
         onPressed: _openEditor,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Nuevo'),
+        label: Text(strings.add),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
@@ -275,9 +285,9 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
               children: [
                 TextField(
                   controller: _searchController,
-                  decoration: const InputDecoration(
-                    hintText: 'Buscar por nota o referencia',
-                    prefixIcon: Icon(Icons.search_rounded),
+                  decoration: InputDecoration(
+                    hintText: strings.searchByNote,
+                    prefixIcon: const Icon(Icons.search_rounded),
                   ),
                   onChanged: (value) {
                     setState(() {
@@ -294,21 +304,21 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                   child: Row(
                     children: [
                       _TypeChip(
-                        label: 'Todos',
+                        label: strings.all,
                         selected: _filter.type == null,
                         onTap: () => setState(() {
                           _filter = _filter.copyWith(clearType: true);
                         }),
                       ),
                       _TypeChip(
-                        label: 'Ingresos',
+                        label: strings.income,
                         selected: _filter.type == MovementType.income,
                         onTap: () => setState(() {
                           _filter = _filter.copyWith(type: MovementType.income);
                         }),
                       ),
                       _TypeChip(
-                        label: 'Gastos',
+                        label: strings.expense,
                         selected: _filter.type == MovementType.expense,
                         onTap: () => setState(() {
                           _filter =
@@ -316,7 +326,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                         }),
                       ),
                       _TypeChip(
-                        label: 'Ahorro',
+                        label: strings.saving,
                         selected: _filter.type == MovementType.saving,
                         onTap: () => setState(() {
                           _filter = _filter.copyWith(type: MovementType.saving);
@@ -334,10 +344,15 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
               if (movements.isEmpty) {
                 return EmptyStateView(
                   icon: Icons.receipt_long_outlined,
-                  title: 'No encontramos movimientos',
-                  message:
-                      'Probá cambiando el filtro o agregando un nuevo registro.',
-                  actionLabel: 'Agregar movimiento',
+                  title: strings.isEnglish
+                      ? 'No movements found'
+                      : 'No encontramos movimientos',
+                  message: strings.isEnglish
+                      ? 'Try changing the filters or adding a new record.'
+                      : 'Probá cambiando el filtro o agregando un nuevo registro.',
+                  actionLabel: strings.isEnglish
+                      ? 'Add movement'
+                      : 'Agregar movimiento',
                   onAction: _openEditor,
                 );
               }
@@ -387,7 +402,9 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                                 Text(
                                   movement.subcategoryName ??
                                       movement.categoryName ??
-                                      'Sin categoría',
+                                      (strings.isEnglish
+                                          ? 'Uncategorized'
+                                          : 'Sin categoría'),
                                   style:
                                       Theme.of(context).textTheme.titleMedium,
                                 ),
@@ -397,7 +414,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                                     if (movement.subcategoryName != null &&
                                         movement.categoryName != null)
                                       movement.categoryName!,
-                                    DateFormat('d MMM yyyy', 'es')
+                                    DateFormat('d MMM yyyy', localeCode)
                                         .format(movement.occurredOn),
                                     if (movement.note?.isNotEmpty == true)
                                       movement.note!,
@@ -456,7 +473,9 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
             ),
             error: (error, _) => EmptyStateView(
               icon: Icons.error_outline_rounded,
-              title: 'No se pudieron cargar los movimientos',
+              title: strings.isEnglish
+                  ? 'Could not load movements'
+                  : 'No se pudieron cargar los movimientos',
               message: '$error',
             ),
           ),

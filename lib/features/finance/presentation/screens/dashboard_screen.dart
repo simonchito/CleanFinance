@@ -90,9 +90,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final showSensitiveAmounts = ref.watch(showSensitiveAmountsProvider);
     final strings = AppStrings.of(context);
     final symbol = settings?.currencySymbol ?? r'$';
-    final localeCode = settings?.localeCode ?? 'es';
-    final monthLabel =
-        DateFormat.yMMMM('es').format(DateTime.now()).replaceFirstMapped(
+    final localeCode = ref.watch(appLocaleCodeProvider);
+    final monthLabel = DateFormat.yMMMM(localeCode)
+        .format(DateTime.now())
+        .replaceFirstMapped(
               RegExp(r'^[a-z]'),
               (match) => match.group(0)!.toUpperCase(),
             );
@@ -179,7 +180,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              'Saldo actual',
+                              strings.isEnglish
+                                  ? 'Current balance'
+                                  : 'Saldo actual',
                               style: Theme.of(context)
                                   .textTheme
                                   .labelLarge
@@ -240,8 +243,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         ),
                         child: Text(
                           overview.monthRemaining >= 0
-                              ? 'Te quedan ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining, symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} este mes.'
-                              : 'Este mes vas ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining.abs(), symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} por encima de tu margen.',
+                              ? (strings.isEnglish
+                                  ? 'You still have ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining, symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} left this month.'
+                                  : 'Te quedan ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining, symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} este mes.')
+                              : (strings.isEnglish
+                                  ? 'This month you are ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining.abs(), symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} above your margin.'
+                                  : 'Este mes vas ${AmountVisibilityFormatter.formatCurrency(amount: overview.monthRemaining.abs(), symbol: symbol, isVisible: showSensitiveAmounts, localeCode: localeCode)} por encima de tu margen.'),
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     color: Colors.white,
@@ -253,7 +260,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         children: [
                           Expanded(
                             child: _QuickActionButton(
-                              label: 'Gasto',
+                              label: strings.expense,
                               icon: Icons.south_west_rounded,
                               onTap: () => _openForm(MovementType.expense),
                             ),
@@ -261,7 +268,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: _QuickActionButton(
-                              label: 'Ingreso',
+                              label: strings.income,
                               icon: Icons.north_east_rounded,
                               onTap: () => _openForm(MovementType.income),
                             ),
@@ -269,7 +276,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: _QuickActionButton(
-                              label: 'Ahorro',
+                              label: strings.saving,
                               icon: Icons.savings_rounded,
                               onTap: () => _openForm(MovementType.saving),
                             ),
@@ -287,7 +294,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         Expanded(
                           child: MetricChip(
                             icon: Icons.arrow_upward_rounded,
-                            label: 'Ingresos',
+                            label: strings.income,
                             value: AmountVisibilityFormatter.formatCurrency(
                               amount: overview.summary.incomeMonth,
                               symbol: symbol,
@@ -301,7 +308,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         Expanded(
                           child: MetricChip(
                             icon: Icons.arrow_downward_rounded,
-                            label: 'Gastos',
+                            label: strings.expense,
                             value: AmountVisibilityFormatter.formatCurrency(
                               amount: overview.summary.expenseMonth,
                               symbol: symbol,
@@ -319,7 +326,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         Expanded(
                           child: MetricChip(
                             icon: Icons.auto_graph_rounded,
-                            label: 'Movimientos',
+                            label: strings.movements,
                             value:
                                 '${overview.summary.currentMonthMovementCount}',
                             color: Theme.of(context).colorScheme.secondary,
@@ -329,7 +336,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         Expanded(
                           child: MetricChip(
                             icon: Icons.savings_rounded,
-                            label: 'Ahorro total',
+                            label: strings.isEnglish
+                                ? 'Total savings'
+                                : 'Ahorro total',
                             value: AmountVisibilityFormatter.formatCurrency(
                               amount: overview.summary.savingsAccumulated,
                               symbol: symbol,
@@ -392,12 +401,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Ingresos vs gastos',
+                        strings.isEnglish
+                            ? 'Income vs expense'
+                            : 'Ingresos vs gastos',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Una lectura rápida de cómo viene el mes.',
+                        strings.isEnglish
+                            ? 'A quick read on how this month is going.'
+                            : 'Una lectura rápida de cómo viene el mes.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -421,12 +434,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Evolución mensual',
+                        strings.isEnglish
+                            ? 'Monthly trend'
+                            : 'Evolución mensual',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Compará tus ingresos y gastos de los últimos 6 meses.',
+                        strings.isEnglish
+                            ? 'Compare your income and expenses over the last 6 months.'
+                            : 'Compará tus ingresos y gastos de los últimos 6 meses.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -444,12 +461,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Gastos por categoría',
+                        strings.isEnglish
+                            ? 'Expenses by category'
+                            : 'Gastos por categoría',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Simple, claro y fácil de leer.',
+                        strings.isEnglish
+                            ? 'Simple, clear and easy to read.'
+                            : 'Simple, claro y fácil de leer.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -460,10 +481,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       if (overview.reports.topExpenseCategories.isEmpty)
                         EmptyStateView(
                           icon: Icons.pie_chart_outline_rounded,
-                          title: 'Todavía no hay gastos suficientes',
-                          message:
-                              'Cuando registres gastos, vas a ver tus categorías principales acá.',
-                          actionLabel: 'Agregar gasto',
+                          title: strings.isEnglish
+                              ? 'Not enough expense data yet'
+                              : 'Todavía no hay gastos suficientes',
+                          message: strings.isEnglish
+                              ? 'Once you register expenses, your top categories will show here.'
+                              : 'Cuando registres gastos, vas a ver tus categorías principales acá.',
+                          actionLabel: strings.isEnglish
+                              ? 'Add expense'
+                              : 'Agregar gasto',
                           onAction: () => _openForm(MovementType.expense),
                         )
                       else
@@ -476,17 +502,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 const SizedBox(height: 22),
                 Text(
-                  'Movimientos recientes',
+                  strings.isEnglish ? 'Recent movements' : 'Movimientos recientes',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 12),
                 if (overview.recentMovements.isEmpty)
                   EmptyStateView(
                     icon: Icons.receipt_long_outlined,
-                    title: 'Empezá con tu primer movimiento',
-                    message:
-                        'Cargar gastos e ingresos te va a permitir ver resumen, alertas y gráficos.',
-                    actionLabel: 'Agregar movimiento',
+                    title: strings.isEnglish
+                        ? 'Start with your first movement'
+                        : 'Empezá con tu primer movimiento',
+                    message: strings.isEnglish
+                        ? 'Adding income and expenses helps unlock summaries, alerts and charts.'
+                        : 'Cargar gastos e ingresos te va a permitir ver resumen, alertas y gráficos.',
+                    actionLabel: strings.isEnglish
+                        ? 'Add movement'
+                        : 'Agregar movimiento',
                     onAction: () => _openForm(),
                   )
                 else
@@ -513,9 +544,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               EmptyStateView(
                 icon: Icons.wifi_tethering_error_rounded,
-                title: 'No pudimos cargar el inicio',
+                title: strings.isEnglish
+                    ? 'Could not load home'
+                    : 'No pudimos cargar el inicio',
                 message: '$error',
-                actionLabel: 'Reintentar',
+                actionLabel: strings.isEnglish ? 'Retry' : 'Reintentar',
                 onAction: _refresh,
               ),
             ],
@@ -636,9 +669,12 @@ class _MovementTile extends StatelessWidget {
         ),
         child: Icon(icon, color: color),
       ),
-      title: Text(movement.categoryName ?? 'Sin categoría'),
+      title: Text(
+        movement.categoryName ??
+            (AppStrings.of(context).isEnglish ? 'Uncategorized' : 'Sin categoría'),
+      ),
       subtitle: Text(
-        DateFormat('dd MMM', 'es').format(movement.occurredOn) +
+        DateFormat('dd MMM', localeCode).format(movement.occurredOn) +
             (movement.note?.isNotEmpty == true ? ' · ${movement.note}' : ''),
       ),
       trailing: Text(

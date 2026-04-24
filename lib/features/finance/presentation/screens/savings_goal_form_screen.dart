@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../../shared/providers.dart';
+import '../../../../app/app_strings.dart';
 import '../widgets/section_card.dart';
 import '../widgets/selection_sheet_field.dart';
 import '../../domain/entities/savings_goal.dart';
@@ -38,9 +38,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
   @override
   void initState() {
     super.initState();
-    _localeCode =
-        ref.read(settingsControllerProvider).valueOrNull?.localeCode ??
-            AppConstants.defaultLocaleCode;
+    _localeCode = ref.read(appLocaleCodeProvider);
     _nameController.text = widget.initialGoal?.name ?? '';
     _targetController.text = widget.initialGoal == null
         ? ''
@@ -61,9 +59,10 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
   }
 
   Future<void> _pickDate() async {
+    final strings = AppStrings.of(context);
     final picked = await showDatePicker(
       context: context,
-      locale: const Locale('es'),
+      locale: Locale(strings.languageCode),
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
       initialDate: _targetDate ?? DateTime.now(),
@@ -74,13 +73,20 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
   }
 
   Future<void> _save() async {
+    final strings = AppStrings.of(context);
     if (!_formKey.currentState!.validate()) {
       return;
     }
     if (_reminderEnabled &&
         (_reminderDay == null || _reminderDay! < 1 || _reminderDay! > 31)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Elegí un día de recordatorio válido.')),
+        SnackBar(
+          content: Text(
+            strings.isEnglish
+                ? 'Choose a valid reminder day.'
+                : 'Elegí un día de recordatorio válido.',
+          ),
+        ),
       );
       return;
     }
@@ -114,9 +120,10 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initialGoal == null ? 'Nueva meta' : 'Editar meta'),
+        title: Text(widget.initialGoal == null ? strings.newGoal : strings.editGoal),
       ),
       body: Form(
         key: _formKey,
@@ -128,12 +135,16 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Definí una meta simple y visible',
+                    strings.isEnglish
+                        ? 'Define a simple and visible goal'
+                        : 'Definí una meta simple y visible',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Nombre claro, monto objetivo y fecha opcional. Nada más.',
+                    strings.isEnglish
+                        ? 'Clear name, target amount and optional date. Nothing else.'
+                        : 'Nombre claro, monto objetivo y fecha opcional. Nada más.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -144,10 +155,15 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Nombre de la meta'),
+              decoration: InputDecoration(
+                labelText:
+                    strings.isEnglish ? 'Goal name' : 'Nombre de la meta',
+              ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Ingresá un nombre.';
+                  return strings.isEnglish
+                      ? 'Enter a name.'
+                      : 'Ingresá un nombre.';
                 }
                 return null;
               },
@@ -159,14 +175,19 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
               inputFormatters: <TextInputFormatter>[
                 WholeAmountInputFormatter(localeCode: _localeCode),
               ],
-              decoration: const InputDecoration(labelText: 'Monto objetivo'),
+              decoration: InputDecoration(
+                labelText:
+                    strings.isEnglish ? 'Target amount' : 'Monto objetivo',
+              ),
               validator: (value) {
                 final parsed = CurrencyFormatter.tryParseWholeAmount(
                   value ?? '',
                   localeCode: _localeCode,
                 );
                 if (parsed == null || parsed <= 0) {
-                  return 'Ingresá un monto válido.';
+                  return strings.isEnglish
+                      ? 'Enter a valid amount.'
+                      : 'Ingresá un monto válido.';
                 }
                 return null;
               },
@@ -177,16 +198,21 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
               icon: const Icon(Icons.calendar_month_rounded),
               label: Text(
                 _targetDate == null
-                    ? 'Agregar fecha objetivo'
-                    : DateFormat('d MMMM y', 'es').format(_targetDate!),
+                    ? (strings.isEnglish
+                        ? 'Add target date'
+                        : 'Agregar fecha objetivo')
+                    : DateFormat('d MMMM y', strings.languageCode)
+                        .format(_targetDate!),
               ),
             ),
             const SizedBox(height: 12),
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Recordatorio mensual'),
-              subtitle: const Text(
-                'Te ayuda a no olvidarte del aporte mensual para esta meta.',
+              title: Text(strings.monthlyReminder),
+              subtitle: Text(
+                strings.isEnglish
+                    ? 'Helps you remember monthly contributions for this goal.'
+                    : 'Te ayuda a no olvidarte del aporte mensual para esta meta.',
               ),
               value: _reminderEnabled,
               onChanged: (value) {
@@ -199,16 +225,17 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             if (_reminderEnabled) ...[
               const SizedBox(height: 8),
               SelectionSheetField<int>(
-                label: 'Día de recordatorio',
+                label: strings.reminderDay,
                 value: _reminderDay,
-                sheetTitle: 'Día de recordatorio',
-                sheetDescription:
-                    'Elegí el día del mes en el que querés recibir el recordatorio.',
+                sheetTitle: strings.reminderDay,
+                sheetDescription: strings.isEnglish
+                    ? 'Choose the day of month when you want the reminder.'
+                    : 'Elegí el día del mes en el que querés recibir el recordatorio.',
                 items: List.generate(
                   31,
                   (index) => SelectionSheetItem(
                     value: index + 1,
-                    label: 'Día ${index + 1}',
+                    label: '${strings.reminderDayPrefix} ${index + 1}',
                     iconData: Icons.calendar_month_outlined,
                   ),
                 ),
@@ -219,7 +246,9 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             const SizedBox(height: 20),
             FilledButton(
               onPressed: _save,
-              child: const Text('Guardar meta'),
+              child: Text(
+                strings.isEnglish ? 'Save goal' : 'Guardar meta',
+              ),
             ),
           ],
         ),

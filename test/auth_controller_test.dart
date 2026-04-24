@@ -87,8 +87,8 @@ void main() {
 
       expect(success, isFalse);
       expect(
-        controller.state.errorMessage,
-        'No se pudo verificar la recuperación. Revisá tus datos e intentá nuevamente.',
+        controller.state.error?.code,
+        AuthErrorCode.recoveryVerificationFailed,
       );
     });
   });

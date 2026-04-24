@@ -49,7 +49,7 @@ class BudgetsScreen extends ConsumerWidget {
     final budgetState = ref.watch(categoryBudgetStatusProvider);
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final symbol = settings?.currencySymbol ?? r'$';
-    final localeCode = settings?.localeCode ?? 'es';
+    final localeCode = ref.watch(appLocaleCodeProvider);
     final monthLabel = DateFormat.yMMMM(strings.languageCode).format(DateTime.now());
 
     return Scaffold(

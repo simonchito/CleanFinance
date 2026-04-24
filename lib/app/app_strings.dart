@@ -78,6 +78,7 @@ class AppStrings {
   String get reports => isEnglish ? 'Reports' : 'Reportes';
   String get createGoal => isEnglish ? 'Create goal' : 'Crear meta';
   String get newGoal => isEnglish ? 'New goal' : 'Nueva meta';
+  String get editGoal => isEnglish ? 'Edit goal' : 'Editar meta';
   String get completed => isEnglish ? 'Completed' : 'Completadas';
   String get activeGoals => isEnglish ? 'Active goals' : 'Metas activas';
   String get achieved => isEnglish ? 'Achieved' : 'Lograda';
@@ -92,6 +93,14 @@ class AppStrings {
       isEnglish ? 'Import backup' : 'Importar backup';
   String get manageCategories =>
       isEnglish ? 'Manage categories' : 'Gestionar categorías';
+  String get noCategories =>
+      isEnglish ? 'No categories yet.' : 'No hay categorías.';
+  String get defaultCategory => isEnglish ? 'Default' : 'Predefinida';
+  String get customCategory => isEnglish ? 'Custom' : 'Personalizada';
+  String get mainCategory =>
+      isEnglish ? 'Main category' : 'Categoría principal';
+  String get addSubcategory =>
+      isEnglish ? 'Add subcategory' : 'Agregar subcategoría';
   String get budgets => isEnglish ? 'Budgets' : 'Presupuestos';
   String get manageBudgets =>
       isEnglish ? 'Manage budgets' : 'Gestionar presupuestos';

@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/month_context.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/app_settings.dart';
@@ -25,6 +27,17 @@ final settingsControllerProvider =
   );
   Future.microtask(controller.load);
   return controller;
+});
+
+final appLocaleCodeProvider = Provider<String>((ref) {
+  final localePreferenceCode = ref.watch(settingsControllerProvider).valueOrNull?.localeCode ??
+      AppConstants.defaultLocalePreferenceCode;
+  final deviceLocaleCode =
+      WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+  return AppConstants.resolveLocaleCodeFromPreference(
+    localePreferenceCode: localePreferenceCode,
+    deviceLocaleCode: deviceLocaleCode,
+  );
 });
 
 final showSensitiveAmountsOverrideProvider =

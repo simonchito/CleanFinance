@@ -28,8 +28,9 @@ class LocalSettingsRepository implements SettingsRepository {
       biometricEnabled: (row['biometric_enabled'] as int? ?? 0) == 1,
       autoLockMinutes: (row['auto_lock_minutes'] as int?) ??
           AppConstants.defaultAutoLockMinutes,
-      localeCode:
-          (row['locale_code'] as String?) ?? AppConstants.defaultLocaleCode,
+      localeCode: AppConstants.normalizeLocalePreferenceCode(
+        row['locale_code'] as String?,
+      ),
       paymentMethods:
           _support.paymentMethodsFromDb(row['payment_methods'] as String?),
     );
@@ -47,7 +48,8 @@ class LocalSettingsRepository implements SettingsRepository {
         'theme_mode': settings.themePreference.name,
         'biometric_enabled': settings.biometricEnabled ? 1 : 0,
         'auto_lock_minutes': settings.autoLockMinutes,
-        'locale_code': settings.localeCode,
+        'locale_code':
+            AppConstants.normalizeLocalePreferenceCode(settings.localeCode),
         'payment_methods': jsonEncode(settings.paymentMethods),
       },
       where: 'id = 1',
