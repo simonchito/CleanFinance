@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_constants.dart';
@@ -19,11 +20,35 @@ class AuthController extends StateNotifier<AuthState> {
   DateTime? _pausedAt;
 
   Future<void> bootstrap() async {
-    final hasCredential = await _authRepository.hasCredential();
-    final biometricAvailable = await _authRepository.isBiometricAvailable();
-    final biometricEnabled = await _authRepository.isBiometricEnabled();
-    final recoveryConfigured = await _authRepository.hasRecoveryData();
-    final pinSecurityState = await _authRepository.getPinSecurityState();
+    debugPrint('[startup] Auth bootstrap begin');
+
+    final hasCredential = await _safeStartupStep<bool>(
+      'read stored credential',
+      _authRepository.hasCredential,
+      fallback: false,
+    );
+    final recoveryConfigured = await _safeStartupStep<bool>(
+      'read recovery data',
+      _authRepository.hasRecoveryData,
+      fallback: false,
+    );
+    final pinSecurityState = await _safeStartupStep<PinSecurityState>(
+      'read pin security state',
+      _authRepository.getPinSecurityState,
+      fallback: const PinSecurityState.initial(),
+    );
+    final biometricAvailable = await _safeStartupStep<bool>(
+      'detect biometric availability',
+      _authRepository.isBiometricAvailable,
+      fallback: false,
+    );
+    final biometricEnabled = biometricAvailable
+        ? await _safeStartupStep<bool>(
+            'read biometric setting',
+            _authRepository.isBiometricEnabled,
+            fallback: false,
+          )
+        : false;
 
     state = state.copyWith(
       status: hasCredential ? AuthStatus.locked : AuthStatus.setupRequired,
@@ -31,7 +56,10 @@ class AuthController extends StateNotifier<AuthState> {
       biometricEnabled: biometricEnabled,
       recoveryConfigured: recoveryConfigured,
       pinSecurityState: pinSecurityState,
-      clearError: true,
+    );
+    debugPrint(
+      '[startup] Auth bootstrap done. status=${state.status.name}, '
+      'biometricAvailable=$biometricAvailable, biometricEnabled=$biometricEnabled',
     );
   }
 
@@ -226,6 +254,25 @@ class AuthController extends StateNotifier<AuthState> {
 
   Future<void> _ensureFinanceSeed() {
     return _categoriesRepository.ensureSeedData();
+  }
+
+  Future<T> _safeStartupStep<T>(
+    String label,
+    Future<T> Function() action, {
+    required T fallback,
+  }) async {
+    try {
+      return await action();
+    } catch (error, stackTrace) {
+      debugPrint('[startup] Auth bootstrap step failed: $label -> $error');
+      debugPrintStack(stackTrace: stackTrace);
+
+      state = state.copyWith(
+        errorMessage:
+            'Algunas validaciones de seguridad no pudieron inicializarse. La app sigue disponible con un modo seguro.',
+      );
+      return fallback;
+    }
   }
 
   bool _isValidRecoveryBirthDate(String value) {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
@@ -35,6 +36,7 @@ class AppDatabase {
   Future<Database> _open() async {
     final databasesPath = await getDatabasesPath();
     final path = p.join(databasesPath, AppConstants.databaseName);
+    debugPrint('[startup] Opening SQLite database at $path');
 
     return openDatabase(
       path,
@@ -147,6 +149,9 @@ class AppDatabase {
         await db.execute('CREATE INDEX idx_budgets_month ON budgets(month)');
       },
       onUpgrade: (db, oldVersion, newVersion) async {
+        debugPrint(
+          '[startup] Upgrading SQLite database from $oldVersion to $newVersion',
+        );
         if (oldVersion < 2) {
           await db.execute(
             "ALTER TABLE app_settings ADD COLUMN locale_code TEXT NOT NULL DEFAULT 'es'",

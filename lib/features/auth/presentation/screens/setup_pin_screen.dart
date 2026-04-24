@@ -90,8 +90,8 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final biometricAvailable =
-        ref.watch(authControllerProvider).biometricAvailable;
+    final authState = ref.watch(authControllerProvider);
+    final biometricAvailable = authState.biometricAvailable;
 
     return Scaffold(
       body: DecoratedBox(
@@ -180,6 +180,21 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
+                    if (authState.errorMessage != null) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: scheme.errorContainer.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          authState.errorMessage!,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       value: _enableBiometrics,

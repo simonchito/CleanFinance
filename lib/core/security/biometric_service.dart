@@ -1,4 +1,5 @@
 import 'package:local_auth/local_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class BiometricService {
   final LocalAuthentication _localAuthentication;
@@ -7,11 +8,22 @@ class BiometricService {
       : _localAuthentication = localAuthentication ?? LocalAuthentication();
 
   Future<bool> isAvailable() async {
-    final canCheck = await _localAuthentication.canCheckBiometrics;
-    if (canCheck) {
-      return true;
+    try {
+      debugPrint('[startup] Checking biometric availability');
+      final canCheck = await _localAuthentication.canCheckBiometrics;
+      if (canCheck) {
+        return true;
+      }
+      return await _localAuthentication.isDeviceSupported();
+    } on LocalAuthException catch (error, stackTrace) {
+      debugPrint('[startup] Biometric availability failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
+    } catch (error, stackTrace) {
+      debugPrint('[startup] Unexpected biometric availability failure: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      return false;
     }
-    return _localAuthentication.isDeviceSupported();
   }
 
   Future<bool> authenticate() async {
@@ -21,13 +33,18 @@ class BiometricService {
     }
 
     try {
+      debugPrint('[startup] Starting biometric authentication');
       return _localAuthentication.authenticate(
         localizedReason: 'Usá tu biometría para desbloquear Clean Finance',
         biometricOnly: true,
       );
-    } on LocalAuthException {
+    } on LocalAuthException catch (error, stackTrace) {
+      debugPrint('[startup] Biometric auth failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
       return false;
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('[startup] Unexpected biometric auth failure: $error');
+      debugPrintStack(stackTrace: stackTrace);
       return false;
     }
   }
