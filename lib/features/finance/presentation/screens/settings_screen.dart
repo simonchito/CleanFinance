@@ -265,6 +265,8 @@ class SettingsScreen extends ConsumerWidget {
       body: settingsState.when(
         data: (settings) {
           return ListView(
+            cacheExtent: 1800,
+            shrinkWrap: true,
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 120),
             children: [
               SectionCard(
@@ -319,14 +321,14 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish ? 'Notifications' : 'Notificaciones',
+                      strings.security,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       strings.isEnglish
-                          ? 'Receive monthly reminders on this device.'
-                          : 'Recibí recordatorios mensuales en este teléfono.',
+                          ? 'Keep fast access without losing privacy.'
+                          : 'Mantené acceso rápido sin perder privacidad.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -335,56 +337,75 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(height: 14),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: Text(
-                        strings.isEnglish
-                            ? 'System notifications'
-                            : 'Notificaciones del sistema',
-                      ),
-                      subtitle: _NotificationStatusText(
-                        isEnglish: strings.isEnglish,
-                      ),
-                      value: settings.notificationsEnabled,
-                      onChanged: (value) => ref
-                          .read(notificationSettingsControllerProvider)
-                          .setNotificationsEnabled(value),
-                    ),
-                    const SizedBox(height: 8),
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.schedule_outlined),
-                      title: Text(
-                        strings.isEnglish
-                            ? 'Reminder time'
-                            : 'Hora de recordatorio',
-                      ),
+                      title: Text(strings.biometric),
                       subtitle: Text(
-                        MaterialLocalizations.of(context).formatTimeOfDay(
-                          TimeOfDay(
-                            hour: settings.notificationReminderHour,
-                            minute: settings.notificationReminderMinute,
-                          ),
-                        ),
+                        authState.biometricAvailable
+                            ? (strings.isEnglish
+                                ? 'Use fingerprint or face unlock if available.'
+                                : 'Usá huella o reconocimiento facial si está disponible.')
+                            : (strings.isEnglish
+                                ? 'This device does not support biometrics.'
+                                : 'Este dispositivo no tiene biometría disponible.'),
                       ),
-                      onTap: settings.notificationsEnabled
-                          ? () => _pickNotificationTime(
-                                context,
-                                ref,
-                                hour: settings.notificationReminderHour,
-                                minute: settings.notificationReminderMinute,
-                              )
+                      value: authState.biometricEnabled,
+                      onChanged: authState.biometricAvailable
+                          ? (value) async {
+                              final success = await ref
+                                  .read(authControllerProvider.notifier)
+                                  .setBiometricEnabled(value);
+                              if (success) {
+                                await ref
+                                    .read(settingsControllerProvider.notifier)
+                                    .setBiometricEnabled(value);
+                              }
+                            }
                           : null,
+                    ),
+                    const SizedBox(height: 12),
+                    DropdownButtonFormField<int>(
+                      initialValue: settings.autoLockMinutes,
+                      decoration: InputDecoration(
+                        labelText: strings.isEnglish
+                            ? 'Auto lock'
+                            : 'Bloqueo automático',
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: 1,
+                          child:
+                              Text(strings.isEnglish ? '1 minute' : '1 minuto'),
+                        ),
+                        DropdownMenuItem(
+                          value: 5,
+                          child: Text(
+                              strings.isEnglish ? '5 minutes' : '5 minutos'),
+                        ),
+                        DropdownMenuItem(
+                          value: 15,
+                          child: Text(
+                              strings.isEnglish ? '15 minutes' : '15 minutos'),
+                        ),
+                        DropdownMenuItem(
+                          value: 30,
+                          child: Text(
+                              strings.isEnglish ? '30 minutes' : '30 minutos'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          ref
+                              .read(settingsControllerProvider.notifier)
+                              .setAutoLockMinutes(value);
+                        }
+                      },
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const ManageRemindersScreen(),
-                          ),
-                        );
+                        ref.read(authControllerProvider.notifier).lock();
                       },
-                      icon: const Icon(Icons.notifications_active_outlined),
-                      label: Text(strings.manageReminders),
+                      icon: const Icon(Icons.lock_outline_rounded),
+                      label: Text(strings.lockNow),
                     ),
                   ],
                 ),
@@ -551,14 +572,14 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.security,
+                      strings.isEnglish ? 'Notifications' : 'Notificaciones',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       strings.isEnglish
-                          ? 'Keep fast access without losing privacy.'
-                          : 'Mantené acceso rápido sin perder privacidad.',
+                          ? 'Receive monthly reminders on this device.'
+                          : 'Recibí recordatorios mensuales en este teléfono.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -567,75 +588,56 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(height: 14),
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: Text(strings.biometric),
-                      subtitle: Text(
-                        authState.biometricAvailable
-                            ? (strings.isEnglish
-                                ? 'Use fingerprint or face unlock if available.'
-                                : 'Usá huella o reconocimiento facial si está disponible.')
-                            : (strings.isEnglish
-                                ? 'This device does not support biometrics.'
-                                : 'Este dispositivo no tiene biometría disponible.'),
+                      title: Text(
+                        strings.isEnglish
+                            ? 'System notifications'
+                            : 'Notificaciones del sistema',
                       ),
-                      value: authState.biometricEnabled,
-                      onChanged: authState.biometricAvailable
-                          ? (value) async {
-                              final success = await ref
-                                  .read(authControllerProvider.notifier)
-                                  .setBiometricEnabled(value);
-                              if (success) {
-                                await ref
-                                    .read(settingsControllerProvider.notifier)
-                                    .setBiometricEnabled(value);
-                              }
-                            }
-                          : null,
+                      subtitle: _NotificationStatusText(
+                        isEnglish: strings.isEnglish,
+                      ),
+                      value: settings.notificationsEnabled,
+                      onChanged: (value) => ref
+                          .read(notificationSettingsControllerProvider)
+                          .setNotificationsEnabled(value),
                     ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<int>(
-                      initialValue: settings.autoLockMinutes,
-                      decoration: InputDecoration(
-                        labelText: strings.isEnglish
-                            ? 'Auto lock'
-                            : 'Bloqueo automático',
+                    const SizedBox(height: 8),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.schedule_outlined),
+                      title: Text(
+                        strings.isEnglish
+                            ? 'Reminder time'
+                            : 'Hora de recordatorio',
                       ),
-                      items: [
-                        DropdownMenuItem(
-                          value: 1,
-                          child:
-                              Text(strings.isEnglish ? '1 minute' : '1 minuto'),
+                      subtitle: Text(
+                        MaterialLocalizations.of(context).formatTimeOfDay(
+                          TimeOfDay(
+                            hour: settings.notificationReminderHour,
+                            minute: settings.notificationReminderMinute,
+                          ),
                         ),
-                        DropdownMenuItem(
-                          value: 5,
-                          child: Text(
-                              strings.isEnglish ? '5 minutes' : '5 minutos'),
-                        ),
-                        DropdownMenuItem(
-                          value: 15,
-                          child: Text(
-                              strings.isEnglish ? '15 minutes' : '15 minutos'),
-                        ),
-                        DropdownMenuItem(
-                          value: 30,
-                          child: Text(
-                              strings.isEnglish ? '30 minutes' : '30 minutos'),
-                        ),
-                      ],
-                      onChanged: (value) {
-                        if (value != null) {
-                          ref
-                              .read(settingsControllerProvider.notifier)
-                              .setAutoLockMinutes(value);
-                        }
-                      },
+                      ),
+                      onTap: settings.notificationsEnabled
+                          ? () => _pickNotificationTime(
+                                context,
+                                ref,
+                                hour: settings.notificationReminderHour,
+                                minute: settings.notificationReminderMinute,
+                              )
+                          : null,
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () {
-                        ref.read(authControllerProvider.notifier).lock();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ManageRemindersScreen(),
+                          ),
+                        );
                       },
-                      icon: const Icon(Icons.lock_outline_rounded),
-                      label: Text(strings.lockNow),
+                      icon: const Icon(Icons.notifications_active_outlined),
+                      label: Text(strings.manageReminders),
                     ),
                   ],
                 ),

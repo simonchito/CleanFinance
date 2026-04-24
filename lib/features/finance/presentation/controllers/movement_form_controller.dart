@@ -62,7 +62,7 @@ class MovementFormController {
       updatedAt: now,
     );
 
-    await _ref.read(movementRepositoryProvider).upsertMovement(movement);
+    await _ref.read(movementsRepositoryProvider).upsertMovement(movement);
     await _syncMonthlyReminderNotifications();
     _refreshFinanceData();
   }
