@@ -109,6 +109,33 @@ class LocalFinanceRepository implements FinanceRepository {
   }
 
   @override
+  Future<Category?> getCategoryById(String categoryId) {
+    return _categoriesRepository.getCategoryById(categoryId);
+  }
+
+  @override
+  Future<Category?> getActiveExpenseReminderBySubcategory(
+    String subcategoryId,
+  ) {
+    return _categoriesRepository.getActiveExpenseReminderBySubcategory(
+      subcategoryId,
+    );
+  }
+
+  @override
+  Future<Category> setExpenseSubcategoryMonthlyReminder({
+    required String subcategoryId,
+    required bool enabled,
+    int? reminderDay,
+  }) {
+    return _categoriesRepository.setExpenseSubcategoryMonthlyReminder(
+      subcategoryId: subcategoryId,
+      enabled: enabled,
+      reminderDay: reminderDay,
+    );
+  }
+
+  @override
   Future<void> upsertCategory(Category category) {
     return _categoriesRepository.upsertCategory(category);
   }

@@ -106,6 +106,29 @@ class AppLocalizationsEn extends AppLocalizations {
       'Use this for recurring monthly expenses so they appear as pending until you register the payment.';
 
   @override
+  String get movementReminderTitle =>
+      'Remind me about this expense every month';
+
+  @override
+  String get movementReminderSubtitle =>
+      'We will notify you near the day of this transaction.';
+
+  @override
+  String get movementReminderActive => 'Reminder active';
+
+  @override
+  String get movementReminderDisabled => 'Reminder disabled';
+
+  @override
+  String movementReminderMonthlyDay(Object day) {
+    return 'Day $day of every month';
+  }
+
+  @override
+  String get movementReminderSettingsHint =>
+      'You can also change this reminder from Settings.';
+
+  @override
   String get reminderDay => 'Reminder day';
 
   @override

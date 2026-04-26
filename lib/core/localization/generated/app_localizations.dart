@@ -292,6 +292,42 @@ abstract class AppLocalizations {
   /// **'Usalo para gastos mensuales recurrentes y verlos como pendientes hasta registrar el pago.'**
   String get monthlyReminderDescription;
 
+  /// No description provided for @movementReminderTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordarme este gasto todos los meses'**
+  String get movementReminderTitle;
+
+  /// No description provided for @movementReminderSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Te avisaremos cerca del día de este movimiento.'**
+  String get movementReminderSubtitle;
+
+  /// No description provided for @movementReminderActive.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorio activo'**
+  String get movementReminderActive;
+
+  /// No description provided for @movementReminderDisabled.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordatorio desactivado'**
+  String get movementReminderDisabled;
+
+  /// No description provided for @movementReminderMonthlyDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Día {day} de cada mes'**
+  String movementReminderMonthlyDay(Object day);
+
+  /// No description provided for @movementReminderSettingsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Este recordatorio también se puede cambiar desde Ajustes.'**
+  String get movementReminderSettingsHint;
+
   /// No description provided for @reminderDay.
   ///
   /// In es, this message translates to:

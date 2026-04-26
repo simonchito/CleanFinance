@@ -28,6 +28,82 @@ class LocalCategoryRepository implements CategoriesRepository {
   }
 
   @override
+  Future<Category?> getCategoryById(String categoryId) async {
+    final normalizedId = categoryId.trim();
+    if (normalizedId.isEmpty) {
+      return null;
+    }
+
+    final db = await _support.appDatabase.instance;
+    final rows = await db.query(
+      'categories',
+      where: 'id = ?',
+      whereArgs: [normalizedId],
+      limit: 1,
+    );
+    if (rows.isEmpty) {
+      return null;
+    }
+    return _support.categoryFromMap(rows.single);
+  }
+
+  @override
+  Future<Category?> getActiveExpenseReminderBySubcategory(
+    String subcategoryId,
+  ) async {
+    final normalizedId = subcategoryId.trim();
+    if (normalizedId.isEmpty) {
+      return null;
+    }
+
+    final db = await _support.appDatabase.instance;
+    final rows = await db.query(
+      'categories',
+      where: '''
+        id = ?
+        AND scope = ?
+        AND parent_id IS NOT NULL
+        AND reminder_enabled = 1
+      ''',
+      whereArgs: [normalizedId, CategoryScope.expense.name],
+      limit: 1,
+    );
+    if (rows.isEmpty) {
+      return null;
+    }
+    return _support.categoryFromMap(rows.single);
+  }
+
+  @override
+  Future<Category> setExpenseSubcategoryMonthlyReminder({
+    required String subcategoryId,
+    required bool enabled,
+    int? reminderDay,
+  }) async {
+    final category = await getCategoryById(subcategoryId);
+    if (category == null) {
+      throw StateError('La subcategoría no existe.');
+    }
+    if (category.scope != CategoryScope.expense || !category.isSubcategory) {
+      throw StateError(
+        'Los recordatorios de gasto solo se pueden activar en subcategorías de gasto.',
+      );
+    }
+    if (enabled && !_isValidReminderDay(reminderDay)) {
+      throw StateError('El día de recordatorio debe estar entre 1 y 31.');
+    }
+
+    final updated = category.copyWith(
+      reminderEnabled: enabled,
+      reminderDay: enabled ? reminderDay : null,
+      clearReminderDay: !enabled,
+      updatedAt: DateTime.now(),
+    );
+    await upsertCategory(updated);
+    return updated;
+  }
+
+  @override
   Future<void> upsertCategory(Category category) async {
     final db = await _support.appDatabase.instance;
     await db.insert(
@@ -83,5 +159,9 @@ class LocalCategoryRepository implements CategoriesRepository {
     }
 
     await db.delete('categories', where: 'id = ?', whereArgs: [categoryId]);
+  }
+
+  bool _isValidReminderDay(int? reminderDay) {
+    return reminderDay != null && reminderDay >= 1 && reminderDay <= 31;
   }
 }

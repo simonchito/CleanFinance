@@ -15,6 +15,11 @@ final movementFormControllerProvider =
   MovementFormController.new,
 );
 
+final movementFormReminderControllerProvider = StateNotifierProvider
+    .autoDispose<MovementFormReminderController, MovementFormReminderState>(
+  MovementFormReminderController.new,
+);
+
 class MovementFormController {
   MovementFormController(this._ref);
 
@@ -145,5 +150,188 @@ CategoryScope categoryScopeFromMovementType(MovementType type) {
       return CategoryScope.expense;
     case MovementType.saving:
       return CategoryScope.saving;
+  }
+}
+
+class MovementFormReminderState {
+  const MovementFormReminderState({
+    this.selectedSubcategoryId,
+    this.reminderEnabled = false,
+    this.existingReminder,
+    this.reminderDay,
+    this.isLoading = false,
+    this.activatedFromForm = false,
+  });
+
+  final String? selectedSubcategoryId;
+  final bool reminderEnabled;
+  final Category? existingReminder;
+  final int? reminderDay;
+  final bool isLoading;
+  final bool activatedFromForm;
+
+  MovementFormReminderState copyWith({
+    String? selectedSubcategoryId,
+    bool? reminderEnabled,
+    Category? existingReminder,
+    int? reminderDay,
+    bool? isLoading,
+    bool? activatedFromForm,
+    bool clearSubcategory = false,
+    bool clearExistingReminder = false,
+    bool clearReminderDay = false,
+  }) {
+    return MovementFormReminderState(
+      selectedSubcategoryId: clearSubcategory
+          ? null
+          : selectedSubcategoryId ?? this.selectedSubcategoryId,
+      reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+      existingReminder: clearExistingReminder
+          ? null
+          : existingReminder ?? this.existingReminder,
+      reminderDay: clearReminderDay ? null : reminderDay ?? this.reminderDay,
+      isLoading: isLoading ?? this.isLoading,
+      activatedFromForm: activatedFromForm ?? this.activatedFromForm,
+    );
+  }
+}
+
+class MovementFormReminderController
+    extends StateNotifier<MovementFormReminderState> {
+  MovementFormReminderController(this._ref)
+      : super(const MovementFormReminderState());
+
+  final Ref _ref;
+  int _loadGeneration = 0;
+
+  Future<void> loadFor({
+    required MovementType type,
+    required String? subcategoryId,
+    required DateTime occurredOn,
+  }) async {
+    final generation = ++_loadGeneration;
+    final normalizedSubcategoryId = _normalizeNullableText(subcategoryId);
+    if (type != MovementType.expense || normalizedSubcategoryId == null) {
+      state = MovementFormReminderState(reminderDay: occurredOn.day);
+      return;
+    }
+
+    state = MovementFormReminderState(
+      selectedSubcategoryId: normalizedSubcategoryId,
+      reminderDay: occurredOn.day,
+      isLoading: true,
+    );
+
+    final repository = _ref.read(categoriesRepositoryProvider);
+    final activeReminder =
+        await repository.getActiveExpenseReminderBySubcategory(
+      normalizedSubcategoryId,
+    );
+    final subcategory = activeReminder ??
+        await repository.getCategoryById(normalizedSubcategoryId);
+    if (generation != _loadGeneration) {
+      return;
+    }
+
+    if (subcategory == null ||
+        subcategory.scope != CategoryScope.expense ||
+        !subcategory.isSubcategory) {
+      state = MovementFormReminderState(reminderDay: occurredOn.day);
+      return;
+    }
+
+    state = MovementFormReminderState(
+      selectedSubcategoryId: normalizedSubcategoryId,
+      reminderEnabled: activeReminder != null,
+      existingReminder: activeReminder,
+      reminderDay: activeReminder?.reminderDay ?? occurredOn.day,
+    );
+  }
+
+  Future<void> setEnabled({
+    required bool enabled,
+    required MovementType type,
+    required String? subcategoryId,
+    required DateTime occurredOn,
+  }) async {
+    final normalizedSubcategoryId = _normalizeNullableText(subcategoryId);
+    if (type != MovementType.expense || normalizedSubcategoryId == null) {
+      return;
+    }
+
+    state = state.copyWith(
+      selectedSubcategoryId: normalizedSubcategoryId,
+      isLoading: true,
+    );
+
+    final updated = await _ref
+        .read(categoriesRepositoryProvider)
+        .setExpenseSubcategoryMonthlyReminder(
+          subcategoryId: normalizedSubcategoryId,
+          enabled: enabled,
+          reminderDay: enabled ? occurredOn.day : null,
+        );
+
+    state = MovementFormReminderState(
+      selectedSubcategoryId: normalizedSubcategoryId,
+      reminderEnabled: enabled,
+      existingReminder: enabled ? updated : null,
+      reminderDay: enabled ? updated.reminderDay : occurredOn.day,
+      activatedFromForm: enabled,
+    );
+
+    await _syncMonthlyReminderNotifications();
+    _refreshReminderData();
+  }
+
+  Future<void> updateDate(DateTime occurredOn) async {
+    if (!state.reminderEnabled) {
+      state = state.copyWith(reminderDay: occurredOn.day);
+      return;
+    }
+    if (!state.activatedFromForm || state.selectedSubcategoryId == null) {
+      return;
+    }
+
+    state = state.copyWith(isLoading: true);
+    final updated = await _ref
+        .read(categoriesRepositoryProvider)
+        .setExpenseSubcategoryMonthlyReminder(
+          subcategoryId: state.selectedSubcategoryId!,
+          enabled: true,
+          reminderDay: occurredOn.day,
+        );
+    state = state.copyWith(
+      existingReminder: updated,
+      reminderDay: updated.reminderDay,
+      isLoading: false,
+    );
+    await _syncMonthlyReminderNotifications();
+    _refreshReminderData();
+  }
+
+  Future<void> _syncMonthlyReminderNotifications() async {
+    try {
+      await _ref
+          .read(monthlyReminderNotificationSchedulerProvider)
+          .syncScheduledReminders();
+    } catch (_) {
+      // Reminder edits should remain saved even if notification scheduling fails.
+    }
+  }
+
+  void _refreshReminderData() {
+    _ref.invalidate(categoriesProvider(CategoryScope.expense));
+    _ref.invalidate(expenseReminderSubcategoriesProvider);
+    _ref.invalidate(monthlyDueRemindersProvider);
+    _ref.invalidate(financeOverviewProvider);
+  }
+
+  String? _normalizeNullableText(String? value) {
+    if (value == null) {
+      return null;
+    }
+    final normalized = value.trim();
+    return normalized.isEmpty ? null : normalized;
   }
 }

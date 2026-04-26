@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -66,6 +68,12 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
         : movement.categoryId;
     _subcategoryId = movement?.subcategoryId;
     _goalId = movement?.goalId;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _loadReminderForCurrentSelection();
+    });
   }
 
   @override
@@ -86,7 +94,22 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     );
     if (picked != null) {
       setState(() => _selectedDate = picked);
+      unawaited(
+        ref
+            .read(movementFormReminderControllerProvider.notifier)
+            .updateDate(_selectedDate),
+      );
     }
+  }
+
+  void _loadReminderForCurrentSelection() {
+    unawaited(
+      ref.read(movementFormReminderControllerProvider.notifier).loadFor(
+            type: _type,
+            subcategoryId: _subcategoryId,
+            occurredOn: _selectedDate,
+          ),
+    );
   }
 
   Future<void> _save() async {
@@ -129,6 +152,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
     final goalsState = ref.watch(savingsGoalsProvider);
     final isEditing =
         widget.initialMovement != null && widget.initialMovement!.id.isNotEmpty;
+    final reminderState = ref.watch(movementFormReminderControllerProvider);
     final configuredPaymentMethods =
         ref.watch(settingsControllerProvider).valueOrNull?.paymentMethods ?? [];
     final paymentMethods = PaymentMethodUtils.normalizeMethods([
@@ -160,6 +184,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                 return;
               }
               setState(() => _subcategoryId = null);
+              _loadReminderForCurrentSelection();
             });
           }
 
@@ -224,6 +249,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                         _goalId = null;
                       }
                     });
+                    _loadReminderForCurrentSelection();
                   },
                 ),
                 const SizedBox(height: 12),
@@ -270,6 +296,7 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       _subcategoryId = null;
                       _categoryErrorText = null;
                     });
+                    _loadReminderForCurrentSelection();
                   },
                 ),
                 if (_categoryErrorText != null) ...[
@@ -310,8 +337,54 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                         ),
                       ),
                     ],
-                    onChanged: (value) =>
-                        setState(() => _subcategoryId = value),
+                    onChanged: (value) {
+                      setState(() => _subcategoryId = value);
+                      _loadReminderForCurrentSelection();
+                    },
+                  ),
+                ],
+                if (_type == MovementType.expense &&
+                    _subcategoryId != null) ...[
+                  const SizedBox(height: 12),
+                  _MonthlyExpenseReminderCard(
+                    state: reminderState,
+                    onChanged: (value) async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final strings = AppStrings.of(context);
+                      try {
+                        await ref
+                            .read(
+                              movementFormReminderControllerProvider.notifier,
+                            )
+                            .setEnabled(
+                              enabled: value,
+                              type: _type,
+                              subcategoryId: _subcategoryId,
+                              occurredOn: _selectedDate,
+                            );
+                        if (!mounted) {
+                          return;
+                        }
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              value
+                                  ? strings.movementReminderActive
+                                  : strings.movementReminderDisabled,
+                            ),
+                          ),
+                        );
+                      } catch (error) {
+                        if (!mounted) {
+                          return;
+                        }
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(strings.technicalErrorDetails(error)),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ],
                 if (_type == MovementType.saving) ...[
@@ -427,6 +500,84 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _MonthlyExpenseReminderCard extends StatelessWidget {
+  const _MonthlyExpenseReminderCard({
+    required this.state,
+    required this.onChanged,
+  });
+
+  final MovementFormReminderState state;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final reminderDay = state.reminderDay;
+
+    return SectionCard(
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: scheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              Icons.notifications_active_outlined,
+              color: state.reminderEnabled ? scheme.primary : null,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  strings.movementReminderTitle,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  strings.movementReminderSubtitle,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+                if (state.reminderEnabled && reminderDay != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    strings.movementReminderMonthlyDay(reminderDay),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: scheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ],
+                const SizedBox(height: 4),
+                Text(
+                  strings.movementReminderSettingsHint,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Switch(
+            value: state.reminderEnabled,
+            onChanged: state.isLoading ? null : onChanged,
+          ),
+        ],
       ),
     );
   }

@@ -31,6 +31,7 @@ class SavingsGoal {
     DateTime? updatedAt,
     bool? reminderEnabled,
     int? reminderDay,
+    bool clearReminderDay = false,
   }) {
     return SavingsGoal(
       id: id ?? this.id,
@@ -41,7 +42,7 @@ class SavingsGoal {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       reminderEnabled: reminderEnabled ?? this.reminderEnabled,
-      reminderDay: reminderDay ?? this.reminderDay,
+      reminderDay: clearReminderDay ? null : reminderDay ?? this.reminderDay,
     );
   }
 }

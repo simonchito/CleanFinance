@@ -32,6 +32,19 @@
   "paymentMethodUnspecified": "Unspecified",
   "monthlyReminder": "Monthly reminder",
   "monthlyReminderDescription": "Use this for recurring monthly expenses so they appear as pending until you register the payment.",
+  "movementReminderTitle": "Remind me about this expense every month",
+  "movementReminderSubtitle": "We will notify you near the day of this transaction.",
+  "movementReminderActive": "Reminder active",
+  "movementReminderDisabled": "Reminder disabled",
+  "movementReminderMonthlyDay": "Day {day} of every month",
+  "@movementReminderMonthlyDay": {
+    "placeholders": {
+      "day": {
+        "type": "Object"
+      }
+    }
+  },
+  "movementReminderSettingsHint": "You can also change this reminder from Settings.",
   "reminderDay": "Reminder day",
   "pendingThisMonth": "Pending this month",
   "reminderRegisterPayment": "Register payment",

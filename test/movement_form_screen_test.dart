@@ -103,6 +103,161 @@ void main() {
   );
 
   testWidgets(
+    'shows reminder switch after selecting an expense subcategory',
+    (tester) async {
+      final now = DateTime(2026, 4, 17);
+      final categories = [
+        Category(
+          id: 'services',
+          name: 'Servicios',
+          iconKey: 'bolt',
+          scope: CategoryScope.expense,
+          isDefault: true,
+          createdAt: now,
+          updatedAt: now,
+        ),
+        Category(
+          id: 'internet',
+          name: 'Internet',
+          iconKey: 'wifi',
+          scope: CategoryScope.expense,
+          parentId: 'services',
+          isDefault: true,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            categoriesRepositoryProvider.overrideWithValue(
+              _FakeCategoriesRepository(categories),
+            ),
+            movementsRepositoryProvider.overrideWithValue(
+              _FakeMovementsRepository(),
+            ),
+            settingsRepositoryProvider.overrideWithValue(
+              _FakeSettingsRepository(),
+            ),
+            savingsGoalsRepositoryProvider.overrideWithValue(
+              _FakeSavingsGoalsRepository(),
+            ),
+          ],
+          child: const MaterialApp(
+            locale: Locale('es'),
+            supportedLocales: [Locale('es'), Locale('en')],
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
+            home: MovementFormScreen(initialType: MovementType.expense),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      var selectionFields = find.byWidgetPredicate(
+        (widget) =>
+            widget.runtimeType.toString().startsWith('SelectionSheetField'),
+      );
+      await tester.tap(selectionFields.at(1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Servicios').last);
+      await tester.pumpAndSettle();
+
+      selectionFields = find.byWidgetPredicate(
+        (widget) =>
+            widget.runtimeType.toString().startsWith('SelectionSheetField'),
+      );
+      await tester.tap(selectionFields.at(2));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Internet').last);
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(
+          find.text('Recordarme este gasto todos los meses'), findsOneWidget);
+      expect(find.text('Te avisaremos cerca del día de este movimiento.'),
+          findsOneWidget);
+      expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
+    },
+  );
+
+  testWidgets(
+    'shows active localized reminder text in English',
+    (tester) async {
+      final now = DateTime(2026, 4, 17);
+      final categories = [
+        Category(
+          id: 'services',
+          name: 'Services',
+          iconKey: 'bolt',
+          scope: CategoryScope.expense,
+          isDefault: true,
+          createdAt: now,
+          updatedAt: now,
+        ),
+        Category(
+          id: 'internet',
+          name: 'Internet',
+          iconKey: 'wifi',
+          scope: CategoryScope.expense,
+          parentId: 'services',
+          isDefault: true,
+          reminderEnabled: true,
+          reminderDay: 26,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            categoriesRepositoryProvider.overrideWithValue(
+              _FakeCategoriesRepository(categories),
+            ),
+            movementsRepositoryProvider.overrideWithValue(
+              _FakeMovementsRepository(),
+            ),
+            settingsRepositoryProvider.overrideWithValue(
+              _FakeSettingsRepository(localeCode: 'en'),
+            ),
+            savingsGoalsRepositoryProvider.overrideWithValue(
+              _FakeSavingsGoalsRepository(),
+            ),
+          ],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            supportedLocales: const [Locale('es'), Locale('en')],
+            localizationsDelegates: GlobalMaterialLocalizations.delegates,
+            home: MovementFormScreen(
+              initialMovement: Movement(
+                id: 'movement-1',
+                type: MovementType.expense,
+                amount: 1500,
+                categoryId: 'services',
+                subcategoryId: 'internet',
+                occurredOn: DateTime(2026, 4, 26),
+                createdAt: now,
+                updatedAt: now,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('Remind me about this expense every month'),
+          findsOneWidget);
+      expect(find.text('Day 26 of every month'), findsOneWidget);
+      expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+    },
+  );
+
+  testWidgets(
     'shows the current payment method in preview even if it is not configured anymore',
     (tester) async {
       final now = DateTime(2026, 4, 17);
@@ -377,6 +532,49 @@ class _FakeCategoriesRepository implements CategoriesRepository {
       return categories;
     }
     return categories.where((category) => category.scope == scope).toList();
+  }
+
+  @override
+  Future<Category?> getCategoryById(String categoryId) async {
+    return categories.cast<Category?>().firstWhere(
+          (category) => category?.id == categoryId,
+          orElse: () => null,
+        );
+  }
+
+  @override
+  Future<Category?> getActiveExpenseReminderBySubcategory(
+    String subcategoryId,
+  ) async {
+    final category = await getCategoryById(subcategoryId);
+    if (category == null ||
+        category.scope != CategoryScope.expense ||
+        !category.isSubcategory ||
+        !category.reminderEnabled) {
+      return null;
+    }
+    return category;
+  }
+
+  @override
+  Future<Category> setExpenseSubcategoryMonthlyReminder({
+    required String subcategoryId,
+    required bool enabled,
+    int? reminderDay,
+  }) async {
+    final index =
+        categories.indexWhere((category) => category.id == subcategoryId);
+    if (index == -1) {
+      throw StateError('missing category');
+    }
+    final updated = categories[index].copyWith(
+      reminderEnabled: enabled,
+      reminderDay: enabled ? reminderDay : null,
+      clearReminderDay: !enabled,
+      updatedAt: DateTime.now(),
+    );
+    categories[index] = updated;
+    return updated;
   }
 
   @override

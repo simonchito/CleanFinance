@@ -32,6 +32,19 @@
   "paymentMethodUnspecified": "Não definido",
   "monthlyReminder": "Lembrete mensal",
   "monthlyReminderDescription": "Use para despesas mensais recorrentes e veja-as como pendentes até registrar o pagamento.",
+  "movementReminderTitle": "Lembrar esta despesa todos os meses",
+  "movementReminderSubtitle": "Vamos avisar perto do dia deste movimento.",
+  "movementReminderActive": "Lembrete ativo",
+  "movementReminderDisabled": "Lembrete desativado",
+  "movementReminderMonthlyDay": "Dia {day} de cada mês",
+  "@movementReminderMonthlyDay": {
+    "placeholders": {
+      "day": {
+        "type": "Object"
+      }
+    }
+  },
+  "movementReminderSettingsHint": "Este lembrete também pode ser alterado em Ajustes.",
   "reminderDay": "Dia do lembrete",
   "pendingThisMonth": "Pendentes este mês",
   "reminderRegisterPayment": "Registrar pagamento",

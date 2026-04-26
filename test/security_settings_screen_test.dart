@@ -270,5 +270,23 @@ class _FakeCategoriesRepository implements CategoriesRepository {
       const [];
 
   @override
+  Future<Category?> getCategoryById(String categoryId) async => null;
+
+  @override
+  Future<Category?> getActiveExpenseReminderBySubcategory(
+    String subcategoryId,
+  ) async =>
+      null;
+
+  @override
+  Future<Category> setExpenseSubcategoryMonthlyReminder({
+    required String subcategoryId,
+    required bool enabled,
+    int? reminderDay,
+  }) async {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<void> upsertCategory(Category category) async {}
 }

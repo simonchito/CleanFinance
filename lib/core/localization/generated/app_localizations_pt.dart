@@ -106,6 +106,28 @@ class AppLocalizationsPt extends AppLocalizations {
       'Use para despesas mensais recorrentes e veja-as como pendentes até registrar o pagamento.';
 
   @override
+  String get movementReminderTitle => 'Lembrar esta despesa todos os meses';
+
+  @override
+  String get movementReminderSubtitle =>
+      'Vamos avisar perto do dia deste movimento.';
+
+  @override
+  String get movementReminderActive => 'Lembrete ativo';
+
+  @override
+  String get movementReminderDisabled => 'Lembrete desativado';
+
+  @override
+  String movementReminderMonthlyDay(Object day) {
+    return 'Dia $day de cada mês';
+  }
+
+  @override
+  String get movementReminderSettingsHint =>
+      'Este lembrete também pode ser alterado em Ajustes.';
+
+  @override
   String get reminderDay => 'Dia do lembrete';
 
   @override

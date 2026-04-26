@@ -32,6 +32,19 @@
   "paymentMethodUnspecified": "Sin definir",
   "monthlyReminder": "Recordatorio mensual",
   "monthlyReminderDescription": "Usalo para gastos mensuales recurrentes y verlos como pendientes hasta registrar el pago.",
+  "movementReminderTitle": "Recordarme este gasto todos los meses",
+  "movementReminderSubtitle": "Te avisaremos cerca del día de este movimiento.",
+  "movementReminderActive": "Recordatorio activo",
+  "movementReminderDisabled": "Recordatorio desactivado",
+  "movementReminderMonthlyDay": "Día {day} de cada mes",
+  "@movementReminderMonthlyDay": {
+    "placeholders": {
+      "day": {
+        "type": "Object"
+      }
+    }
+  },
+  "movementReminderSettingsHint": "Este recordatorio también se puede cambiar desde Ajustes.",
   "reminderDay": "Día de recordatorio",
   "pendingThisMonth": "Pendientes este mes",
   "reminderRegisterPayment": "Registrar pago",

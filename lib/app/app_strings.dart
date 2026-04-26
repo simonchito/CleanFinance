@@ -61,6 +61,11 @@ class AppStrings {
   String get paymentMethodUnspecified => _l10n.paymentMethodUnspecified;
   String get monthlyReminder => _l10n.monthlyReminder;
   String get monthlyReminderDescription => _l10n.monthlyReminderDescription;
+  String get movementReminderTitle => _l10n.movementReminderTitle;
+  String get movementReminderSubtitle => _l10n.movementReminderSubtitle;
+  String get movementReminderActive => _l10n.movementReminderActive;
+  String get movementReminderDisabled => _l10n.movementReminderDisabled;
+  String get movementReminderSettingsHint => _l10n.movementReminderSettingsHint;
   String get reminderDay => _l10n.reminderDay;
   String get pendingThisMonth => _l10n.pendingThisMonth;
   String get reminderRegisterPayment => _l10n.reminderRegisterPayment;
@@ -741,6 +746,8 @@ class AppStrings {
 
   String movementFormLoadCategoriesError(Object error) =>
       _l10n.movementFormLoadCategoriesError(error);
+  String movementReminderMonthlyDay(Object day) =>
+      _l10n.movementReminderMonthlyDay(day);
   String financeInsightOvercommittedMessage(Object percentage) =>
       _l10n.financeInsightOvercommittedMessage(percentage);
   String financeInsightDominantCategoryMessage(
@@ -836,6 +843,11 @@ class AppStrings {
       'paymentMethodUnspecified' => _l10n.paymentMethodUnspecified,
       'monthlyReminder' => _l10n.monthlyReminder,
       'monthlyReminderDescription' => _l10n.monthlyReminderDescription,
+      'movementReminderTitle' => _l10n.movementReminderTitle,
+      'movementReminderSubtitle' => _l10n.movementReminderSubtitle,
+      'movementReminderActive' => _l10n.movementReminderActive,
+      'movementReminderDisabled' => _l10n.movementReminderDisabled,
+      'movementReminderSettingsHint' => _l10n.movementReminderSettingsHint,
       'reminderDay' => _l10n.reminderDay,
       'pendingThisMonth' => _l10n.pendingThisMonth,
       'reminderRegisterPayment' => _l10n.reminderRegisterPayment,

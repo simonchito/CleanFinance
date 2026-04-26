@@ -167,6 +167,7 @@ class ManageRemindersScreen extends ConsumerWidget {
           subcategory.copyWith(
             reminderEnabled: false,
             reminderDay: null,
+            clearReminderDay: true,
             updatedAt: DateTime.now(),
           ),
         );
@@ -179,6 +180,7 @@ class ManageRemindersScreen extends ConsumerWidget {
           goal.copyWith(
             reminderEnabled: false,
             reminderDay: null,
+            clearReminderDay: true,
             updatedAt: DateTime.now(),
           ),
         );

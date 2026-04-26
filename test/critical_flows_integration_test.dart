@@ -248,6 +248,47 @@ class _FakeCategoriesRepository implements CategoriesRepository {
   }
 
   @override
+  Future<Category?> getCategoryById(String categoryId) async {
+    return categories.cast<Category?>().firstWhere(
+          (category) => category?.id == categoryId,
+          orElse: () => null,
+        );
+  }
+
+  @override
+  Future<Category?> getActiveExpenseReminderBySubcategory(
+    String subcategoryId,
+  ) async {
+    final category = await getCategoryById(subcategoryId);
+    if (category == null ||
+        category.scope != CategoryScope.expense ||
+        !category.isSubcategory ||
+        !category.reminderEnabled) {
+      return null;
+    }
+    return category;
+  }
+
+  @override
+  Future<Category> setExpenseSubcategoryMonthlyReminder({
+    required String subcategoryId,
+    required bool enabled,
+    int? reminderDay,
+  }) async {
+    final index =
+        categories.indexWhere((category) => category.id == subcategoryId);
+    if (index == -1) {
+      throw StateError('missing category');
+    }
+    return categories[index].copyWith(
+      reminderEnabled: enabled,
+      reminderDay: enabled ? reminderDay : null,
+      clearReminderDay: !enabled,
+      updatedAt: DateTime.now(),
+    );
+  }
+
+  @override
   Future<void> upsertCategory(Category category) async {}
 }
 
