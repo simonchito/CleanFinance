@@ -24,7 +24,7 @@ void main() {
           const [Locale('pt', 'BR')],
           AppLocaleMode.supportedLocales,
         ),
-        const Locale('pt', 'BR'),
+        const Locale('pt'),
       );
       expect(
         AppLocaleMode.resolveSystemLocale(

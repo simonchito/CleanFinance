@@ -1,7 +1,11 @@
 import 'package:flutter/widgets.dart';
 
+import 'package:clean_finance/core/utils/payment_method_utils.dart';
+
 import '../core/localization/generated/app_localizations.dart';
-import '../features/finance/domain/models/payment_method.dart';
+import '../core/localization/generated/app_localizations_en.dart';
+import '../core/localization/generated/app_localizations_es.dart';
+import '../core/localization/generated/app_localizations_pt.dart';
 
 class AppStrings {
   AppStrings(this._l10n);
@@ -9,7 +13,16 @@ class AppStrings {
   final AppLocalizations _l10n;
 
   static AppStrings of(BuildContext context) {
-    return AppStrings(AppLocalizations.of(context)!);
+    final l10n = Localizations.of<AppLocalizations>(
+          context,
+          AppLocalizations,
+        ) ??
+        switch (Localizations.localeOf(context).languageCode) {
+          'en' => AppLocalizationsEn(),
+          'pt' => AppLocalizationsPt(),
+          _ => AppLocalizationsEs(),
+        };
+    return AppStrings(l10n);
   }
 
   String get languageCode => _l10n.localeName;

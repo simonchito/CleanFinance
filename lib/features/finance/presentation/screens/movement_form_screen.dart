@@ -77,10 +77,9 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
   }
 
   Future<void> _pickDate() async {
-    final strings = AppStrings.of(context);
     final picked = await showDatePicker(
       context: context,
-      locale: strings.locale,
+      locale: Localizations.localeOf(context),
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
       initialDate: _selectedDate,
