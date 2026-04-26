@@ -88,9 +88,8 @@ class _CategoryTab extends ConsumerWidget {
                   ),
                   subtitle: Text(
                     category.isDefault
-                        ? (strings.localized(es: 'Predefinida', en: 'Default'))
-                        : (strings.localized(
-                            es: 'Personalizada', en: 'Custom')),
+                        ? (strings.t('defaultCategory'))
+                        : (strings.t('customCategory')),
                   ),
                   children: [
                     for (final child in children)
@@ -116,9 +115,7 @@ class _CategoryTab extends ConsumerWidget {
                         category.name,
                         strings,
                       ),
-                      subtitle: strings.isEnglish
-                          ? 'Main category'
-                          : 'Categoría principal',
+                      subtitle: strings.t('mainCategory'),
                       onEdit: () => _showCategoryDialog(
                         context,
                         ref,
@@ -132,9 +129,7 @@ class _CategoryTab extends ConsumerWidget {
                     ListTile(
                       leading: const Icon(Icons.add),
                       title: Text(
-                        strings.isEnglish
-                            ? 'Add subcategory'
-                            : 'Agregar subcategoría',
+                        strings.t('addSubcategory'),
                       ),
                       onTap: () => _showCategoryDialog(
                         context,
@@ -150,7 +145,9 @@ class _CategoryTab extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text('Error: $error')),
+        error: (error, _) => Center(
+          child: Text(strings.categoriesLoadError(error)),
+        ),
       ),
     );
   }
@@ -162,22 +159,19 @@ class _CategoryTab extends ConsumerWidget {
   ) async {
     final strings = AppStrings.of(context);
     try {
+      final categoryName = DefaultCategoryNameLocalizer.localize(
+        category.name,
+        strings,
+      );
       final confirmed = await showConfirmActionDialog(
         context: context,
         title: category.isSubcategory
-            ? (strings.isEnglish
-                ? 'Delete subcategory'
-                : 'Eliminar subcategoría')
-            : (strings.localized(
-                es: 'Eliminar categoría', en: 'Delete category')),
+            ? (strings.t('eliminarSubcategoria'))
+            : (strings.t('eliminarCategoria')),
         message: category.isSubcategory
-            ? (strings.isEnglish
-                ? 'The subcategory "${DefaultCategoryNameLocalizer.localize(category.name, strings)}" will be deleted. If there are linked movements or dependencies, the app will block deletion.'
-                : 'Se eliminará la subcategoría "${category.name}". Si tiene movimientos o dependencias, la app lo bloqueará antes de borrar.')
-            : (strings.isEnglish
-                ? 'The category "${DefaultCategoryNameLocalizer.localize(category.name, strings)}" will be deleted. If there are linked movements, subcategories or budgets, the app will block deletion.'
-                : 'Se eliminará la categoría "${category.name}". Si tiene movimientos, subcategorías o presupuestos asociados, la app lo bloqueará antes de borrar.'),
-        confirmLabel: strings.localized(es: 'Eliminar', en: 'Delete'),
+            ? strings.deleteSubcategoryMessage(categoryName)
+            : strings.deleteCategoryMessage(categoryName),
+        confirmLabel: strings.t('eliminar'),
         cancelLabel: strings.cancel,
       );
       if (!confirmed) {
@@ -242,9 +236,8 @@ class _CategoryTab extends ConsumerWidget {
         return AlertDialog(
           title: Text(
             initial == null
-                ? (strings.localized(es: 'Nueva categoría', en: 'New category'))
-                : (strings.localized(
-                    es: 'Editar categoría', en: 'Edit category')),
+                ? (strings.t('nuevaCategoria'))
+                : (strings.t('editarCategoria')),
           ),
           content: StatefulBuilder(
             builder: (context, setState) {
@@ -255,7 +248,7 @@ class _CategoryTab extends ConsumerWidget {
                     TextField(
                       controller: nameController,
                       decoration: InputDecoration(
-                        labelText: strings.localized(es: 'Nombre', en: 'Name'),
+                        labelText: strings.t('nombre'),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -266,25 +259,16 @@ class _CategoryTab extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     SelectionSheetField<String?>(
-                      label: strings.isEnglish
-                          ? 'Parent category'
-                          : 'Categoría padre',
+                      label: strings.t('categoriaPadre'),
                       value: selectedParentId,
-                      placeholder: strings.isEnglish
-                          ? 'No parent category'
-                          : 'Sin categoría padre',
-                      sheetTitle: strings.isEnglish
-                          ? 'Parent category'
-                          : 'Categoría padre',
-                      sheetDescription: strings.isEnglish
-                          ? 'Choose a top-level category only if you want a subcategory.'
-                          : 'Elegí una categoría principal solo si querés crear una subcategoría.',
+                      placeholder: strings.t('sinCategoriaPadre'),
+                      sheetTitle: strings.t('categoriaPadre'),
+                      sheetDescription:
+                          strings.t('elegiUnaCategoriaPrincipalSoloSiQueres'),
                       items: [
                         SelectionSheetItem<String?>(
                           value: null,
-                          label: strings.isEnglish
-                              ? 'No parent category'
-                              : 'Sin categoría padre',
+                          label: strings.t('sinCategoriaPadre'),
                           iconData: Icons.account_tree_outlined,
                         ),
                         ...parents.where((item) => item.id != initial?.id).map(
@@ -314,9 +298,7 @@ class _CategoryTab extends ConsumerWidget {
                         contentPadding: EdgeInsets.zero,
                         title: Text(strings.monthlyReminder),
                         subtitle: Text(
-                          strings.isEnglish
-                              ? 'Use this subcategory for recurring services or expenses.'
-                              : 'Usá esta subcategoría para servicios o gastos recurrentes.',
+                          strings.t('usaEstaSubcategoriaParaServiciosOGastos'),
                         ),
                         value: reminderEnabled,
                         onChanged: (value) => setState(() {

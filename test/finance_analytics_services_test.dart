@@ -70,7 +70,9 @@ void main() {
     expect(points.last.expense, 400);
   });
 
-  test('CategoryComparisonService calcula share y variacion contra el mes anterior', () {
+  test(
+      'CategoryComparisonService calcula share y variacion contra el mes anterior',
+      () {
     const service = CategoryComparisonService();
     final report = service.build(
       movements: [
@@ -187,7 +189,9 @@ void main() {
     expect(month.previous().startDate, DateTime(2026, 2, 1));
   });
 
-  test('SavingsGoalReportService estima fecha de cumplimiento con ritmo de aporte', () {
+  test(
+      'SavingsGoalReportService estima fecha de cumplimiento con ritmo de aporte',
+      () {
     const service = SavingsGoalReportService();
     final goal = SavingsGoalProgress(
       goal: SavingsGoal(
@@ -276,10 +280,9 @@ void main() {
       isTrue,
     );
     expect(
-      insights.any((insight) => insight.type == FinanceInsightType.overcommitted),
+      insights
+          .any((insight) => insight.type == FinanceInsightType.overcommitted),
       isTrue,
     );
   });
 }
-
-

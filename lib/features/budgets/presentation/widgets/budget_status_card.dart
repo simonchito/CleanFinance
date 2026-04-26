@@ -140,19 +140,19 @@ class BudgetStatusCard extends StatelessWidget {
     switch (status) {
       case BudgetStatus.warning:
         return _BudgetVisualStyle(
-          label: strings.localized(es: 'Atención', en: 'Warning'),
+          label: strings.t('atencion'),
           foreground: Colors.orange.shade800,
           background: Colors.orange.shade100,
         );
       case BudgetStatus.exceeded:
         return _BudgetVisualStyle(
-          label: strings.localized(es: 'Excedido', en: 'Exceeded'),
+          label: strings.t('excedido'),
           foreground: scheme.error,
           background: scheme.errorContainer,
         );
       case BudgetStatus.normal:
         return _BudgetVisualStyle(
-          label: strings.localized(es: 'Normal', en: 'Normal'),
+          label: strings.t('normal'),
           foreground: scheme.primary,
           background: scheme.primaryContainer,
         );

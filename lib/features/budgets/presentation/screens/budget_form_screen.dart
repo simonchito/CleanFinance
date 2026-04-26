@@ -67,11 +67,9 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
 
     final confirmed = await showConfirmActionDialog(
       context: context,
-      title: strings.localized(es: 'Eliminar presupuesto', en: 'Delete budget'),
-      message: strings.isEnglish
-          ? 'This monthly budget will be removed and tracking for this category will stop until you create a new one.'
-          : 'Este presupuesto mensual se eliminará y el seguimiento de esta categoría se detendrá hasta que crees uno nuevo.',
-      confirmLabel: strings.localized(es: 'Eliminar', en: 'Delete'),
+      title: strings.t('eliminarPresupuesto'),
+      message: strings.t('estePresupuestoMensualSeEliminaraYEl'),
+      confirmLabel: strings.t('eliminar'),
       cancelLabel: strings.cancel,
     );
     if (!confirmed) {
@@ -91,9 +89,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
     }
     if (_categoryId == null) {
       _showMessage(
-        AppStrings.of(context).isEnglish
-            ? 'Select a category.'
-            : 'Seleccioná una categoría.',
+        AppStrings.of(context).t('seleccionaUnaCategoria'),
       );
       return;
     }
@@ -157,8 +153,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
             IconButton(
               onPressed: _isSaving ? null : _deleteBudget,
               icon: const Icon(Icons.delete_outline_rounded),
-              tooltip: strings.localized(
-                  es: 'Eliminar presupuesto', en: 'Delete budget'),
+              tooltip: strings.t('eliminarPresupuesto'),
             ),
         ],
       ),
@@ -174,12 +169,8 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
               children: [
                 EmptyStateView(
                   icon: Icons.category_outlined,
-                  title: strings.isEnglish
-                      ? 'Create an expense category first'
-                      : 'Primero creá una categoría de gasto',
-                  message: strings.isEnglish
-                      ? 'Budgets are created from your existing expense categories.'
-                      : 'Los presupuestos se crean a partir de tus categorías de gasto existentes.',
+                  title: strings.t('primeroCreaUnaCategoriaDeGasto'),
+                  message: strings.t('losPresupuestosSeCreanAPartirDe'),
                 ),
               ],
             );
@@ -196,19 +187,14 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                     children: [
                       Text(
                         isEditing
-                            ? (strings.isEnglish
-                                ? 'Adjust this monthly budget'
-                                : 'Ajustá este presupuesto mensual')
-                            : (strings.isEnglish
-                                ? 'Create a monthly budget by category'
-                                : 'Creá un presupuesto mensual por categoría'),
+                            ? (strings.t('ajustaEstePresupuestoMensual'))
+                            : (strings
+                                .t('creaUnPresupuestoMensualPorCategoria')),
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        strings.isEnglish
-                            ? 'Budgets are stored locally and tracked against your current-month expenses.'
-                            : 'Los presupuestos se guardan localmente y se comparan con tus gastos del mes actual.',
+                        strings.t('losPresupuestosSeGuardanLocalmenteYSe'),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -233,14 +219,11 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                 SelectionSheetField<String>(
                   label: strings.category,
                   value: _categoryId,
-                  placeholder: strings.isEnglish
-                      ? 'Choose a category'
-                      : 'Elegí una categoría',
+                  placeholder: strings.t('elegiUnaCategoria'),
                   enabled: !isEditing,
                   sheetTitle: strings.category,
-                  sheetDescription: strings.isEnglish
-                      ? 'Choose the expense category for this monthly budget.'
-                      : 'Elegí la categoría de gasto para este presupuesto mensual.',
+                  sheetDescription:
+                      strings.t('elegiLaCategoriaDeGastoParaEste'),
                   items: availableCategories
                       .map(
                         (category) => SelectionSheetItem(
@@ -268,9 +251,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                       localeCode: _localeCode,
                     );
                     if (parsed == null || parsed <= 0) {
-                      return strings.isEnglish
-                          ? 'Enter a valid monthly limit.'
-                          : 'Ingresá un límite mensual válido.';
+                      return strings.t('ingresaUnLimiteMensualValido');
                     }
                     return null;
                   },
@@ -280,8 +261,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                   onPressed: _isSaving ? null : _save,
                   child: Text(
                     _isSaving
-                        ? (strings.localized(
-                            es: 'Guardando...', en: 'Saving...'))
+                        ? (strings.t('guardando'))
                         : (isEditing ? strings.saveChanges : strings.save),
                   ),
                 ),
@@ -293,11 +273,7 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Text(
-              strings.isEnglish
-                  ? 'Could not load categories: $error'
-                  : 'No se pudieron cargar las categorías: $error',
-            ),
+            child: Text(strings.categoriesLoadError(error)),
           ),
         ),
       ),

@@ -1,107 +1,114 @@
 class IconOption {
   const IconOption({
     required this.key,
-    required this.label,
+    required this.labelKey,
   });
 
   final String key;
-  final String label;
+  final String labelKey;
 }
 
 abstract final class IconOptions {
   static const String defaultKey = 'category';
 
   static const List<IconOption> all = [
-    IconOption(key: 'category', label: 'General'),
-    IconOption(key: 'home', label: 'Hogar'),
-    IconOption(key: 'bolt', label: 'Servicios'),
-    IconOption(key: 'restaurant', label: 'Comida'),
-    IconOption(key: 'car', label: 'Transporte'),
-    IconOption(key: 'health', label: 'Salud'),
-    IconOption(key: 'education', label: 'Educación'),
-    IconOption(key: 'shopping', label: 'Compras'),
-    IconOption(key: 'entertainment', label: 'Ocio'),
-    IconOption(key: 'finance', label: 'Finanzas'),
-    IconOption(key: 'family', label: 'Familia'),
-    IconOption(key: 'work', label: 'Trabajo'),
-    IconOption(key: 'payments', label: 'Pagos'),
-    IconOption(key: 'storefront', label: 'Ventas'),
-    IconOption(key: 'savings', label: 'Ahorro'),
-    IconOption(key: 'shield', label: 'Protección'),
-    IconOption(key: 'flight', label: 'Viajes'),
-    IconOption(key: 'palette', label: 'Decoración'),
-    IconOption(key: 'kitchen', label: 'Cocina'),
-    IconOption(key: 'receipt', label: 'Facturas'),
-    IconOption(key: 'cleaning_services', label: 'Limpieza'),
-    IconOption(key: 'build', label: 'Mantenimiento'),
-    IconOption(key: 'chair', label: 'Muebles'),
-    IconOption(key: 'handyman', label: 'Reparaciones'),
-    IconOption(key: 'water_drop', label: 'Agua'),
-    IconOption(key: 'tv', label: 'TV'),
-    IconOption(key: 'local_fire_department', label: 'Gas'),
-    IconOption(key: 'wifi', label: 'Internet'),
-    IconOption(key: 'electric_bolt', label: 'Luz'),
-    IconOption(key: 'cloud', label: 'Apps'),
-    IconOption(key: 'play_circle', label: 'Streaming'),
-    IconOption(key: 'phone', label: 'Teléfono'),
-    IconOption(key: 'coffee', label: 'Cafetería'),
-    IconOption(key: 'set_meal', label: 'Carnicería'),
-    IconOption(key: 'delivery_dining', label: 'Delivery'),
-    IconOption(key: 'bakery_dining', label: 'Panadería'),
-    IconOption(key: 'restaurant_menu', label: 'Restaurantes'),
-    IconOption(key: 'shopping_cart', label: 'Supermercado'),
-    IconOption(key: 'eco', label: 'Verdulería'),
-    IconOption(key: 'local_gas_station', label: 'Combustible'),
-    IconOption(key: 'local_parking', label: 'Estacionamiento'),
-    IconOption(key: 'toll', label: 'Peajes'),
-    IconOption(key: 'security', label: 'Seguro'),
-    IconOption(key: 'local_taxi', label: 'Taxi'),
-    IconOption(key: 'directions_bus', label: 'Colectivo'),
-    IconOption(key: 'emoji_transportation', label: 'Movilidad'),
-    IconOption(key: 'medical_services', label: 'Consultas'),
-    IconOption(key: 'science', label: 'Estudios'),
-    IconOption(key: 'medication', label: 'Medicamentos'),
-    IconOption(key: 'health_and_safety', label: 'Prepaga'),
-    IconOption(key: 'mood', label: 'Odontología'),
-    IconOption(key: 'visibility', label: 'Óptica'),
-    IconOption(key: 'menu_book', label: 'Cursos'),
-    IconOption(key: 'book', label: 'Libros'),
-    IconOption(key: 'edit', label: 'Materiales'),
-    IconOption(key: 'school', label: 'Capacitación'),
-    IconOption(key: 'hiking', label: 'Calzado'),
-    IconOption(key: 'language', label: 'Online'),
-    IconOption(key: 'card_giftcard', label: 'Regalos'),
-    IconOption(key: 'checkroom', label: 'Ropa'),
-    IconOption(key: 'devices', label: 'Tecnología'),
-    IconOption(key: 'movie', label: 'Cine'),
-    IconOption(key: 'event', label: 'Eventos'),
-    IconOption(key: 'sports_esports', label: 'Juegos'),
-    IconOption(key: 'nightlife', label: 'Salidas'),
-    IconOption(key: 'account_balance_wallet', label: 'Comisiones'),
-    IconOption(key: 'receipt_long', label: 'Impuestos'),
-    IconOption(key: 'percent', label: 'Intereses'),
-    IconOption(key: 'business', label: 'Monotributo'),
-    IconOption(key: 'credit_card', label: 'Tarjetas'),
-    IconOption(key: 'self_improvement', label: 'Personal'),
-    IconOption(key: 'child_care', label: 'Guardería'),
-    IconOption(key: 'child_friendly', label: 'Hijos'),
-    IconOption(key: 'pets', label: 'Mascotas'),
-    IconOption(key: 'lunch_dining', label: 'Comidas'),
-    IconOption(key: 'commute', label: 'Traslados'),
-    IconOption(key: 'volunteer_activism', label: 'Donaciones'),
-    IconOption(key: 'warning', label: 'Imprevistos'),
-    IconOption(key: 'more_horiz', label: 'Varios'),
+    IconOption(key: 'category', labelKey: 'iconOptionCategory'),
+    IconOption(key: 'home', labelKey: 'iconOptionHome'),
+    IconOption(key: 'bolt', labelKey: 'iconOptionBolt'),
+    IconOption(key: 'restaurant', labelKey: 'iconOptionRestaurant'),
+    IconOption(key: 'car', labelKey: 'iconOptionCar'),
+    IconOption(key: 'health', labelKey: 'iconOptionHealth'),
+    IconOption(key: 'education', labelKey: 'iconOptionEducation'),
+    IconOption(key: 'shopping', labelKey: 'iconOptionShopping'),
+    IconOption(key: 'entertainment', labelKey: 'iconOptionEntertainment'),
+    IconOption(key: 'finance', labelKey: 'iconOptionFinance'),
+    IconOption(key: 'family', labelKey: 'iconOptionFamily'),
+    IconOption(key: 'work', labelKey: 'iconOptionWork'),
+    IconOption(key: 'payments', labelKey: 'iconOptionPayments'),
+    IconOption(key: 'storefront', labelKey: 'iconOptionStorefront'),
+    IconOption(key: 'savings', labelKey: 'iconOptionSavings'),
+    IconOption(key: 'shield', labelKey: 'iconOptionShield'),
+    IconOption(key: 'flight', labelKey: 'iconOptionFlight'),
+    IconOption(key: 'palette', labelKey: 'iconOptionPalette'),
+    IconOption(key: 'kitchen', labelKey: 'iconOptionKitchen'),
+    IconOption(key: 'receipt', labelKey: 'iconOptionReceipt'),
+    IconOption(
+        key: 'cleaning_services', labelKey: 'iconOptionCleaningServices'),
+    IconOption(key: 'build', labelKey: 'iconOptionBuild'),
+    IconOption(key: 'chair', labelKey: 'iconOptionChair'),
+    IconOption(key: 'handyman', labelKey: 'iconOptionHandyman'),
+    IconOption(key: 'water_drop', labelKey: 'iconOptionWaterDrop'),
+    IconOption(key: 'tv', labelKey: 'iconOptionTv'),
+    IconOption(
+        key: 'local_fire_department',
+        labelKey: 'iconOptionLocalFireDepartment'),
+    IconOption(key: 'wifi', labelKey: 'iconOptionWifi'),
+    IconOption(key: 'electric_bolt', labelKey: 'iconOptionElectricBolt'),
+    IconOption(key: 'cloud', labelKey: 'iconOptionCloud'),
+    IconOption(key: 'play_circle', labelKey: 'iconOptionPlayCircle'),
+    IconOption(key: 'phone', labelKey: 'iconOptionPhone'),
+    IconOption(key: 'coffee', labelKey: 'iconOptionCoffee'),
+    IconOption(key: 'set_meal', labelKey: 'iconOptionSetMeal'),
+    IconOption(key: 'delivery_dining', labelKey: 'iconOptionDeliveryDining'),
+    IconOption(key: 'bakery_dining', labelKey: 'iconOptionBakeryDining'),
+    IconOption(key: 'restaurant_menu', labelKey: 'iconOptionRestaurantMenu'),
+    IconOption(key: 'shopping_cart', labelKey: 'iconOptionShoppingCart'),
+    IconOption(key: 'eco', labelKey: 'iconOptionEco'),
+    IconOption(key: 'local_gas_station', labelKey: 'iconOptionLocalGasStation'),
+    IconOption(key: 'local_parking', labelKey: 'iconOptionLocalParking'),
+    IconOption(key: 'toll', labelKey: 'iconOptionToll'),
+    IconOption(key: 'security', labelKey: 'iconOptionSecurity'),
+    IconOption(key: 'local_taxi', labelKey: 'iconOptionLocalTaxi'),
+    IconOption(key: 'directions_bus', labelKey: 'iconOptionDirectionsBus'),
+    IconOption(
+        key: 'emoji_transportation', labelKey: 'iconOptionEmojiTransportation'),
+    IconOption(key: 'medical_services', labelKey: 'iconOptionMedicalServices'),
+    IconOption(key: 'science', labelKey: 'iconOptionScience'),
+    IconOption(key: 'medication', labelKey: 'iconOptionMedication'),
+    IconOption(key: 'health_and_safety', labelKey: 'iconOptionHealthAndSafety'),
+    IconOption(key: 'mood', labelKey: 'iconOptionMood'),
+    IconOption(key: 'visibility', labelKey: 'iconOptionVisibility'),
+    IconOption(key: 'menu_book', labelKey: 'iconOptionMenuBook'),
+    IconOption(key: 'book', labelKey: 'iconOptionBook'),
+    IconOption(key: 'edit', labelKey: 'iconOptionEdit'),
+    IconOption(key: 'school', labelKey: 'iconOptionSchool'),
+    IconOption(key: 'hiking', labelKey: 'iconOptionHiking'),
+    IconOption(key: 'language', labelKey: 'iconOptionLanguage'),
+    IconOption(key: 'card_giftcard', labelKey: 'iconOptionCardGiftcard'),
+    IconOption(key: 'checkroom', labelKey: 'iconOptionCheckroom'),
+    IconOption(key: 'devices', labelKey: 'iconOptionDevices'),
+    IconOption(key: 'movie', labelKey: 'iconOptionMovie'),
+    IconOption(key: 'event', labelKey: 'iconOptionEvent'),
+    IconOption(key: 'sports_esports', labelKey: 'iconOptionSportsEsports'),
+    IconOption(key: 'nightlife', labelKey: 'iconOptionNightlife'),
+    IconOption(
+        key: 'account_balance_wallet',
+        labelKey: 'iconOptionAccountBalanceWallet'),
+    IconOption(key: 'receipt_long', labelKey: 'iconOptionReceiptLong'),
+    IconOption(key: 'percent', labelKey: 'iconOptionPercent'),
+    IconOption(key: 'business', labelKey: 'iconOptionBusiness'),
+    IconOption(key: 'credit_card', labelKey: 'iconOptionCreditCard'),
+    IconOption(key: 'self_improvement', labelKey: 'iconOptionSelfImprovement'),
+    IconOption(key: 'child_care', labelKey: 'iconOptionChildCare'),
+    IconOption(key: 'child_friendly', labelKey: 'iconOptionChildFriendly'),
+    IconOption(key: 'pets', labelKey: 'iconOptionPets'),
+    IconOption(key: 'lunch_dining', labelKey: 'iconOptionLunchDining'),
+    IconOption(key: 'commute', labelKey: 'iconOptionCommute'),
+    IconOption(
+        key: 'volunteer_activism', labelKey: 'iconOptionVolunteerActivism'),
+    IconOption(key: 'warning', labelKey: 'iconOptionWarning'),
+    IconOption(key: 'more_horiz', labelKey: 'iconOptionMoreHoriz'),
   ];
 
-  static final Map<String, String> _labelsByKey = {
-    for (final option in all) option.key: option.label,
+  static final Map<String, String> _labelKeysByKey = {
+    for (final option in all) option.key: option.labelKey,
   };
 
   static bool isSupported(String? key) {
     if (key == null) {
       return false;
     }
-    return _labelsByKey.containsKey(key);
+    return _labelKeysByKey.containsKey(key);
   }
 
   static String normalize(String? key) {
@@ -111,7 +118,7 @@ abstract final class IconOptions {
     return defaultKey;
   }
 
-  static String labelFor(String? key) {
-    return _labelsByKey[normalize(key)] ?? _labelsByKey[defaultKey]!;
+  static String labelKeyFor(String? key) {
+    return _labelKeysByKey[normalize(key)] ?? _labelKeysByKey[defaultKey]!;
   }
 }

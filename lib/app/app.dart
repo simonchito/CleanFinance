@@ -52,7 +52,7 @@ class _CleanFinanceAppState extends ConsumerState<CleanFinanceApp>
         AppConstants.defaultLocalePreferenceCode;
 
     return MaterialApp(
-      title: 'CleanFinance',
+      title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

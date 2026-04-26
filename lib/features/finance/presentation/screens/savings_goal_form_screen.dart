@@ -83,9 +83,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            strings.isEnglish
-                ? 'Choose a valid reminder day.'
-                : 'Elegí un día de recordatorio válido.',
+            strings.t('elegiUnDiaDeRecordatorioValido'),
           ),
         ),
       );
@@ -148,16 +146,12 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    strings.isEnglish
-                        ? 'Define a simple and visible goal'
-                        : 'Definí una meta simple y visible',
+                    strings.t('definiUnaMetaSimpleYVisible'),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    strings.isEnglish
-                        ? 'Clear name, target amount and optional date. Nothing else.'
-                        : 'Nombre claro, monto objetivo y fecha opcional. Nada más.',
+                    strings.t('nombreClaroMontoObjetivoYFechaOpcional'),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -169,14 +163,11 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             TextFormField(
               controller: _nameController,
               decoration: InputDecoration(
-                labelText:
-                    strings.localized(es: 'Nombre de la meta', en: 'Goal name'),
+                labelText: strings.t('nombreDeLaMeta'),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return strings.isEnglish
-                      ? 'Enter a name.'
-                      : 'Ingresá un nombre.';
+                  return strings.t('ingresaUnNombre');
                 }
                 return null;
               },
@@ -189,8 +180,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
                 WholeAmountInputFormatter(localeCode: _localeCode),
               ],
               decoration: InputDecoration(
-                labelText: strings.localized(
-                    es: 'Monto objetivo', en: 'Target amount'),
+                labelText: strings.t('montoObjetivo'),
               ),
               validator: (value) {
                 final parsed = CurrencyFormatter.tryParseWholeAmount(
@@ -198,9 +188,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
                   localeCode: _localeCode,
                 );
                 if (parsed == null || parsed <= 0) {
-                  return strings.isEnglish
-                      ? 'Enter a valid amount.'
-                      : 'Ingresá un monto válido.';
+                  return strings.t('ingresaUnMontoValido');
                 }
                 return null;
               },
@@ -211,9 +199,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
               icon: const Icon(Icons.calendar_month_rounded),
               label: Text(
                 _targetDate == null
-                    ? (strings.isEnglish
-                        ? 'Add target date'
-                        : 'Agregar fecha objetivo')
+                    ? (strings.t('agregarFechaObjetivo'))
                     : DateFormat('d MMMM y', strings.languageCode)
                         .format(_targetDate!),
               ),
@@ -223,9 +209,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
               contentPadding: EdgeInsets.zero,
               title: Text(strings.monthlyReminder),
               subtitle: Text(
-                strings.isEnglish
-                    ? 'Helps you remember monthly contributions for this goal.'
-                    : 'Te ayuda a no olvidarte del aporte mensual para esta meta.',
+                strings.t('teAyudaANoOlvidarteDelAporte'),
               ),
               value: _reminderEnabled,
               onChanged: (value) {
@@ -241,9 +225,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
                 label: strings.reminderDay,
                 value: _reminderDay,
                 sheetTitle: strings.reminderDay,
-                sheetDescription: strings.isEnglish
-                    ? 'Choose the day of month when you want the reminder.'
-                    : 'Elegí el día del mes en el que querés recibir el recordatorio.',
+                sheetDescription: strings.t('elegiElDiaDelMesEnEl'),
                 items: List.generate(
                   31,
                   (index) => SelectionSheetItem(
@@ -260,7 +242,7 @@ class _SavingsGoalFormScreenState extends ConsumerState<SavingsGoalFormScreen> {
             FilledButton(
               onPressed: _save,
               child: Text(
-                strings.localized(es: 'Guardar meta', en: 'Save goal'),
+                strings.t('guardarMeta'),
               ),
             ),
           ],

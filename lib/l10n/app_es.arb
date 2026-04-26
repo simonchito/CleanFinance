@@ -6,7 +6,6 @@
   "useDeviceLanguage": "Usar idioma del dispositivo",
   "spanish": "Español",
   "english": "Inglés",
-  "portugueseBrazil": "Portugués",
   "dashboard": "Inicio",
   "movements": "Movimientos",
   "savings": "Ahorros",
@@ -20,5 +19,791 @@
   "cancel": "Cancelar",
   "save": "Guardar",
   "apply": "Aplicar",
-  "clear": "Limpiar"
+  "clear": "Limpiar",
+  "privacyPolicy": "Política de privacidad",
+  "paymentMethods": "Medios de pago",
+  "managePaymentMethods": "Gestionar medios de pago",
+  "manageReminders": "Gestionar recordatorios",
+  "addPaymentMethod": "Agregar medio de pago",
+  "movementPaymentMethod": "Medio de pago",
+  "paymentMethodTransfer": "Transferencia",
+  "paymentMethodDebitCard": "Tarjeta débito",
+  "paymentMethodCreditCard": "Tarjeta crédito",
+  "paymentMethodUnspecified": "Sin definir",
+  "monthlyReminder": "Recordatorio mensual",
+  "monthlyReminderDescription": "Usalo para gastos mensuales recurrentes y verlos como pendientes hasta registrar el pago.",
+  "reminderDay": "Día de recordatorio",
+  "pendingThisMonth": "Pendientes este mes",
+  "reminderRegisterPayment": "Registrar pago",
+  "reminderLastRegistered": "Último registro",
+  "noSubcategory": "Sin subcategoría",
+  "newMovement": "Nuevo movimiento",
+  "editMovement": "Editar movimiento",
+  "saveMovement": "Guardar movimiento",
+  "saveChanges": "Guardar cambios",
+  "unlimitedDate": "Sin fecha límite",
+  "biometric": "Desbloqueo con biometría",
+  "exportBackup": "Exportar backup",
+  "importBackup": "Importar backup",
+  "manageCategories": "Gestionar categorías",
+  "noCategories": "No hay categorías.",
+  "mainCategory": "Categoría principal",
+  "addSubcategory": "Agregar subcategoría",
+  "manageBudgets": "Gestionar presupuestos",
+  "amountPrivacy": "Privacidad de montos",
+  "amountPrivacyDescription": "Ocultá saldos y resúmenes cuando usás la app en público.",
+  "newBudget": "Nuevo presupuesto",
+  "editBudget": "Editar presupuesto",
+  "monthlyLimit": "Límite mensual",
+  "searchByNote": "Buscar por nota o referencia",
+  "setupTitle": "Tu dinero, claro y bajo control",
+  "unlockTitle": "Bienvenido otra vez",
+  "recoverAccess": "Recuperar acceso",
+  "documentId": "Documento personal",
+  "paymentMethodQr": "QR",
+  "text": "Atención",
+  "text2": "Descriptivo",
+  "text3": "Diagnóstico",
+  "text4": "Proyección",
+  "text5": "Acción",
+  "text6": "Metas",
+  "appearance": "Apariencia",
+  "privacy": "Privacidad",
+  "security": "Seguridad",
+  "data": "Datos",
+  "paymentMethodCash": "Efectivo",
+  "reminderDayPrefix": "Día",
+  "noGoal": "Sin meta",
+  "amount": "Monto",
+  "note": "Nota",
+  "type": "Tipo",
+  "date": "Fecha",
+  "movement": "Movimiento",
+  "movementsTab": "Movs.",
+  "createGoal": "Crear meta",
+  "newGoal": "Nueva meta",
+  "editGoal": "Editar meta",
+  "completed": "Completadas",
+  "activeGoals": "Metas activas",
+  "achieved": "Lograda",
+  "contribute": "Aportar",
+  "defaultCategory": "Predefinida",
+  "customCategory": "Personalizada",
+  "budgets": "Presupuestos",
+  "showAmounts": "Mostrar montos",
+  "hideAmounts": "Ocultar montos",
+  "spent": "Gastado",
+  "remaining": "Disponible",
+  "lockNow": "Bloquear ahora",
+  "add": "Agregar",
+  "all": "Todos",
+  "from": "Desde",
+  "to": "Hasta",
+  "filters": "Filtros",
+  "forgotPin": "Olvidé mi PIN",
+  "birthDate": "Fecha de nacimiento",
+  "todaviaNoHaySuficienteActividadEsteMes": "Todavía no hay suficiente actividad este mes para una proyección sólida.",
+  "vasEnCaminoACerrarElMes": "Vas en camino a cerrar el mes con saldo positivo si mantenés este ritmo.",
+  "tuRitmoActualPodriaDejarteConMuy": "Tu ritmo actual podría dejarte con muy poco margen al cierre del mes.",
+  "siElGastoSigueAEsteRitmo": "Si el gasto sigue a este ritmo, este mes podría cerrar en déficit.",
+  "muySaludable": "Muy saludable",
+  "tuMesVieneEquilibradoYConBuen": "Tu mes viene equilibrado y con buen margen para absorber imprevistos.",
+  "tusNumerosEstanBastanteControladosConAlgunos": "Tus números están bastante controlados, con algunos puntos para seguir de cerca.",
+  "tuFlujoSigueFuncionandoPeroConvieneAjustar": "Tu flujo sigue funcionando, pero conviene ajustar antes de que el mes se ponga más justo.",
+  "elRitmoActualPuedeDejarteSinMargen": "El ritmo actual puede dejarte sin margen antes de cerrar el mes.",
+  "masDeLoQueEntra": "Más de lo que entra",
+  "mesConMargen": "Mes con margen",
+  "categoriaDominante": "Categoría dominante",
+  "cambioBruscoDeGasto": "Cambio brusco de gasto",
+  "buenAjuste": "Buen ajuste",
+  "riesgoDeFinDeMes": "Riesgo de fin de mes",
+  "ritmoBajoControl": "Ritmo bajo control",
+  "gastoAtipico": "Gasto atípico",
+  "ahorroSaludable": "Ahorro saludable",
+  "sugerenciaSimple": "Sugerencia simple",
+  "mesEnMejora": "Mes en mejora",
+  "mesMasExigente": "Mes más exigente",
+  "metaEncaminada": "Meta encaminada",
+  "despuesDeGastarYAhorrarTodaviaTe": "Después de gastar y ahorrar, todavía te queda un margen positivo este mes.",
+  "tuProyeccionDeGastoCierraDentroDel": "Tu proyección de gasto cierra dentro del margen disponible para este mes.",
+  "reservarAunqueSeaUn5AlCobrar": "Reservar aunque sea un 5% al cobrar puede darte más aire para fin de mes.",
+  "tuResultadoMensualVieneMejorQueEl": "Tu resultado mensual viene mejor que el del período anterior.",
+  "tuMargenBajoFrenteAlMesAnterior": "Tu margen bajó frente al mes anterior. Vale la pena revisar el ritmo.",
+  "actualizaTuRegistro": "Actualizá tu registro",
+  "registraUnMovimientoEnSegundos": "Registrá un movimiento en segundos",
+  "usaLenguajeSimpleYDejaSoloLa": "Usá lenguaje simple y dejá solo la información necesaria.",
+  "elegiQueTipoDeMovimientoQueresRegistrar": "Elegí qué tipo de movimiento querés registrar.",
+  "ingresaUnMontoValido": "Ingresá un monto válido.",
+  "elegiUnaCategoria": "Elegí una categoría",
+  "elegiLaCategoriaPrincipal": "Elegí la categoría principal.",
+  "subcategoriaOpcional": "Subcategoría (opcional)",
+  "siAplicaElegiUnDetalleMasEspecifico": "Si aplica, elegí un detalle más específico.",
+  "vinculaElMovimientoConUnaDeTus": "Vinculá el movimiento con una de tus metas de ahorro.",
+  "siGuardasAhoraQuedaraEnAhorroGeneral": "Si guardás ahora, quedará en Ahorro general y podés crear una meta después.",
+  "tipSiElegisUnaMetaVasA": "Tip: si elegís una meta, vas a seguir el progreso más fácil en Ahorros.",
+  "elegiUnMedioDePago": "Elegí un medio de pago",
+  "ejemploCompraSemanalOPagoDeServicio": "Ejemplo: compra semanal o pago de servicio",
+  "protegerBackup": "Proteger backup",
+  "agregaUnaContrasenaOpcionalSiLaDejas": "Agregá una contraseña opcional. Si la dejás vacía, el backup se exportará como JSON legible.",
+  "backupLocalDeCleanfinance": "Backup local de CleanFinance",
+  "estaAccionReemplazaraTusDatosLocalesActuales": "Esta acción reemplazará tus datos locales actuales. El archivo se validará antes de importar para no tocar tus datos si encuentra problemas.",
+  "siEsteBackupFueProtegidoConContrasena": "Si este backup fue protegido con contraseña, ingresala ahora. Si es un JSON plano, dejala vacía.",
+  "datosImportadosCorrectamente": "Datos importados correctamente.",
+  "borrarTodosLosDatos": "Borrar todos los datos",
+  "estoEliminaraLaBaseLocalCompletaEl": "Esto eliminará la base local completa, el PIN, los datos de recuperación y las banderas de biometría, dejando la app como una instalación limpia.",
+  "borrarTodo": "Borrar todo",
+  "seBorraronTodosLosDatosLocalesLa": "Se borraron todos los datos locales. La app quedó en estado de instalación limpia.",
+  "contrasenaOpcional": "Contraseña (opcional)",
+  "unaAppSimplePrivadaYClara": "Una app simple, privada y clara",
+  "configuraLaExperienciaParaQueSeSienta": "Configurá la experiencia para que se sienta realmente tuya.",
+  "manteneAccesoRapidoSinPerderPrivacidad": "Mantené acceso rápido sin perder privacidad.",
+  "usaHuellaOReconocimientoFacialSiEsta": "Usá huella o reconocimiento facial si está disponible.",
+  "esteDispositivoNoTieneBiometriaDisponible": "Este dispositivo no tiene biometría disponible.",
+  "bloqueoAutomatico": "Bloqueo automático",
+  "revisaQueGuardaCleanfinanceDeFormaLocal": "Revisá qué guarda CleanFinance de forma local, cómo funcionan los backups y qué datos nunca se envían a servidores.",
+  "seguirSistema": "Seguir sistema",
+  "recibiRecordatoriosMensualesEnEsteTelefono": "Recibí recordatorios mensuales en este teléfono.",
+  "notificacionesDelSistema": "Notificaciones del sistema",
+  "horaDeRecordatorio": "Hora de recordatorio",
+  "personalizaLasListasQueUsasTodosLos": "Personalizá las listas que usás todos los días para que cargar datos siga siendo rápido y claro.",
+  "tusDatosVivenEnTuDispositivoPodes": "Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.",
+  "notaDeSeguridadLosBackupsLocalesPueden": "Nota de seguridad: los backups locales pueden exportarse como JSON plano. Ahora podés agregar una contraseña opcional, pero los datos guardados en SQLite dentro del dispositivo siguen sin cifrado de base.",
+  "privacidadPrimeroNoHayTrackingNoSe": "Privacidad primero: no hay tracking, no se suben datos financieros y todo queda bajo tu control local.",
+  "noSePudieronCargarLosAjustes": "No se pudieron cargar los ajustes",
+  "revisandoPermiso": "Revisando permiso...",
+  "noSePudoRevisarElPermiso": "No se pudo revisar el permiso",
+  "notificacionesDesactivadas": "Notificaciones desactivadas",
+  "notificacionesActivadas": "Notificaciones activadas",
+  "permisoPendiente": "Permiso pendiente",
+  "permisoDenegado": "Permiso denegado",
+  "noDisponibleEnEstaPlataforma": "No disponible en esta plataforma",
+  "errorInesperado": "Error inesperado.",
+  "pinIncorrecto": "PIN incorrecto.",
+  "nuevoPin": "Nuevo PIN",
+  "confirmarPin": "Confirmar PIN",
+  "validando": "Validando...",
+  "empezar": "Empezar",
+  "desbloquear": "Desbloquear",
+  "eliminarPresupuesto": "Eliminar presupuesto",
+  "eliminar": "Eliminar",
+  "guardando": "Guardando...",
+  "reintentar": "Reintentar",
+  "atencion": "Atención",
+  "excedido": "Excedido",
+  "normal": "Normal",
+  "bajo": "Bajo",
+  "medio": "Medio",
+  "alto": "Alto",
+  "estable": "Estable",
+  "enRiesgo": "En riesgo",
+  "eliminarCategoria": "Eliminar categoría",
+  "nuevaCategoria": "Nueva categoría",
+  "editarCategoria": "Editar categoría",
+  "nombre": "Nombre",
+  "recomendaciones": "Recomendaciones",
+  "movimientosRecientes": "Movimientos recientes",
+  "recordatoriosDeGastos": "Recordatorios de gastos",
+  "recordatoriosDeAhorro": "Recordatorios de ahorro",
+  "eliminarMovimiento": "Eliminar movimiento",
+  "agregarMovimiento": "Agregar movimiento",
+  "evolucionMensual": "Evolución mensual",
+  "ritmoDeGasto": "Ritmo de gasto",
+  "proyeccion": "Proyección",
+  "estado": "Estado",
+  "metasDeAhorro": "Metas de ahorro",
+  "lecturaRapida": "Lectura rápida",
+  "enRango": "En rango",
+  "atencion2": "Atención",
+  "riesgo": "Riesgo",
+  "nuevo": "Nuevo",
+  "sinEstimacionTodavia": "Sin estimación todavía",
+  "nombreDeLaMeta": "Nombre de la meta",
+  "montoObjetivo": "Monto objetivo",
+  "guardarMeta": "Guardar meta",
+  "eliminarMeta": "Eliminar meta",
+  "ahorroGeneral": "Ahorro general",
+  "objetivo": "Objetivo",
+  "advertenciaElArchivoNoEstaCifrado": "Advertencia: el archivo no está cifrado.",
+  "oneMinute": "1 minuto",
+  "fiveMinutes": "5 minutos",
+  "fifteenMinutes": "15 minutos",
+  "thirtyMinutes": "30 minutos",
+  "tema": "Tema",
+  "claro": "Claro",
+  "oscuro": "Oscuro",
+  "moneda": "Moneda",
+  "notificaciones": "Notificaciones",
+  "organizacion": "Organización",
+  "netoEstimado": "Neto estimado",
+  "icono": "Ícono",
+  "tocaParaCambiar": "Tocá para cambiar",
+  "elegiUnIcono": "Elegí un ícono",
+  "seleccionar": "Seleccionar",
+  "total": "Total",
+  "movementFormMissingCategory": "Seleccioná una categoría antes de guardar.",
+  "movementFormLoadCategoriesError": "No se pudieron cargar categorías: {error}",
+  "@movementFormLoadCategoriesError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "financeInsightOvercommittedMessage": "Tus gastos y ahorros ya consumieron {percentage}% de tus ingresos del mes.",
+  "@financeInsightOvercommittedMessage": {
+    "placeholders": {
+      "percentage": {}
+    }
+  },
+  "financeInsightDominantCategoryMessage": "{categoryName} concentra {percentage}% de tus gastos del mes.",
+  "@financeInsightDominantCategoryMessage": {
+    "placeholders": {
+      "percentage": {},
+      "categoryName": {}
+    }
+  },
+  "financeInsightExpenseIncreaseMessage": "{categoryName} subió {percentage}% frente al mes anterior.",
+  "@financeInsightExpenseIncreaseMessage": {
+    "placeholders": {
+      "percentage": {},
+      "categoryName": {}
+    }
+  },
+  "financeInsightExpenseDecreaseMessage": "{categoryName} bajó {percentage}% frente al mes anterior.",
+  "@financeInsightExpenseDecreaseMessage": {
+    "placeholders": {
+      "percentage": {},
+      "categoryName": {}
+    }
+  },
+  "financeInsightEndOfMonthRiskMessage": "Si seguís con este ritmo, podrías cerrar con un margen {amount} por debajo de cero.",
+  "@financeInsightEndOfMonthRiskMessage": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "financeInsightAtypicalExpenseMessage": "Una sola compra representó {percentage}% de tus ingresos del mes.",
+  "@financeInsightAtypicalExpenseMessage": {
+    "placeholders": {
+      "percentage": {}
+    }
+  },
+  "financeInsightHealthySavingsMessage": "Ya separaste {percentage}% de tus ingresos del mes.",
+  "@financeInsightHealthySavingsMessage": {
+    "placeholders": {
+      "percentage": {}
+    }
+  },
+  "financeInsightGoalOnTrackMessage": "{goalName} ya va en {percentage}% y mantiene buen ritmo.",
+  "@financeInsightGoalOnTrackMessage": {
+    "placeholders": {
+      "percentage": {},
+      "goalName": {}
+    }
+  },
+  "authRecoveryDocumentExample": "Ejemplo: 12345678",
+  "authUseBiometrics": "Usar biometría",
+  "authUnlockWithPinOrBiometrics": "Entrá con tu PIN o usá biometría para acceder rápido a tus finanzas.",
+  "authWaitBeforeRetry": "Esperá {seconds}s para volver a intentar.",
+  "@authWaitBeforeRetry": {
+    "placeholders": {
+      "seconds": {}
+    }
+  },
+  "authBiometricsEnabledTip": "Tip: si activaste biometría, entrar te lleva un toque.",
+  "authBiometricsUnavailablePinProtected": "La biometría no está disponible en este dispositivo, pero tu PIN sigue protegido localmente.",
+  "estaCategoria": "Esta categoría",
+  "tuMeta": "Tu meta",
+  "revisaTusDatosDeRecuperacionEIntenta": "Revisá tus datos de recuperación e intentá nuevamente.",
+  "laBiometriaNoEstaDisponibleEnEste": "La biometría no está disponible en este dispositivo.",
+  "noSePudoUsarLaBiometriaConfigura": "No se pudo usar la biometría. Configurá huella/rostro y bloqueo de pantalla.",
+  "noSePudoValidarLaBiometriaVerifica": "No se pudo validar la biometría. Verificá la configuración del dispositivo.",
+  "noSePudoVerificarLaRecuperacionRevisa": "No se pudo verificar la recuperación. Revisá tus datos e intentá nuevamente.",
+  "algunasValidacionesDeSeguridadNoPudieronInicializarse": "Algunas validaciones de seguridad no pudieron inicializarse. La app está en modo seguro.",
+  "completaAmbasRespuestasDeRecuperacion": "Completá ambas respuestas de recuperación.",
+  "usaUnaFechaValidaYUnDocumento": "Usá una fecha válida y un documento con al menos 6 caracteres.",
+  "losPinNoCoinciden": "Los PIN no coinciden.",
+  "recuperaTuAccesoSinComplicarte": "Recuperá tu acceso sin complicarte",
+  "respondeTusDosPreguntasPersonalesYElegi": "Respondé tus dos preguntas personales y elegí un PIN nuevo.",
+  "laRecuperacionLocalEsMenosRobustaQue": "La recuperación local es menos robusta que tu PIN. Si alguien conoce estos datos y tiene el dispositivo, podría intentar restablecer el acceso.",
+  "ejemplo10021996": "Ejemplo: 10/02/1996",
+  "activarHuellaParaProximosAccesos": "Activar huella para próximos accesos",
+  "asiVasAPoderEntrarMasRapido": "Así vas a poder entrar más rápido después de recuperar tu cuenta.",
+  "completaTusDosPreguntasDeRecuperacion": "Completá tus dos preguntas de recuperación.",
+  "creaUnPinCortoParaProtegerTus": "Creá un PIN corto para proteger tus datos. Todo queda guardado solo en tu dispositivo.",
+  "elegiTuPin": "Elegí tu PIN",
+  "repetiTuPin": "Repetí tu PIN",
+  "activarHuellaParaEntrarMasRapido": "Activar huella para entrar más rápido",
+  "laAppTeLaVaAOfrecer": "La app te la va a ofrecer en el próximo desbloqueo.",
+  "configurando": "Configurando...",
+  "guardamosEstasRespuestasSoloParaAyudarteA": "Guardamos estas respuestas solo para ayudarte a recuperar el acceso si olvidás tu PIN.",
+  "lasRespuestasDeRecuperacionSonMasDebiles": "Las respuestas de recuperación son más débiles que tu PIN. Usá datos reales, pero tené en cuenta que alguien que los conozca podría intentar restablecer el acceso en este dispositivo.",
+  "estePresupuestoMensualSeEliminaraYEl": "Este presupuesto mensual se eliminará y el seguimiento de esta categoría se detendrá hasta que crees uno nuevo.",
+  "seleccionaUnaCategoria": "Seleccioná una categoría.",
+  "primeroCreaUnaCategoriaDeGasto": "Primero creá una categoría de gasto",
+  "losPresupuestosSeCreanAPartirDe": "Los presupuestos se crean a partir de tus categorías de gasto existentes.",
+  "ajustaEstePresupuestoMensual": "Ajustá este presupuesto mensual",
+  "creaUnPresupuestoMensualPorCategoria": "Creá un presupuesto mensual por categoría",
+  "losPresupuestosSeGuardanLocalmenteYSe": "Los presupuestos se guardan localmente y se comparan con tus gastos del mes actual.",
+  "elegiLaCategoriaDeGastoParaEste": "Elegí la categoría de gasto para este presupuesto mensual.",
+  "ingresaUnLimiteMensualValido": "Ingresá un límite mensual válido.",
+  "presupuestosMensuales": "Presupuestos mensuales",
+  "seguiComoVieneCadaCategoriaEsteMes": "Seguí cómo viene cada categoría este mes y ajustá los límites cuando lo necesites.",
+  "creaTuPrimerPresupuesto": "Creá tu primer presupuesto",
+  "definiUnLimiteMensualParaUnaCategoria": "Definí un límite mensual para una categoría de gasto y vamos a seguir cuánto ya gastaste.",
+  "agregarPresupuesto": "Agregar presupuesto",
+  "noSePudieronCargarLosPresupuestos": "No se pudieron cargar los presupuestos",
+  "eliminarSubcategoria": "Eliminar subcategoría",
+  "categoriaPadre": "Categoría padre",
+  "sinCategoriaPadre": "Sin categoría padre",
+  "elegiUnaCategoriaPrincipalSoloSiQueres": "Elegí una categoría principal solo si querés crear una subcategoría.",
+  "usaEstaSubcategoriaParaServiciosOGastos": "Usá esta subcategoría para servicios o gastos recurrentes.",
+  "saldoActual": "Saldo actual",
+  "ahorroTotal": "Ahorro total",
+  "todaviaNoHayRecomendaciones": "Todavía no hay recomendaciones",
+  "cargaAlgunosMovimientosParaVerAlertasY": "Cargá algunos movimientos para ver alertas y recomendaciones simples.",
+  "ingresosVsGastos": "Ingresos vs gastos",
+  "unaLecturaRapidaDeComoVieneEl": "Una lectura rápida de cómo viene el mes.",
+  "comparaTusIngresosYGastosDeLos": "Compará tus ingresos y gastos de los últimos 6 meses.",
+  "gastosPorCategoria": "Gastos por categoría",
+  "simpleClaroYFacilDeLeer": "Simple, claro y fácil de leer.",
+  "todaviaNoHayGastosSuficientes": "Todavía no hay gastos suficientes",
+  "cuandoRegistresGastosVasAVerTus": "Cuando registres gastos, vas a ver tus categorías principales acá.",
+  "agregarGasto": "Agregar gasto",
+  "empezaConTuPrimerMovimiento": "Empezá con tu primer movimiento",
+  "cargarGastosEIngresosTeVaA": "Cargar gastos e ingresos te va a permitir ver resumen, alertas y gráficos.",
+  "noPudimosCargarElInicio": "No pudimos cargar el inicio",
+  "sinCategoria": "Sin categoría",
+  "revisaTusRecordatoriosMensualesActivos": "Revisá tus recordatorios mensuales activos",
+  "losRecordatoriosDeGastoSalenDeSubcategorias": "Los recordatorios de gasto salen de subcategorías y los de ahorro salen de metas.",
+  "noHayRecordatoriosDeGastoActivos": "No hay recordatorios de gasto activos",
+  "activaRecordatoriosAlCrearOEditarUna": "Activá recordatorios al crear o editar una subcategoría de gastos.",
+  "noSePudieronCargarLosRecordatoriosDe": "No se pudieron cargar los recordatorios de gasto",
+  "noHayRecordatoriosDeAhorroActivos": "No hay recordatorios de ahorro activos",
+  "activaRecordatoriosAlCrearOEditarUna2": "Activá recordatorios al crear o editar una meta de ahorro.",
+  "metaCompletada": "Meta completada",
+  "noSePudieronCargarLosRecordatoriosDe2": "No se pudieron cargar los recordatorios de ahorro",
+  "elegiElDiaDelMesParaEl": "Elegí el día del mes para el recordatorio.",
+  "seEliminaraEsteMovimientoDeFormaPermanente": "Se eliminará este movimiento de forma permanente. Verificá los datos antes de continuar.",
+  "elegiSoloLoNecesarioParaEncontrarRapido": "Elegí solo lo necesario para encontrar rápido lo que buscás.",
+  "filtraPorUnaCategoriaPrincipalParaAcotar": "Filtrá por una categoría principal para acotar la búsqueda.",
+  "noEncontramosMovimientos": "No encontramos movimientos",
+  "probaCambiandoElFiltroOAgregandoUn": "Probá cambiando el filtro o agregando un nuevo registro.",
+  "noSePudieronCargarLosMovimientos": "No se pudieron cargar los movimientos",
+  "editarMedioDePago": "Editar medio de pago",
+  "ejemploQrTransferenciaOEfectivo": "Ejemplo: QR, transferencia o efectivo",
+  "elegiSoloLosMediosDePagoQue": "Elegí solo los medios de pago que realmente usás",
+  "estasOpcionesVanAAparecerComoDesplegable": "Estas opciones van a aparecer como desplegable al cargar un movimiento.",
+  "todaviaNoHayMediosDePago": "Todavía no hay medios de pago",
+  "agregaTusOpcionesHabitualesComoTransferenciaDebito": "Agregá tus opciones habituales como transferencia, débito o efectivo.",
+  "saludFinanciera": "Salud financiera",
+  "cashflowMensual": "Cashflow mensual",
+  "unResumenRapidoParaEntenderCuantoEntro": "Un resumen rápido para entender cuánto entró, cuánto salió y qué margen te quedó.",
+  "saldoNeto": "Saldo neto",
+  "comparaComoVienenTusIngresosYGastos": "Compará cómo vienen tus ingresos y gastos en los últimos meses.",
+  "topCategoriasDelMes": "Top categorías del mes",
+  "vasAVerEnQueSeFue": "Vas a ver en qué se fue más dinero y cómo cambió frente al mes anterior.",
+  "sinDatosTodavia": "Sin datos todavía",
+  "cuandoRegistresGastosVasAVerAca": "Cuando registres gastos, vas a ver acá en qué categorías se fue más dinero.",
+  "teMuestraSiElGastoAcumuladoVa": "Te muestra si el gasto acumulado va dentro del margen esperable para este momento del mes.",
+  "esperadoHoy": "Esperado hoy",
+  "elRitmoActualEsExigenteParaTu": "El ritmo actual es exigente para tu margen disponible.",
+  "vasCercaDelLimiteConvieneMirarCon": "Vas cerca del límite. Conviene mirar con atención la segunda mitad del mes.",
+  "tuGastoVieneEnUnaZonaSaludable": "Tu gasto viene en una zona saludable para este momento del mes.",
+  "seguimientoSimpleDelAvanceRitmoDeAporte": "Seguimiento simple del avance, ritmo de aporte y fecha estimada de cumplimiento.",
+  "todaviaNoHayMetasParaAnalizar": "Todavía no hay metas para analizar",
+  "cuandoTengasMetasYAportesVasA": "Cuando tengas metas y aportes, vas a ver acá el ritmo de avance.",
+  "gastosPorMedioDePago": "Gastos por medio de pago",
+  "teAyudaAVerQueMetodoEstas": "Te ayuda a ver qué método estás usando más en el mes.",
+  "noSePudieronCargarLosReportes": "No se pudieron cargar los reportes",
+  "elegiUnDiaDeRecordatorioValido": "Elegí un día de recordatorio válido.",
+  "definiUnaMetaSimpleYVisible": "Definí una meta simple y visible",
+  "nombreClaroMontoObjetivoYFechaOpcional": "Nombre claro, monto objetivo y fecha opcional. Nada más.",
+  "ingresaUnNombre": "Ingresá un nombre.",
+  "agregarFechaObjetivo": "Agregar fecha objetivo",
+  "teAyudaANoOlvidarteDelAporte": "Te ayuda a no olvidarte del aporte mensual para esta meta.",
+  "elegiElDiaDelMesEnEl": "Elegí el día del mes en el que querés recibir el recordatorio.",
+  "todaviaNoTenesAhorroRegistrado": "Todavía no tenés ahorro registrado",
+  "creaUnaMetaORegistraUnAporte": "Creá una meta o registrá un aporte para empezar a ordenar tus ahorros.",
+  "totalAhorrado": "Total ahorrado",
+  "todoLoQueAhorrasteEstaOrganizadoEn": "Todo lo que ahorraste está organizado en metas.",
+  "logradas": "Logradas",
+  "metasLogradas": "Metas logradas",
+  "noPudimosCargarTusMetas": "No pudimos cargar tus metas",
+  "noPudimosCargarAhorros": "No pudimos cargar ahorros",
+  "dineroGuardadoSinUnaMetaEspecifica": "Dinero guardado sin una meta específica.",
+  "creaUnaMetaParaOrganizarMejorTus": "Creá una meta para organizar mejor tus ahorros.",
+  "excelenteYaAlcanzasteEstaMeta": "Excelente. Ya alcanzaste esta meta.",
+  "proyeccionDeFinDeMes": "Proyeccion de fin de mes",
+  "gastoProyectado": "Gasto proyectado",
+  "usaUnaOpcionClaraParaReconocerMas": "Usá una opción clara para reconocer más rápido la categoría.",
+  "iconoSeleccionado": "Ícono seleccionado",
+  "todaviaTeQuedaPagarOAhorrarPara": "Todavía te queda pagar o ahorrar para:",
+  "pinLabel": "PIN",
+  "authPinLengthInvalid": "El PIN debe tener {length} dígitos.",
+  "@authPinLengthInvalid": {
+    "placeholders": {
+      "length": {
+        "type": "Object"
+      }
+    }
+  },
+  "authLockoutActive": "Demasiados intentos fallidos. Esperá {seconds} segundos antes de volver a intentar.",
+  "@authLockoutActive": {
+    "placeholders": {
+      "seconds": {
+        "type": "Object"
+      }
+    }
+  },
+  "categoriesLoadError": "No se pudieron cargar las categorías: {error}",
+  "@categoriesLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "deleteSubcategoryMessage": "Se eliminará la subcategoría \"{name}\". Si tiene movimientos o dependencias, la app lo bloqueará antes de borrar.",
+  "@deleteSubcategoryMessage": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "deleteCategoryMessage": "Se eliminará la categoría \"{name}\". Si tiene movimientos, subcategorías o presupuestos asociados, la app lo bloqueará antes de borrar.",
+  "@deleteCategoryMessage": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "dashboardRemainingPositive": "Te quedan {amount} este mes.",
+  "@dashboardRemainingPositive": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "dashboardRemainingNegative": "Este mes vas {amount} por encima de tu margen.",
+  "@dashboardRemainingNegative": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "projectionAverageExpensePace": "Ritmo promedio: {amount}/día. Quedan {days} días.",
+  "@projectionAverageExpensePace": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      },
+      "days": {
+        "type": "Object"
+      }
+    }
+  },
+  "reportsShareOfTotal": "{percentage}% del total",
+  "@reportsShareOfTotal": {
+    "placeholders": {
+      "percentage": {
+        "type": "Object"
+      }
+    }
+  },
+  "reportsPreviousMonth": "Mes anterior: {amount}",
+  "@reportsPreviousMonth": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "savingsGoalProgress": "{saved} de {target}",
+  "@savingsGoalProgress": {
+    "placeholders": {
+      "saved": {
+        "type": "Object"
+      },
+      "target": {
+        "type": "Object"
+      }
+    }
+  },
+  "goalAverageContribution": "Aporte promedio: {amount} por mes",
+  "@goalAverageContribution": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "goalContributionThisMonth": "Aporte este mes: {amount}",
+  "@goalContributionThisMonth": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "goalEstimatedDate": "Fecha estimada: {date}",
+  "@goalEstimatedDate": {
+    "placeholders": {
+      "date": {
+        "type": "Object"
+      }
+    }
+  },
+  "deleteSavingsGoalMessage": "Se eliminará la meta \"{name}\". Los aportes ya registrados seguirán existiendo, pero dejarán de estar vinculados a esta meta.",
+  "@deleteSavingsGoalMessage": {
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "savingsGeneralIncluded": "Incluye {amount} en ahorro general.",
+  "@savingsGeneralIncluded": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "savingsContributionCount": "{count, plural, =1{1 aporte registrado.} other{{count} aportes registrados.}}",
+  "@savingsContributionCount": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "savingsContributionCountWithDate": "{count, plural, =1{1 aporte · último: {date}.} other{{count} aportes · último: {date}.}}",
+  "@savingsContributionCountWithDate": {
+    "placeholders": {
+      "count": {
+        "type": "num"
+      },
+      "date": {
+        "type": "Object"
+      }
+    }
+  },
+  "savingsGoalTargetDate": "Objetivo: {date}",
+  "@savingsGoalTargetDate": {
+    "placeholders": {
+      "date": {
+        "type": "Object"
+      }
+    }
+  },
+  "savingsGoalRemaining": "Te falta {amount} para llegar.",
+  "@savingsGoalRemaining": {
+    "placeholders": {
+      "amount": {
+        "type": "Object"
+      }
+    }
+  },
+  "privacySummaryTitle": "Resumen",
+  "privacySummaryBody1": "CleanFinance es una app de finanzas personales offline-first. No crea cuentas online, no sube tus registros financieros a servidores del desarrollador y no incluye SDKs de analítica, publicidad ni tracking.",
+  "privacySummaryBody2": "Esta política dentro de la app resume el tratamiento de datos que puede confirmarse desde el código fuente actual. La URL pública de política de privacidad que se publique en Google Play debe reflejar este mismo contenido e incluir el contacto final del desarrollador.",
+  "privacyStoredDataTitle": "Datos guardados en tu dispositivo",
+  "privacyStoredDataBody1": "CleanFinance guarda en una base SQLite local las categorías, movimientos, metas de ahorro, presupuestos, medios de pago, idioma, tema, preferencia de ocultar montos, preferencia de bloqueo automático y preferencia de biometría.",
+  "privacyStoredDataBody2": "La app también guarda en almacenamiento seguro de Android un PIN hasheado, respuestas de recuperación hasheadas para fecha de nacimiento y documento personal, y el estado de bloqueos temporales por intentos fallidos. Las respuestas de recuperación se piden solo para restablecer acceso en este mismo dispositivo si olvidás el PIN.",
+  "privacyBiometricsTitle": "Biometría y permisos",
+  "privacyBiometricsBody1": "Si activás el desbloqueo biométrico, CleanFinance le pide a Android que valide tu huella o rostro de forma local en el dispositivo. La app no recibe ni almacena tu plantilla biométrica.",
+  "privacyBiometricsBody2": "La versión Android solicita el permiso biométrico necesario para mostrar el diálogo del sistema. El manifest principal no declara permisos de ubicación, contactos, cámara, micrófono, SMS, teléfono ni publicidad.",
+  "privacyBackupsTitle": "Backups y compartición de archivos",
+  "privacyBackupsBody1": "Podés exportar tus datos manualmente desde Configuración. La exportación incluye tu base financiera local y la configuración. Si dejás la contraseña vacía, el archivo se guarda como JSON legible. Si ingresás una contraseña, el archivo se cifra antes de compartirlo o guardarlo.",
+  "privacyBackupsBody2": "Las importaciones son iniciadas por vos y reemplazan la base local actual solo después de validar el archivo. CleanFinance no sincroniza backups automáticamente con servidores del desarrollador.",
+  "privacySharingTitle": "Compartición, retención y borrado",
+  "privacySharingBody1": "La app no comparte datos personales ni financieros con el desarrollador ni con terceros. Los datos quedan en el dispositivo, salvo que vos decidas exportar y compartir un backup manualmente.",
+  "privacySharingBody2": "Tus datos permanecen en el dispositivo hasta que los borres, limpies la app, desinstales la app o uses la acción interna para borrar todos los datos locales. Borrar todos los datos elimina la base SQLite, las credenciales en almacenamiento seguro, los datos de recuperación y las banderas de biometría.",
+  "privacySecurityTitle": "Notas de seguridad",
+  "privacySecurityBody1": "Los datos financieros guardados en SQLite son locales, pero no tienen cifrado a nivel de archivo de base de datos. Los datos sensibles de autenticación se guardan hasheados en almacenamiento seguro. Además, las builds release desactivan el backup en la nube de Android para reducir copias no deseadas de datos financieros locales.",
+  "privacySecurityBody2": "Como la recuperación usa fecha de nacimiento y documento personal, alguien que conozca esos datos y tenga el dispositivo podría intentar un restablecimiento local. Por eso es importante proteger el equipo con bloqueo de pantalla de Android.",
+  "privacyContactTitle": "Contacto de privacidad",
+  "privacyContactBody1": "El canal oficial de contacto de privacidad para la app publicada debe ser el correo de desarrollador que figure en la ficha de Google Play de CleanFinance. Antes de salir a producción, asegurate de que la política pública alojada incluya esa dirección exacta.",
+  "iconOptionCategory": "General",
+  "iconOptionHome": "Hogar",
+  "iconOptionBolt": "Servicios",
+  "iconOptionRestaurant": "Comida",
+  "iconOptionCar": "Transporte",
+  "iconOptionHealth": "Salud",
+  "iconOptionEducation": "Educación",
+  "iconOptionShopping": "Compras",
+  "iconOptionEntertainment": "Ocio",
+  "iconOptionFinance": "Finanzas",
+  "iconOptionFamily": "Familia",
+  "iconOptionWork": "Trabajo",
+  "iconOptionPayments": "Pagos",
+  "iconOptionStorefront": "Ventas",
+  "iconOptionSavings": "Ahorro",
+  "iconOptionShield": "Protección",
+  "iconOptionFlight": "Viajes",
+  "iconOptionPalette": "Decoración",
+  "iconOptionKitchen": "Cocina",
+  "iconOptionReceipt": "Facturas",
+  "iconOptionCleaningServices": "Limpieza",
+  "iconOptionBuild": "Mantenimiento",
+  "iconOptionChair": "Muebles",
+  "iconOptionHandyman": "Reparaciones",
+  "iconOptionWaterDrop": "Agua",
+  "iconOptionTv": "TV",
+  "iconOptionLocalFireDepartment": "Gas",
+  "iconOptionWifi": "Internet",
+  "iconOptionElectricBolt": "Luz",
+  "iconOptionCloud": "Apps",
+  "iconOptionPlayCircle": "Streaming",
+  "iconOptionPhone": "Teléfono",
+  "iconOptionCoffee": "Cafetería",
+  "iconOptionSetMeal": "Carnicería",
+  "iconOptionDeliveryDining": "Delivery",
+  "iconOptionBakeryDining": "Panadería",
+  "iconOptionRestaurantMenu": "Restaurantes",
+  "iconOptionShoppingCart": "Supermercado",
+  "iconOptionEco": "Verdulería",
+  "iconOptionLocalGasStation": "Combustible",
+  "iconOptionLocalParking": "Estacionamiento",
+  "iconOptionToll": "Peajes",
+  "iconOptionSecurity": "Seguro",
+  "iconOptionLocalTaxi": "Taxi",
+  "iconOptionDirectionsBus": "Colectivo",
+  "iconOptionEmojiTransportation": "Movilidad",
+  "iconOptionMedicalServices": "Consultas",
+  "iconOptionScience": "Estudios",
+  "iconOptionMedication": "Medicamentos",
+  "iconOptionHealthAndSafety": "Prepaga",
+  "iconOptionMood": "Odontología",
+  "iconOptionVisibility": "Óptica",
+  "iconOptionMenuBook": "Cursos",
+  "iconOptionBook": "Libros",
+  "iconOptionEdit": "Materiales",
+  "iconOptionSchool": "Capacitación",
+  "iconOptionHiking": "Calzado",
+  "iconOptionLanguage": "Online",
+  "iconOptionCardGiftcard": "Regalos",
+  "iconOptionCheckroom": "Ropa",
+  "iconOptionDevices": "Tecnología",
+  "iconOptionMovie": "Cine",
+  "iconOptionEvent": "Eventos",
+  "iconOptionSportsEsports": "Juegos",
+  "iconOptionNightlife": "Salidas",
+  "iconOptionAccountBalanceWallet": "Comisiones",
+  "iconOptionReceiptLong": "Impuestos",
+  "iconOptionPercent": "Intereses",
+  "iconOptionBusiness": "Monotributo",
+  "iconOptionCreditCard": "Tarjetas",
+  "iconOptionSelfImprovement": "Personal",
+  "iconOptionChildCare": "Guardería",
+  "iconOptionChildFriendly": "Hijos",
+  "iconOptionPets": "Mascotas",
+  "iconOptionLunchDining": "Comidas",
+  "iconOptionCommute": "Traslados",
+  "iconOptionVolunteerActivism": "Donaciones",
+  "iconOptionWarning": "Imprevistos",
+  "iconOptionMoreHoriz": "Varios",
+  "defaultCategoryNameHobbies": "Hobbies",
+  "defaultCategoryNameCompras": "Compras",
+  "defaultCategoryNameImpuestos": "Impuestos",
+  "defaultCategoryNameLimpieza": "Limpieza",
+  "defaultCategoryNameMuebles": "Muebles",
+  "defaultCategoryNameMantenimientoDelVehiculo": "Mantenimiento del vehículo",
+  "defaultCategoryNameMateriales": "Materiales",
+  "defaultCategoryNameExpensas": "Expensas",
+  "defaultCategoryNameInternet": "Internet",
+  "defaultCategoryNameAlquiler": "Alquiler",
+  "defaultCategoryNamePanaderia": "Panadería",
+  "defaultCategoryNameComisionesBancarias": "Comisiones bancarias",
+  "defaultCategoryNameDonaciones": "Donaciones",
+  "defaultCategoryNameElectrodomesticos": "Electrodomésticos",
+  "defaultCategoryNameEstacionamiento": "Estacionamiento",
+  "defaultCategoryNameTransportePublico": "Transporte público",
+  "defaultCategoryNameOdontologia": "Odontología",
+  "defaultCategoryNameTrabajo": "Trabajo",
+  "defaultCategoryNameOcio": "Ocio",
+  "defaultCategoryNameVerduleria": "Verdulería",
+  "defaultCategoryNameSueldo": "Sueldo",
+  "defaultCategoryNameOptica": "Óptica",
+  "defaultCategoryNameUberCabify": "Uber / Cabify",
+  "defaultCategoryNameCafeteria": "Cafetería",
+  "defaultCategoryNameRegalos": "Regalos",
+  "defaultCategoryNameObraSocialPrepaga": "Obra social / Prepaga",
+  "defaultCategoryNameConsultasMedicas": "Consultas médicas",
+  "defaultCategoryNameEstudios": "Estudios",
+  "defaultCategoryNameCine": "Cine",
+  "defaultCategoryNameAlimentacion": "Alimentación",
+  "defaultCategoryNameCuidadoPersonal": "Cuidado personal",
+  "defaultCategoryNameGuarderiaColegio": "Guardería / Colegio",
+  "defaultCategoryNameHerramientas": "Herramientas",
+  "defaultCategoryNameCombustible": "Combustible",
+  "defaultCategoryNameMantenimiento": "Mantenimiento",
+  "defaultCategoryNameLuz": "Luz",
+  "defaultCategoryNameLibros": "Libros",
+  "defaultCategoryNameTelefono": "Teléfono",
+  "defaultCategoryNameHijos": "Hijos",
+  "defaultCategoryNameSalidas": "Salidas",
+  "defaultCategoryNameFinanzas": "Finanzas",
+  "defaultCategoryNameCuotas": "Cuotas",
+  "defaultCategoryNameServicios": "Servicios",
+  "defaultCategoryNameReparaciones": "Reparaciones",
+  "defaultCategoryNameSuscripcionesEducativas": "Suscripciones educativas",
+  "defaultCategoryNameTaxiRemis": "Taxi / Remis",
+  "defaultCategoryNameDecoracion": "Decoración",
+  "defaultCategoryNameTecnologia": "Tecnología",
+  "defaultCategoryNameSalud": "Salud",
+  "defaultCategoryNameIntereses": "Intereses",
+  "defaultCategoryNameJuegos": "Juegos",
+  "defaultCategoryNameSupermercado": "Supermercado",
+  "defaultCategoryNameCalzado": "Calzado",
+  "defaultCategoryNameViaje": "Viaje",
+  "defaultCategoryNameCableTv": "Cable / TV",
+  "defaultCategoryNamePeajes": "Peajes",
+  "defaultCategoryNameVarios": "Varios",
+  "defaultCategoryNameRestaurantes": "Restaurantes",
+  "defaultCategoryNameMonotributoAutonomos": "Monotributo / Autónomos",
+  "defaultCategoryNameEventos": "Eventos",
+  "defaultCategoryNameAlimentos": "Alimentos",
+  "defaultCategoryNameMascotas": "Mascotas",
+  "defaultCategoryNameVacaciones": "Vacaciones",
+  "defaultCategoryNameFondoDeEmergencia": "Fondo de emergencia",
+  "defaultCategoryNameMedicamentos": "Medicamentos",
+  "defaultCategoryNameTransporte": "Transporte",
+  "defaultCategoryNameImprevistos": "Imprevistos",
+  "defaultCategoryNameCapacitacion": "Capacitación",
+  "defaultCategoryNameAgua": "Agua",
+  "defaultCategoryNameEducacion": "Educación",
+  "defaultCategoryNameFreelance": "Freelance",
+  "defaultCategoryNameTarjetasDeCredito": "Tarjetas de crédito",
+  "defaultCategoryNameCursos": "Cursos",
+  "defaultCategoryNameRopa": "Ropa",
+  "defaultCategoryNameComprasOnline": "Compras online",
+  "defaultCategoryNameHogar": "Hogar",
+  "defaultCategoryNameSeguroDelAuto": "Seguro del auto",
+  "defaultCategoryNameStreaming": "Streaming",
+  "defaultCategoryNameGas": "Gas",
+  "defaultCategoryNameVenta": "Venta",
+  "defaultCategoryNameDelivery": "Delivery",
+  "defaultCategoryNameCarniceria": "Carnicería",
+  "defaultCategoryNameNubeApps": "Nube / Apps",
+  "defaultCategoryNameFamilia": "Familia",
+  "defaultCategoryNameComidasLaborales": "Comidas laborales",
+  "defaultCategoryNameTransporteLaboral": "Transporte laboral",
+  "defaultCategoryNameAhorroGeneral": "Ahorro general",
+  "defaultCategoryNameOtros": "Otros",
+  "portuguese": "Portugués",
+  "technicalErrorDetails": "Detalle técnico: {error}",
+  "@technicalErrorDetails": {
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "currencyArsOption": "ARS ($)",
+  "currencyUsdOption": "USD (US$)",
+  "currencyEurOption": "EUR (€)"
 }

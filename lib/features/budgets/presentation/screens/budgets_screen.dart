@@ -75,16 +75,12 @@ class BudgetsScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        strings.isEnglish
-                            ? 'Monthly budgets'
-                            : 'Presupuestos mensuales',
+                        strings.t('presupuestosMensuales'),
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        strings.isEnglish
-                            ? 'Track how each category is doing this month and update limits whenever you need.'
-                            : 'Seguí cómo viene cada categoría este mes y ajustá los límites cuando lo necesites.',
+                        strings.t('seguiComoVieneCadaCategoriaEsteMes'),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -120,15 +116,9 @@ class BudgetsScreen extends ConsumerWidget {
                 if (items.isEmpty)
                   EmptyStateView(
                     icon: Icons.account_balance_wallet_outlined,
-                    title: strings.isEnglish
-                        ? 'Create your first budget'
-                        : 'Creá tu primer presupuesto',
-                    message: strings.isEnglish
-                        ? 'Set a monthly limit for an expense category and we will track how much you have already spent.'
-                        : 'Definí un límite mensual para una categoría de gasto y vamos a seguir cuánto ya gastaste.',
-                    actionLabel: strings.isEnglish
-                        ? 'Add budget'
-                        : 'Agregar presupuesto',
+                    title: strings.t('creaTuPrimerPresupuesto'),
+                    message: strings.t('definiUnLimiteMensualParaUnaCategoria'),
+                    actionLabel: strings.t('agregarPresupuesto'),
                     onAction: () => _openForm(context, ref),
                   )
                 else
@@ -162,11 +152,9 @@ class BudgetsScreen extends ConsumerWidget {
             children: [
               EmptyStateView(
                 icon: Icons.error_outline_rounded,
-                title: strings.isEnglish
-                    ? 'Could not load budgets'
-                    : 'No se pudieron cargar los presupuestos',
-                message: '$error',
-                actionLabel: strings.localized(es: 'Reintentar', en: 'Retry'),
+                title: strings.t('noSePudieronCargarLosPresupuestos'),
+                message: strings.technicalErrorDetails(error),
+                actionLabel: strings.t('reintentar'),
                 onAction: () => ref.invalidate(categoryBudgetStatusProvider),
               ),
             ],

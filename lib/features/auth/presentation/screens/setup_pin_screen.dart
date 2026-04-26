@@ -39,25 +39,19 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
     final document = _documentController.text.trim();
     if (pin != confirm) {
       _showMessage(
-        AppStrings.of(context).isEnglish
-            ? 'PIN values do not match.'
-            : 'Los PIN no coinciden.',
+        AppStrings.of(context).t('losPinNoCoinciden'),
       );
       return;
     }
     if (birthDate.isEmpty || document.isEmpty) {
       _showMessage(
-        AppStrings.of(context).isEnglish
-            ? 'Complete both recovery answers.'
-            : 'Completá tus dos preguntas de recuperación.',
+        AppStrings.of(context).t('completaTusDosPreguntasDeRecuperacion'),
       );
       return;
     }
     if (!_isValidBirthDate(birthDate) || !_isValidDocument(document)) {
       _showMessage(
-        AppStrings.of(context).isEnglish
-            ? 'Use a valid date and a document with at least 6 characters.'
-            : 'Usá una fecha válida y un documento con al menos 6 caracteres.',
+        AppStrings.of(context).t('usaUnaFechaValidaYUnDocumento'),
       );
       return;
     }
@@ -134,9 +128,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                strings.isEnglish
-                    ? 'Create a short PIN to protect your data. Everything stays only on your device.'
-                    : 'Creá un PIN corto para proteger tus datos. Todo queda guardado solo en tu dispositivo.',
+                strings.t('creaUnPinCortoParaProtegerTus'),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
@@ -157,9 +149,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       obscureText: true,
                       maxLength: AppConstants.defaultPinLength,
                       decoration: InputDecoration(
-                        labelText: strings.isEnglish
-                            ? 'Choose your PIN'
-                            : 'Elegí tu PIN',
+                        labelText: strings.t('elegiTuPin'),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -169,9 +159,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       obscureText: true,
                       maxLength: AppConstants.defaultPinLength,
                       decoration: InputDecoration(
-                        labelText: strings.isEnglish
-                            ? 'Repeat your PIN'
-                            : 'Repetí tu PIN',
+                        labelText: strings.t('repetiTuPin'),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -180,9 +168,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       keyboardType: TextInputType.datetime,
                       decoration: InputDecoration(
                         labelText: strings.birthDate,
-                        hintText: strings.isEnglish
-                            ? 'Example: 02/10/1996'
-                            : 'Ejemplo: 10/02/1996',
+                        hintText: strings.t('ejemplo10021996'),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -191,9 +177,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         labelText: strings.documentId,
-                        hintText: strings.isEnglish
-                            ? 'Example: 12345678'
-                            : 'Ejemplo: 12345678',
+                        hintText: strings.t('authRecoveryDocumentExample'),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -219,18 +203,12 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                           ? (value) => setState(() => _enableBiometrics = value)
                           : null,
                       title: Text(
-                        strings.isEnglish
-                            ? 'Enable fingerprint for faster access'
-                            : 'Activar huella para entrar más rápido',
+                        strings.t('activarHuellaParaEntrarMasRapido'),
                       ),
                       subtitle: Text(
                         biometricAvailable
-                            ? (strings.isEnglish
-                                ? 'The app will offer it on the next unlock.'
-                                : 'La app te la va a ofrecer en el próximo desbloqueo.')
-                            : (strings.isEnglish
-                                ? 'Biometrics are not available on this device.'
-                                : 'La biometría no está disponible en este dispositivo.'),
+                            ? (strings.t('laAppTeLaVaAOfrecer'))
+                            : (strings.t('laBiometriaNoEstaDisponibleEnEste')),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -238,10 +216,8 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                       onPressed: _isSubmitting ? null : _submit,
                       child: Text(
                         _isSubmitting
-                            ? (strings.isEnglish
-                                ? 'Setting up...'
-                                : 'Configurando...')
-                            : (strings.localized(es: 'Empezar', en: 'Start')),
+                            ? (strings.t('configurando'))
+                            : (strings.t('empezar')),
                       ),
                     ),
                   ],
@@ -255,9 +231,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Text(
-                  strings.isEnglish
-                      ? 'We store these answers only to help you recover access if you forget your PIN.'
-                      : 'Guardamos estas respuestas solo para ayudarte a recuperar el acceso si olvidás tu PIN.',
+                  strings.t('guardamosEstasRespuestasSoloParaAyudarteA'),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurfaceVariant,
                       ),
@@ -271,9 +245,7 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Text(
-                  strings.isEnglish
-                      ? 'Recovery answers are weaker than your PIN. Use real values, but remember that anyone who knows them could try to reset access on this device.'
-                      : 'Las respuestas de recuperación son más débiles que tu PIN. Usá datos reales, pero tené en cuenta que alguien que los conozca podría intentar restablecer el acceso en este dispositivo.',
+                  strings.t('lasRespuestasDeRecuperacionSonMasDebiles'),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: scheme.onSurface,
                       ),

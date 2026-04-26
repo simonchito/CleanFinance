@@ -39,7 +39,7 @@ class DonutChart extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    strings.localized(es: 'Total', en: 'Total'),
+                    strings.t('total'),
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                   Text(

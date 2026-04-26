@@ -61,12 +61,9 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
     final strings = AppStrings.of(context);
     final confirmed = await showConfirmActionDialog(
       context: context,
-      title:
-          strings.localized(es: 'Eliminar movimiento', en: 'Delete movement'),
-      message: strings.isEnglish
-          ? 'This movement will be permanently deleted. Verify the details before continuing.'
-          : 'Se eliminará este movimiento de forma permanente. Verificá los datos antes de continuar.',
-      confirmLabel: strings.localized(es: 'Eliminar', en: 'Delete'),
+      title: strings.t('eliminarMovimiento'),
+      message: strings.t('seEliminaraEsteMovimientoDeFormaPermanente'),
+      confirmLabel: strings.t('eliminar'),
       cancelLabel: strings.cancel,
     );
     if (!confirmed) {
@@ -140,9 +137,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    strings.isEnglish
-                        ? 'Choose only what you need to quickly find what you are looking for.'
-                        : 'Elegí solo lo necesario para encontrar rápido lo que buscás.',
+                    strings.t('elegiSoloLoNecesarioParaEncontrarRapido'),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -153,9 +148,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                     value: selectedCategoryId,
                     placeholder: strings.all,
                     sheetTitle: strings.category,
-                    sheetDescription: strings.isEnglish
-                        ? 'Filter by a main category to narrow the search.'
-                        : 'Filtrá por una categoría principal para acotar la búsqueda.',
+                    sheetDescription:
+                        strings.t('filtraPorUnaCategoriaPrincipalParaAcotar'),
                     items: [
                       SelectionSheetItem<String?>(
                         value: null,
@@ -348,14 +342,9 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
               if (movements.isEmpty) {
                 return EmptyStateView(
                   icon: Icons.receipt_long_outlined,
-                  title: strings.isEnglish
-                      ? 'No movements found'
-                      : 'No encontramos movimientos',
-                  message: strings.isEnglish
-                      ? 'Try changing the filters or adding a new record.'
-                      : 'Probá cambiando el filtro o agregando un nuevo registro.',
-                  actionLabel: strings.localized(
-                      es: 'Agregar movimiento', en: 'Add movement'),
+                  title: strings.t('noEncontramosMovimientos'),
+                  message: strings.t('probaCambiandoElFiltroOAgregandoUn'),
+                  actionLabel: strings.t('agregarMovimiento'),
                   onAction: _openEditor,
                 );
               }
@@ -412,9 +401,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                               children: [
                                 Text(
                                   localizedCategoryName ??
-                                      (strings.isEnglish
-                                          ? 'Uncategorized'
-                                          : 'Sin categoría'),
+                                      (strings.t('sinCategoria')),
                                   style:
                                       Theme.of(context).textTheme.titleMedium,
                                 ),
@@ -486,10 +473,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
             ),
             error: (error, _) => EmptyStateView(
               icon: Icons.error_outline_rounded,
-              title: strings.isEnglish
-                  ? 'Could not load movements'
-                  : 'No se pudieron cargar los movimientos',
-              message: '$error',
+              title: strings.t('noSePudieronCargarLosMovimientos'),
+              message: strings.technicalErrorDetails(error),
             ),
           ),
         ],

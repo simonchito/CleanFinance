@@ -13,7 +13,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('BudgetService', () {
-    test('calcula estados solo con gastos del mes actual agrupados por categoria', () async {
+    test(
+        'calcula estados solo con gastos del mes actual agrupados por categoria',
+        () async {
       final service = BudgetService(
         budgetRepository: _FakeBudgetRepository([
           const Budget(
@@ -87,7 +89,8 @@ void main() {
       expect(result[1].status, BudgetStatus.normal);
     });
 
-    test('marca warning desde 80 por ciento y exceeded desde 100 por ciento', () {
+    test('marca warning desde 80 por ciento y exceeded desde 100 por ciento',
+        () {
       const service = BudgetService(
         budgetRepository: _NoopBudgetRepository(),
         categoriesRepository: _NoopCategoriesRepository(),
@@ -176,7 +179,8 @@ class _FakeBudgetRepository implements BudgetRepository {
   Future<void> deleteBudget(String budgetId) async {}
 
   @override
-  Future<Budget?> getBudgetByCategoryAndMonth(String categoryId, String month) async {
+  Future<Budget?> getBudgetByCategoryAndMonth(
+      String categoryId, String month) async {
     for (final budget in _budgets) {
       if (budget.categoryId == categoryId && budget.month == month) {
         return budget;
@@ -278,7 +282,8 @@ class _NoopBudgetRepository implements BudgetRepository {
   Future<void> deleteBudget(String budgetId) async {}
 
   @override
-  Future<Budget?> getBudgetByCategoryAndMonth(String categoryId, String month) async {
+  Future<Budget?> getBudgetByCategoryAndMonth(
+      String categoryId, String month) async {
     return null;
   }
 
@@ -296,7 +301,8 @@ class _NoopCategoriesRepository implements CategoriesRepository {
   Future<void> ensureSeedData() async {}
 
   @override
-  Future<List<Category>> getCategories({CategoryScope? scope}) async => const [];
+  Future<List<Category>> getCategories({CategoryScope? scope}) async =>
+      const [];
 
   @override
   Future<void> upsertCategory(Category category) async {}
@@ -321,7 +327,8 @@ class _NoopMovementsRepository implements MovementsRepository {
   @override
   Future<List<Movement>> getMovements({
     MovementFilter filter = const MovementFilter(),
-  }) async => const [];
+  }) async =>
+      const [];
 
   @override
   Future<void> upsertMovement(Movement movement) async {}

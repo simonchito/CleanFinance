@@ -87,7 +87,7 @@ class CurrencyFormatter {
     return switch (localeCode) {
       'en' => 'en_US',
       'es' => 'es_AR',
-      'pt_BR' => 'pt_BR',
+      'pt' => 'pt_BR',
       _ => localeCode,
     };
   }

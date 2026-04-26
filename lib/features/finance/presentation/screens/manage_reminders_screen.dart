@@ -34,16 +34,12 @@ class ManageRemindersScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  strings.isEnglish
-                      ? 'Review your active monthly reminders'
-                      : 'Revisá tus recordatorios mensuales activos',
+                  strings.t('revisaTusRecordatoriosMensualesActivos'),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  strings.isEnglish
-                      ? 'Expense reminders come from subcategories and savings reminders come from goals.'
-                      : 'Los recordatorios de gasto salen de subcategorías y los de ahorro salen de metas.',
+                  strings.t('losRecordatoriosDeGastoSalenDeSubcategorias'),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -53,8 +49,7 @@ class ManageRemindersScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            strings.localized(
-                es: 'Recordatorios de gastos', en: 'Expense reminders'),
+            strings.t('recordatoriosDeGastos'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 10),
@@ -63,12 +58,8 @@ class ManageRemindersScreen extends ConsumerWidget {
               if (subcategories.isEmpty) {
                 return EmptyStateView(
                   icon: Icons.receipt_long_outlined,
-                  title: strings.isEnglish
-                      ? 'No active expense reminders'
-                      : 'No hay recordatorios de gasto activos',
-                  message: strings.isEnglish
-                      ? 'Enable reminders when creating or editing an expense subcategory.'
-                      : 'Activá recordatorios al crear o editar una subcategoría de gastos.',
+                  title: strings.t('noHayRecordatoriosDeGastoActivos'),
+                  message: strings.t('activaRecordatoriosAlCrearOEditarUna'),
                 );
               }
 
@@ -110,16 +101,13 @@ class ManageRemindersScreen extends ConsumerWidget {
             ),
             error: (error, _) => EmptyStateView(
               icon: Icons.error_outline_rounded,
-              title: strings.isEnglish
-                  ? 'Could not load expense reminders'
-                  : 'No se pudieron cargar los recordatorios de gasto',
-              message: '$error',
+              title: strings.t('noSePudieronCargarLosRecordatoriosDe'),
+              message: strings.technicalErrorDetails(error),
             ),
           ),
           const SizedBox(height: 18),
           Text(
-            strings.localized(
-                es: 'Recordatorios de ahorro', en: 'Savings reminders'),
+            strings.t('recordatoriosDeAhorro'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 10),
@@ -128,12 +116,8 @@ class ManageRemindersScreen extends ConsumerWidget {
               if (goals.isEmpty) {
                 return EmptyStateView(
                   icon: Icons.savings_outlined,
-                  title: strings.isEnglish
-                      ? 'No active savings reminders'
-                      : 'No hay recordatorios de ahorro activos',
-                  message: strings.isEnglish
-                      ? 'Enable reminders when creating or editing a savings goal.'
-                      : 'Activá recordatorios al crear o editar una meta de ahorro.',
+                  title: strings.t('noHayRecordatoriosDeAhorroActivos'),
+                  message: strings.t('activaRecordatoriosAlCrearOEditarUna2'),
                 );
               }
 
@@ -145,9 +129,7 @@ class ManageRemindersScreen extends ConsumerWidget {
                         child: _ReminderRow(
                           title: progress.goal.name,
                           subtitle: progress.completed
-                              ? (strings.isEnglish
-                                  ? 'Completed goal'
-                                  : 'Meta completada')
+                              ? (strings.t('metaCompletada'))
                               : null,
                           reminderDay: progress.goal.reminderDay ?? 1,
                           icon: Icons.savings_outlined,
@@ -170,10 +152,8 @@ class ManageRemindersScreen extends ConsumerWidget {
             ),
             error: (error, _) => EmptyStateView(
               icon: Icons.error_outline_rounded,
-              title: strings.isEnglish
-                  ? 'Could not load savings reminders'
-                  : 'No se pudieron cargar los recordatorios de ahorro',
-              message: '$error',
+              title: strings.t('noSePudieronCargarLosRecordatoriosDe2'),
+              message: strings.technicalErrorDetails(error),
             ),
           ),
         ],
@@ -272,9 +252,7 @@ class ManageRemindersScreen extends ConsumerWidget {
     return showSelectionSheet<int>(
       context: context,
       title: strings.reminderDay,
-      description: strings.isEnglish
-          ? 'Choose the day of month for the reminder.'
-          : 'Elegí el día del mes para el recordatorio.',
+      description: strings.t('elegiElDiaDelMesParaEl'),
       selectedValue: initialDay,
       maxHeight: 360,
       items: List.generate(

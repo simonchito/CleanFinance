@@ -101,8 +101,7 @@ void main() {
     expect(find.text('QR'), findsNothing);
   });
 
-  testWidgets('canonicalizes card payment methods in the list',
-      (tester) async {
+  testWidgets('canonicalizes card payment methods in the list', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [

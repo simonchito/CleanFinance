@@ -4,7 +4,7 @@ enum AppLocaleMode {
   system('system', null),
   spanish('es', Locale('es')),
   english('en', Locale('en')),
-  portugueseBrazil('pt_BR', Locale('pt', 'BR'));
+  portuguese('pt', Locale('pt'));
 
   const AppLocaleMode(this.preferenceCode, this.locale);
 
@@ -24,7 +24,7 @@ enum AppLocaleMode {
     return switch (normalized) {
       'es' => AppLocaleMode.spanish,
       'en' => AppLocaleMode.english,
-      'pt_BR' => AppLocaleMode.portugueseBrazil,
+      'pt' => AppLocaleMode.portuguese,
       _ => AppLocaleMode.system,
     };
   }
@@ -36,8 +36,8 @@ enum AppLocaleMode {
     if (locale.languageCode == 'en') {
       return AppLocaleMode.english;
     }
-    if (locale.languageCode == 'pt' && locale.countryCode == 'BR') {
-      return AppLocaleMode.portugueseBrazil;
+    if (locale.languageCode == 'pt') {
+      return AppLocaleMode.portuguese;
     }
     return fallback;
   }
@@ -52,7 +52,7 @@ enum AppLocaleMode {
       'system' => AppLocaleMode.system.preferenceCode,
       'es' => AppLocaleMode.spanish.preferenceCode,
       'en' => AppLocaleMode.english.preferenceCode,
-      'pt_br' => AppLocaleMode.portugueseBrazil.preferenceCode,
+      'pt' || 'pt_br' => AppLocaleMode.portuguese.preferenceCode,
       _ => AppLocaleMode.system.preferenceCode,
     };
   }
@@ -77,8 +77,8 @@ enum AppLocaleMode {
       if (locale.languageCode == 'en') {
         return AppLocaleMode.english.locale!;
       }
-      if (locale.languageCode == 'pt' && locale.countryCode == 'BR') {
-        return AppLocaleMode.portugueseBrazil.locale!;
+      if (locale.languageCode == 'pt') {
+        return AppLocaleMode.portuguese.locale!;
       }
     }
     return fallback.locale!;

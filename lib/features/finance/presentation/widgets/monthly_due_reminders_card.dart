@@ -29,9 +29,7 @@ class MonthlyDueRemindersCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            strings.isEnglish
-                ? 'You still need to pay or save for:'
-                : 'Todavía te queda pagar o ahorrar para:',
+            strings.t('todaviaTeQuedaPagarOAhorrarPara'),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),

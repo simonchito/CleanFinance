@@ -11,8 +11,8 @@ class AppConstants {
   static const defaultPinLength = 6;
   static const defaultLocalePreferenceCode = 'system';
   static const defaultLocaleCode = 'es';
-  static const supportedLocaleCodes = ['es', 'en', 'pt_BR'];
-  static const supportedLocalePreferenceCodes = ['system', 'es', 'en', 'pt_BR'];
+  static const supportedLocaleCodes = ['es', 'en', 'pt'];
+  static const supportedLocalePreferenceCodes = ['system', 'es', 'en', 'pt'];
   static const defaultPaymentMethods = [
     'transfer',
     'debit_card',

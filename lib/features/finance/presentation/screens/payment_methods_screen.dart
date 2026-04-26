@@ -33,17 +33,13 @@ class PaymentMethodsScreen extends ConsumerWidget {
           title: Text(
             initialValue == null
                 ? strings.addPaymentMethod
-                : (strings.isEnglish
-                    ? 'Edit payment method'
-                    : 'Editar medio de pago'),
+                : (strings.t('editarMedioDePago')),
           ),
           content: TextField(
             controller: controller,
             decoration: InputDecoration(
               labelText: strings.movementPaymentMethod,
-              hintText: strings.isEnglish
-                  ? 'Example: QR, transfer or cash'
-                  : 'Ejemplo: QR, transferencia o efectivo',
+              hintText: strings.t('ejemploQrTransferenciaOEfectivo'),
             ),
           ),
           actions: [
@@ -103,16 +99,12 @@ class PaymentMethodsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  strings.isEnglish
-                      ? 'Choose the payment methods you really use'
-                      : 'Elegí solo los medios de pago que realmente usás',
+                  strings.t('elegiSoloLosMediosDePagoQue'),
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  strings.isEnglish
-                      ? 'These options will appear as a dropdown when creating a movement.'
-                      : 'Estas opciones van a aparecer como desplegable al cargar un movimiento.',
+                  strings.t('estasOpcionesVanAAparecerComoDesplegable'),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -124,12 +116,9 @@ class PaymentMethodsScreen extends ConsumerWidget {
           if (methods.isEmpty)
             EmptyStateView(
               icon: Icons.account_balance_wallet_outlined,
-              title: strings.isEnglish
-                  ? 'No payment methods yet'
-                  : 'Todavía no hay medios de pago',
-              message: strings.isEnglish
-                  ? 'Add your common options like transfer, debit card or cash.'
-                  : 'Agregá tus opciones habituales como transferencia, débito o efectivo.',
+              title: strings.t('todaviaNoHayMediosDePago'),
+              message: strings
+                  .t('agregaTusOpcionesHabitualesComoTransferenciaDebito'),
               actionLabel: strings.addPaymentMethod,
               onAction: () => _showMethodDialog(context, ref),
             )

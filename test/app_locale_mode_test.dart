@@ -13,7 +13,7 @@ void main() {
       expect(AppLocaleMode.fromPreferenceCode('en'), AppLocaleMode.english);
       expect(
         AppLocaleMode.fromPreferenceCode('pt-BR'),
-        AppLocaleMode.portugueseBrazil,
+        AppLocaleMode.portuguese,
       );
       expect(AppLocaleMode.fromPreferenceCode('fr'), AppLocaleMode.system);
     });
@@ -48,7 +48,7 @@ void main() {
           localePreferenceCode: 'system',
           deviceLocale: const Locale('pt', 'BR'),
         ),
-        'pt_BR',
+        'pt',
       );
     });
   });

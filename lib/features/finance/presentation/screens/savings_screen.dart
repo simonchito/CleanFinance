@@ -90,11 +90,9 @@ class SavingsScreen extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final confirmed = await showConfirmActionDialog(
       context: context,
-      title: strings.localized(es: 'Eliminar meta', en: 'Delete goal'),
-      message: strings.isEnglish
-          ? 'The goal "${goal.name}" will be deleted. Existing contributions will remain but no longer be linked to this goal.'
-          : 'Se eliminará la meta "${goal.name}". Los aportes ya registrados seguirán existiendo, pero dejarán de estar vinculados a esta meta.',
-      confirmLabel: strings.localized(es: 'Eliminar', en: 'Delete'),
+      title: strings.t('eliminarMeta'),
+      message: strings.deleteSavingsGoalMessage(goal.name),
+      confirmLabel: strings.t('eliminar'),
       cancelLabel: strings.cancel,
     );
     if (!confirmed) {
@@ -132,14 +130,9 @@ class SavingsScreen extends ConsumerWidget {
                   if (!summary.hasAnySavingsData) {
                     return EmptyStateView(
                       icon: Icons.savings_outlined,
-                      title: strings.isEnglish
-                          ? 'No savings recorded yet'
-                          : 'Todavía no tenés ahorro registrado',
-                      message: strings.isEnglish
-                          ? 'Create a goal or register a contribution to start organizing your savings.'
-                          : 'Creá una meta o registrá un aporte para empezar a ordenar tus ahorros.',
-                      actionLabel: strings.localized(
-                          es: 'Crear meta', en: 'Create goal'),
+                      title: strings.t('todaviaNoTenesAhorroRegistrado'),
+                      message: strings.t('creaUnaMetaORegistraUnAporte'),
+                      actionLabel: strings.t('createGoal'),
                       onAction: () => _openGoalEditor(context, ref),
                     );
                   }
@@ -165,9 +158,7 @@ class SavingsScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              strings.isEnglish
-                                  ? 'Total saved'
-                                  : 'Total ahorrado',
+                              strings.t('totalAhorrado'),
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const SizedBox(height: 8),
@@ -182,12 +173,15 @@ class SavingsScreen extends ConsumerWidget {
                             const SizedBox(height: 8),
                             Text(
                               unassigned.hasSavings
-                                  ? (strings.isEnglish
-                                      ? 'Includes ${CurrencyFormatter.format(unassigned.totalAmount, symbol: symbol, localeCode: localeCode)} in general savings.'
-                                      : 'Incluye ${CurrencyFormatter.format(unassigned.totalAmount, symbol: symbol, localeCode: localeCode)} en ahorro general.')
-                                  : (strings.isEnglish
-                                      ? 'Everything you saved is already organized into goals.'
-                                      : 'Todo lo que ahorraste está organizado en metas.'),
+                                  ? strings.savingsGeneralIncluded(
+                                      CurrencyFormatter.format(
+                                        unassigned.totalAmount,
+                                        symbol: symbol,
+                                        localeCode: localeCode,
+                                      ),
+                                    )
+                                  : (strings
+                                      .t('todoLoQueAhorrasteEstaOrganizadoEn')),
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -202,16 +196,13 @@ class SavingsScreen extends ConsumerWidget {
                               children: [
                                 Expanded(
                                   child: _SummaryStat(
-                                    label:
-                                        strings.isEnglish ? 'Goals' : 'Metas',
+                                    label: strings.text6,
                                     value: '${summary.goalsCount}',
                                   ),
                                 ),
                                 Expanded(
                                   child: _SummaryStat(
-                                    label: strings.isEnglish
-                                        ? 'Target'
-                                        : 'Objetivo',
+                                    label: strings.t('objetivo'),
                                     value: CurrencyFormatter.format(
                                       summary.totalGoalTargetAmount,
                                       symbol: symbol,
@@ -221,9 +212,7 @@ class SavingsScreen extends ConsumerWidget {
                                 ),
                                 Expanded(
                                   child: _SummaryStat(
-                                    label: strings.isEnglish
-                                        ? 'Completed'
-                                        : 'Logradas',
+                                    label: strings.t('logradas'),
                                     value: '${summary.completedGoalsCount}',
                                   ),
                                 ),
@@ -248,9 +237,7 @@ class SavingsScreen extends ConsumerWidget {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            strings.isEnglish
-                                ? 'Active goals'
-                                : 'Metas activas',
+                            strings.t('activeGoals'),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
@@ -280,9 +267,7 @@ class SavingsScreen extends ConsumerWidget {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            strings.isEnglish
-                                ? 'Completed goals'
-                                : 'Metas logradas',
+                            strings.t('metasLogradas'),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
@@ -316,10 +301,8 @@ class SavingsScreen extends ConsumerWidget {
                 ),
                 error: (error, _) => EmptyStateView(
                   icon: Icons.error_outline_rounded,
-                  title: strings.isEnglish
-                      ? 'Could not load your goals'
-                      : 'No pudimos cargar tus metas',
-                  message: '$error',
+                  title: strings.t('noPudimosCargarTusMetas'),
+                  message: strings.technicalErrorDetails(error),
                 ),
               );
             },
@@ -329,10 +312,8 @@ class SavingsScreen extends ConsumerWidget {
             ),
             error: (error, _) => EmptyStateView(
               icon: Icons.error_outline_rounded,
-              title: strings.isEnglish
-                  ? 'Could not load savings'
-                  : 'No pudimos cargar ahorros',
-              message: '$error',
+              title: strings.t('noPudimosCargarAhorros'),
+              message: strings.technicalErrorDetails(error),
             ),
           ),
         ],
@@ -374,7 +355,7 @@ class _GeneralSavingsCard extends StatelessWidget {
               const Icon(Icons.account_balance_wallet_outlined),
               const SizedBox(width: 8),
               Text(
-                strings.localized(es: 'Ahorro general', en: 'General savings'),
+                strings.t('ahorroGeneral'),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
@@ -390,9 +371,7 @@ class _GeneralSavingsCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            strings.isEnglish
-                ? 'Money saved without a specific goal.'
-                : 'Dinero guardado sin una meta específica.',
+            strings.t('dineroGuardadoSinUnaMetaEspecifica'),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -400,21 +379,18 @@ class _GeneralSavingsCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             lastContributionDate == null
-                ? (strings.isEnglish
-                    ? '${summary.movementsCount} contribution${summary.movementsCount == 1 ? '' : 's'} recorded.'
-                    : '${summary.movementsCount} aporte${summary.movementsCount == 1 ? '' : 's'} registrado${summary.movementsCount == 1 ? '' : 's'}.')
-                : (strings.isEnglish
-                    ? '${summary.movementsCount} contribution${summary.movementsCount == 1 ? '' : 's'} · last: $lastContributionDate.'
-                    : '${summary.movementsCount} aporte${summary.movementsCount == 1 ? '' : 's'} · último: $lastContributionDate.'),
+                ? strings.savingsContributionCount(summary.movementsCount)
+                : strings.savingsContributionCountWithDate(
+                    summary.movementsCount,
+                    lastContributionDate,
+                  ),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: 12),
           Text(
-            strings.isEnglish
-                ? 'Create a goal to organize your savings better.'
-                : 'Creá una meta para organizar mejor tus ahorros.',
+            strings.t('creaUnaMetaParaOrganizarMejorTus'),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
@@ -468,7 +444,11 @@ class _GoalCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final dueDate = goal.targetDate == null
         ? strings.unlimitedDate
-        : '${strings.localized(es: 'Objetivo', en: 'Target')}: ${DateFormat('d MMM y', strings.languageCode).format(goal.targetDate!)}';
+        : strings.savingsGoalTargetDate(
+            DateFormat('d MMM y', strings.languageCode).format(
+              goal.targetDate!,
+            ),
+          );
 
     return SectionCard(
       child: Column(
@@ -501,7 +481,18 @@ class _GoalCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${CurrencyFormatter.format(progress.savedAmount, symbol: symbol, localeCode: localeCode)} de ${CurrencyFormatter.format(goal.targetAmount, symbol: symbol, localeCode: localeCode)}',
+            strings.savingsGoalProgress(
+              CurrencyFormatter.format(
+                progress.savedAmount,
+                symbol: symbol,
+                localeCode: localeCode,
+              ),
+              CurrencyFormatter.format(
+                goal.targetAmount,
+                symbol: symbol,
+                localeCode: localeCode,
+              ),
+            ),
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 4),
@@ -523,12 +514,15 @@ class _GoalCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             progress.completed
-                ? (strings.isEnglish
-                    ? 'Great. You already achieved this goal.'
-                    : 'Excelente. Ya alcanzaste esta meta.')
-                : (strings.isEnglish
-                    ? 'You still need ${CurrencyFormatter.format((goal.targetAmount - progress.savedAmount).clamp(0, goal.targetAmount), symbol: symbol, localeCode: localeCode)} to reach it.'
-                    : 'Te falta ${CurrencyFormatter.format((goal.targetAmount - progress.savedAmount).clamp(0, goal.targetAmount), symbol: symbol, localeCode: localeCode)} para llegar.'),
+                ? (strings.t('excelenteYaAlcanzasteEstaMeta'))
+                : strings.savingsGoalRemaining(
+                    CurrencyFormatter.format(
+                      (goal.targetAmount - progress.savedAmount)
+                          .clamp(0, goal.targetAmount),
+                      symbol: symbol,
+                      localeCode: localeCode,
+                    ),
+                  ),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),

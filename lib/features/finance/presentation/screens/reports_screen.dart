@@ -52,9 +52,7 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish
-                          ? 'Financial health'
-                          : 'Salud financiera',
+                      strings.t('saludFinanciera'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 10),
@@ -90,16 +88,12 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish
-                          ? 'Monthly cashflow'
-                          : 'Cashflow mensual',
+                      strings.t('cashflowMensual'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      strings.isEnglish
-                          ? 'A quick summary of what came in, what went out, and the margin left.'
-                          : 'Un resumen rápido para entender cuánto entró, cuánto salió y qué margen te quedó.',
+                      strings.t('unResumenRapidoParaEntenderCuantoEntro'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -149,9 +143,7 @@ class ReportsScreen extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _MetricBox(
-                            label: strings.isEnglish
-                                ? 'Net balance'
-                                : 'Saldo neto',
+                            label: strings.t('saldoNeto'),
                             value: CurrencyFormatter.format(
                               overview.cashflow.netBalance,
                               symbol: symbol,
@@ -180,15 +172,12 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.localized(
-                          es: 'Evolución mensual', en: 'Monthly trend'),
+                      strings.t('evolucionMensual'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      strings.isEnglish
-                          ? 'Compare how your income and expenses evolved in recent months.'
-                          : 'Compará cómo vienen tus ingresos y gastos en los últimos meses.',
+                      strings.t('comparaComoVienenTusIngresosYGastos'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -204,16 +193,12 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.isEnglish
-                          ? 'Top categories this month'
-                          : 'Top categorías del mes',
+                      strings.t('topCategoriasDelMes'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      strings.isEnglish
-                          ? 'See where most money went and how it changed versus last month.'
-                          : 'Vas a ver en qué se fue más dinero y cómo cambió frente al mes anterior.',
+                      strings.t('vasAVerEnQueSeFue'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -222,12 +207,8 @@ class ReportsScreen extends ConsumerWidget {
                     if (overview.categoryComparison.items.isEmpty)
                       EmptyStateView(
                         icon: Icons.pie_chart_outline_rounded,
-                        title: strings.isEnglish
-                            ? 'No data yet'
-                            : 'Sin datos todavía',
-                        message: strings.isEnglish
-                            ? 'Once you register expenses, you will see where most spending goes.'
-                            : 'Cuando registres gastos, vas a ver acá en qué categorías se fue más dinero.',
+                        title: strings.t('sinDatosTodavia'),
+                        message: strings.t('cuandoRegistresGastosVasAVerAca'),
                       )
                     else ...[
                       DonutChart(
@@ -255,15 +236,12 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.localized(
-                          es: 'Ritmo de gasto', en: 'Spending pace'),
+                      strings.t('ritmoDeGasto'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      strings.isEnglish
-                          ? 'Shows whether your cumulative spending is inside the expected range for this point in the month.'
-                          : 'Te muestra si el gasto acumulado va dentro del margen esperable para este momento del mes.',
+                      strings.t('teMuestraSiElGastoAcumuladoVa'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -285,9 +263,7 @@ class ReportsScreen extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _MetricBox(
-                            label: strings.isEnglish
-                                ? 'Expected today'
-                                : 'Esperado hoy',
+                            label: strings.t('esperadoHoy'),
                             value: CurrencyFormatter.format(
                               overview.spendingPace.expectedSpendToDate,
                               symbol: symbol,
@@ -303,8 +279,7 @@ class ReportsScreen extends ConsumerWidget {
                       children: [
                         Expanded(
                           child: _MetricBox(
-                            label: strings.localized(
-                                es: 'Proyección', en: 'Projection'),
+                            label: strings.t('proyeccion'),
                             value: CurrencyFormatter.format(
                               overview.spendingPace.projectedEndOfMonth,
                               symbol: symbol,
@@ -316,8 +291,7 @@ class ReportsScreen extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: _MetricBox(
-                            label:
-                                strings.localized(es: 'Estado', en: 'Status'),
+                            label: strings.t('estado'),
                             value: _paceLabel(
                                 strings, overview.spendingPace.status),
                             color: _paceColor(
@@ -345,17 +319,11 @@ class ReportsScreen extends ConsumerWidget {
                     const SizedBox(height: 10),
                     Text(
                       overview.spendingPace.status == SpendingPaceStatus.risk
-                          ? (strings.isEnglish
-                              ? 'Your current pace is demanding for the available margin.'
-                              : 'El ritmo actual es exigente para tu margen disponible.')
+                          ? (strings.t('elRitmoActualEsExigenteParaTu'))
                           : overview.spendingPace.status ==
                                   SpendingPaceStatus.watch
-                              ? (strings.isEnglish
-                                  ? 'You are close to the limit. It is worth watching the second half of the month carefully.'
-                                  : 'Vas cerca del límite. Conviene mirar con atención la segunda mitad del mes.')
-                              : (strings.isEnglish
-                                  ? 'Your spending is currently in a healthy zone for this time of month.'
-                                  : 'Tu gasto viene en una zona saludable para este momento del mes.'),
+                              ? (strings.t('vasCercaDelLimiteConvieneMirarCon'))
+                              : (strings.t('tuGastoVieneEnUnaZonaSaludable')),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -369,15 +337,12 @@ class ReportsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.localized(
-                          es: 'Metas de ahorro', en: 'Savings goals'),
+                      strings.t('metasDeAhorro'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      strings.isEnglish
-                          ? 'Simple tracking of progress, contribution pace and estimated completion date.'
-                          : 'Seguimiento simple del avance, ritmo de aporte y fecha estimada de cumplimiento.',
+                      strings.t('seguimientoSimpleDelAvanceRitmoDeAporte'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -386,12 +351,8 @@ class ReportsScreen extends ConsumerWidget {
                     if (overview.savingsGoals.isEmpty)
                       EmptyStateView(
                         icon: Icons.savings_outlined,
-                        title: strings.isEnglish
-                            ? 'No goals to analyze yet'
-                            : 'Todavía no hay metas para analizar',
-                        message: strings.isEnglish
-                            ? 'Once you have goals and contributions, progress pace will show here.'
-                            : 'Cuando tengas metas y aportes, vas a ver acá el ritmo de avance.',
+                        title: strings.t('todaviaNoHayMetasParaAnalizar'),
+                        message: strings.t('cuandoTengasMetasYAportesVasA'),
                       )
                     else
                       ...overview.savingsGoals.map(
@@ -414,16 +375,12 @@ class ReportsScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        strings.isEnglish
-                            ? 'Expenses by payment method'
-                            : 'Gastos por medio de pago',
+                        strings.t('gastosPorMedioDePago'),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        strings.isEnglish
-                            ? 'Helps you see which payment method you use the most this month.'
-                            : 'Te ayuda a ver qué método estás usando más en el mes.',
+                        strings.t('teAyudaAVerQueMetodoEstas'),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: scheme.onSurfaceVariant,
                             ),
@@ -446,7 +403,7 @@ class ReportsScreen extends ConsumerWidget {
               if (overview.insights.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Text(
-                  strings.localized(es: 'Lectura rápida', en: 'Quick read'),
+                  strings.t('lecturaRapida'),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 12),
@@ -466,10 +423,8 @@ class ReportsScreen extends ConsumerWidget {
           children: [
             EmptyStateView(
               icon: Icons.show_chart_rounded,
-              title: strings.isEnglish
-                  ? 'Could not load reports'
-                  : 'No se pudieron cargar los reportes',
-              message: '$error',
+              title: strings.t('noSePudieronCargarLosReportes'),
+              message: strings.technicalErrorDetails(error),
             ),
           ],
         ),
@@ -488,11 +443,9 @@ class ReportsScreen extends ConsumerWidget {
 
   String _paceLabel(AppStrings strings, SpendingPaceStatus status) {
     return switch (status) {
-      SpendingPaceStatus.onTrack =>
-        strings.localized(es: 'En rango', en: 'On track'),
-      SpendingPaceStatus.watch =>
-        strings.localized(es: 'Atención', en: 'Watch'),
-      SpendingPaceStatus.risk => strings.localized(es: 'Riesgo', en: 'Risk'),
+      SpendingPaceStatus.onTrack => strings.t('enRango'),
+      SpendingPaceStatus.watch => strings.t('atencion2'),
+      SpendingPaceStatus.risk => strings.t('riesgo'),
     };
   }
 
@@ -590,7 +543,7 @@ class _CategoryComparisonTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final deltaColor = item.deltaAmount >= 0 ? scheme.error : scheme.primary;
     final deltaLabel = item.deltaPercentage == null
-        ? (strings.localized(es: 'Nuevo', en: 'New'))
+        ? (strings.t('nuevo'))
         : '${item.deltaAmount >= 0 ? '+' : ''}${(item.deltaPercentage! * 100).round()}%';
 
     return Container(
@@ -628,9 +581,9 @@ class _CategoryComparisonTile extends StatelessWidget {
                 ),
               ),
               Text(
-                strings.isEnglish
-                    ? '${(item.shareOfCurrent * 100).round()}% of total'
-                    : '${(item.shareOfCurrent * 100).round()}% del total',
+                strings.reportsShareOfTotal(
+                  (item.shareOfCurrent * 100).round(),
+                ),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: scheme.onSurfaceVariant,
                     ),
@@ -640,9 +593,13 @@ class _CategoryComparisonTile extends StatelessWidget {
           if (item.previousAmount > 0) ...[
             const SizedBox(height: 4),
             Text(
-              strings.isEnglish
-                  ? 'Previous month: ${CurrencyFormatter.format(item.previousAmount, symbol: symbol, localeCode: localeCode)}'
-                  : 'Mes anterior: ${CurrencyFormatter.format(item.previousAmount, symbol: symbol, localeCode: localeCode)}',
+              strings.reportsPreviousMonth(
+                CurrencyFormatter.format(
+                  item.previousAmount,
+                  symbol: symbol,
+                  localeCode: localeCode,
+                ),
+              ),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: scheme.onSurfaceVariant,
                   ),
@@ -670,8 +627,7 @@ class _GoalForecastTile extends StatelessWidget {
     final strings = AppStrings.of(context);
     final scheme = Theme.of(context).colorScheme;
     final estimatedDate = goal.estimatedCompletionDate == null
-        ? (strings.localized(
-            es: 'Sin estimación todavía', en: 'No estimate yet'))
+        ? (strings.t('sinEstimacionTodavia'))
         : DateFormat('MMM yyyy', strings.languageCode)
             .format(goal.estimatedCompletionDate!);
 
@@ -690,9 +646,18 @@ class _GoalForecastTile extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            strings.isEnglish
-                ? '${CurrencyFormatter.format(goal.progress.savedAmount, symbol: symbol, localeCode: localeCode)} of ${CurrencyFormatter.format(goal.progress.goal.targetAmount, symbol: symbol, localeCode: localeCode)}'
-                : '${CurrencyFormatter.format(goal.progress.savedAmount, symbol: symbol, localeCode: localeCode)} de ${CurrencyFormatter.format(goal.progress.goal.targetAmount, symbol: symbol, localeCode: localeCode)}',
+            strings.savingsGoalProgress(
+              CurrencyFormatter.format(
+                goal.progress.savedAmount,
+                symbol: symbol,
+                localeCode: localeCode,
+              ),
+              CurrencyFormatter.format(
+                goal.progress.goal.targetAmount,
+                symbol: symbol,
+                localeCode: localeCode,
+              ),
+            ),
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 10),
@@ -707,27 +672,33 @@ class _GoalForecastTile extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            strings.isEnglish
-                ? 'Average contribution: ${CurrencyFormatter.format(goal.averageMonthlyContribution, symbol: symbol, localeCode: localeCode)} per month'
-                : 'Aporte promedio: ${CurrencyFormatter.format(goal.averageMonthlyContribution, symbol: symbol, localeCode: localeCode)} por mes',
+            strings.goalAverageContribution(
+              CurrencyFormatter.format(
+                goal.averageMonthlyContribution,
+                symbol: symbol,
+                localeCode: localeCode,
+              ),
+            ),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: 4),
           Text(
-            strings.isEnglish
-                ? 'Contribution this month: ${CurrencyFormatter.format(goal.currentMonthContribution, symbol: symbol, localeCode: localeCode)}'
-                : 'Aporte este mes: ${CurrencyFormatter.format(goal.currentMonthContribution, symbol: symbol, localeCode: localeCode)}',
+            strings.goalContributionThisMonth(
+              CurrencyFormatter.format(
+                goal.currentMonthContribution,
+                symbol: symbol,
+                localeCode: localeCode,
+              ),
+            ),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: 4),
           Text(
-            strings.isEnglish
-                ? 'Estimated date: $estimatedDate'
-                : 'Fecha estimada: $estimatedDate',
+            strings.goalEstimatedDate(estimatedDate),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),

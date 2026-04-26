@@ -32,16 +32,8 @@ class SettingsScreen extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final password = await _requestBackupPassword(
       context,
-      title: strings.localized(
-        es: 'Proteger backup',
-        en: 'Protect backup',
-        pt: 'Proteger backup',
-      ),
-      description: strings.localized(
-        es: 'Agregá una contraseña opcional. Si la dejás vacía, el backup se exportará como JSON legible.',
-        en: 'Add an optional password. If you leave it empty, the backup will be exported as readable JSON.',
-        pt: 'Adicione uma senha opcional. Se deixar vazio, o backup será exportado como JSON legível.',
-      ),
+      title: strings.t('protegerBackup'),
+      description: strings.t('agregaUnaContrasenaOpcionalSiLaDejas'),
       confirmLabel: strings.exportBackup,
     );
     if (password == null) {
@@ -59,11 +51,7 @@ class SettingsScreen extends ConsumerWidget {
 
     await Share.shareXFiles(
       [XFile(file.path)],
-      text: strings.localized(
-        es: 'Backup local de CleanFinance',
-        en: 'Local backup from CleanFinance',
-        pt: 'Backup local do CleanFinance',
-      ),
+      text: strings.t('backupLocalDeCleanfinance'),
     );
 
     if (context.mounted) {
@@ -71,7 +59,7 @@ class SettingsScreen extends ConsumerWidget {
         SnackBar(
           content: Text(
             password.trim().isEmpty
-                ? '${strings.exportBackup}: ${file.path}. ${strings.localized(es: 'Advertencia: el archivo no está cifrado.', en: 'Warning: the file is not encrypted.', pt: 'Aviso: o arquivo não está criptografado.')}'
+                ? '${strings.exportBackup}: ${file.path}. ${strings.t('advertenciaElArchivoNoEstaCifrado')}'
                 : '${strings.exportBackup}: ${file.path}',
           ),
         ),
@@ -93,11 +81,7 @@ class SettingsScreen extends ConsumerWidget {
     final confirmed = await showConfirmActionDialog(
       context: context,
       title: strings.importBackup,
-      message: strings.localized(
-        es: 'Esta acción reemplazará tus datos locales actuales. El archivo se validará antes de importar para no tocar tus datos si encuentra problemas.',
-        en: 'This will replace your current local data. The file will be validated before importing so your existing data stays untouched if something is wrong.',
-        pt: 'Esta ação substituirá seus dados locais atuais. O arquivo será validado antes da importação para manter seus dados intactos se algo estiver errado.',
-      ),
+      message: strings.t('estaAccionReemplazaraTusDatosLocalesActuales'),
       confirmLabel: strings.importBackup,
       cancelLabel: strings.cancel,
     );
@@ -113,16 +97,8 @@ class SettingsScreen extends ConsumerWidget {
       }
       final password = await _requestBackupPassword(
         context,
-        title: strings.localized(
-          es: 'Importar backup',
-          en: 'Import backup',
-          pt: 'Importar backup',
-        ),
-        description: strings.localized(
-          es: 'Si este backup fue protegido con contraseña, ingresala ahora. Si es un JSON plano, dejala vacía.',
-          en: 'If this backup was protected with a password, enter it now. Leave it empty for plain JSON backups.',
-          pt: 'Se este backup foi protegido com senha, informe agora. Deixe vazio para backups em JSON simples.',
-        ),
+        title: strings.t('importBackup'),
+        description: strings.t('siEsteBackupFueProtegidoConContrasena'),
         confirmLabel: strings.importBackup,
       );
       if (!context.mounted) {
@@ -140,11 +116,7 @@ class SettingsScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              strings.localized(
-                es: 'Datos importados correctamente.',
-                en: 'Data imported successfully.',
-                pt: 'Dados importados com sucesso.',
-              ),
+              strings.t('datosImportadosCorrectamente'),
             ),
           ),
         );
@@ -164,21 +136,9 @@ class SettingsScreen extends ConsumerWidget {
     final strings = AppStrings.of(context);
     final confirmed = await showConfirmActionDialog(
       context: context,
-      title: strings.localized(
-        es: 'Borrar todos los datos',
-        en: 'Delete all data',
-        pt: 'Excluir todos os dados',
-      ),
-      message: strings.localized(
-        es: 'Esto eliminará la base local completa, el PIN, los datos de recuperación y las banderas de biometría, dejando la app como una instalación limpia.',
-        en: 'This will remove the full local database, PIN, recovery data and biometric flags, leaving the app as a clean install.',
-        pt: 'Isso removerá todo o banco local, PIN, dados de recuperação e biometria, deixando o app como uma instalação limpa.',
-      ),
-      confirmLabel: strings.localized(
-        es: 'Borrar todo',
-        en: 'Delete everything',
-        pt: 'Excluir tudo',
-      ),
+      title: strings.t('borrarTodosLosDatos'),
+      message: strings.t('estoEliminaraLaBaseLocalCompletaEl'),
+      confirmLabel: strings.t('borrarTodo'),
       cancelLabel: strings.cancel,
     );
 
@@ -192,11 +152,7 @@ class SettingsScreen extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            strings.localized(
-              es: 'Se borraron todos los datos locales. La app quedó en estado de instalación limpia.',
-              en: 'All local data was deleted. The app is now in clean-install state.',
-              pt: 'Todos os dados locais foram excluídos. O app voltou ao estado inicial.',
-            ),
+            strings.t('seBorraronTodosLosDatosLocalesLa'),
           ),
         ),
       );
@@ -229,11 +185,7 @@ class SettingsScreen extends ConsumerWidget {
                     controller: controller,
                     obscureText: obscureText,
                     decoration: InputDecoration(
-                      labelText: strings.localized(
-                        es: 'Contraseña (opcional)',
-                        en: 'Password (optional)',
-                        pt: 'Senha (opcional)',
-                      ),
+                      labelText: strings.t('contrasenaOpcional'),
                       suffixIcon: IconButton(
                         onPressed: () =>
                             setState(() => obscureText = !obscureText),
@@ -323,20 +275,12 @@ class SettingsScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            strings.localized(
-                              es: 'Una app simple, privada y clara',
-                              en: 'A simple, private and clear app',
-                              pt: 'Um app simples, privado e claro',
-                            ),
+                            strings.t('unaAppSimplePrivadaYClara'),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            strings.localized(
-                              es: 'Configurá la experiencia para que se sienta realmente tuya.',
-                              en: 'Adjust the experience so it really feels like yours.',
-                              pt: 'Ajuste a experiência para que ela fique do seu jeito.',
-                            ),
+                            strings.t('configuraLaExperienciaParaQueSeSienta'),
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -363,11 +307,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.localized(
-                        es: 'Mantené acceso rápido sin perder privacidad.',
-                        en: 'Keep fast access without losing privacy.',
-                        pt: 'Mantenha o acesso rápido sem perder privacidade.',
-                      ),
+                      strings.t('manteneAccesoRapidoSinPerderPrivacidad'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -379,16 +319,9 @@ class SettingsScreen extends ConsumerWidget {
                       title: Text(strings.biometric),
                       subtitle: Text(
                         authState.biometricAvailable
-                            ? strings.localized(
-                                es: 'Usá huella o reconocimiento facial si está disponible.',
-                                en: 'Use fingerprint or face unlock if available.',
-                                pt: 'Use digital ou reconhecimento facial se estiver disponível.',
-                              )
-                            : strings.localized(
-                                es: 'Este dispositivo no tiene biometría disponible.',
-                                en: 'This device does not support biometrics.',
-                                pt: 'Este dispositivo não tem biometria disponível.',
-                              ),
+                            ? strings.t('usaHuellaOReconocimientoFacialSiEsta')
+                            : strings
+                                .t('esteDispositivoNoTieneBiometriaDisponible'),
                       ),
                       value: authState.biometricEnabled,
                       onChanged: authState.biometricAvailable
@@ -408,32 +341,24 @@ class SettingsScreen extends ConsumerWidget {
                     DropdownButtonFormField<int>(
                       initialValue: settings.autoLockMinutes,
                       decoration: InputDecoration(
-                        labelText: strings.localized(
-                          es: 'Bloqueo automático',
-                          en: 'Auto lock',
-                          pt: 'Bloqueio automático',
-                        ),
+                        labelText: strings.t('bloqueoAutomatico'),
                       ),
                       items: [
                         DropdownMenuItem(
                           value: 1,
-                          child: Text(strings.localized(
-                              es: '1 minuto', en: '1 minute')),
+                          child: Text(strings.t('oneMinute')),
                         ),
                         DropdownMenuItem(
                           value: 5,
-                          child: Text(strings.localized(
-                              es: '5 minutos', en: '5 minutes')),
+                          child: Text(strings.t('fiveMinutes')),
                         ),
                         DropdownMenuItem(
                           value: 15,
-                          child: Text(strings.localized(
-                              es: '15 minutos', en: '15 minutes')),
+                          child: Text(strings.t('fifteenMinutes')),
                         ),
                         DropdownMenuItem(
                           value: 30,
-                          child: Text(strings.localized(
-                              es: '30 minutos', en: '30 minutes')),
+                          child: Text(strings.t('thirtyMinutes')),
                         ),
                       ],
                       onChanged: (value) {
@@ -466,11 +391,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.localized(
-                        es: 'Revisá qué guarda CleanFinance de forma local, cómo funcionan los backups y qué datos nunca se envían a servidores.',
-                        en: 'Review what CleanFinance stores locally, how backups work, and what is never sent to servers.',
-                        pt: 'Veja o que o CleanFinance guarda localmente, como os backups funcionam e o que nunca é enviado a servidores.',
-                      ),
+                      strings.t('revisaQueGuardaCleanfinanceDeFormaLocal'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -520,8 +441,8 @@ class SettingsScreen extends ConsumerWidget {
                           child: Text(strings.english),
                         ),
                         DropdownMenuItem(
-                          value: AppLocaleMode.portugueseBrazil.preferenceCode,
-                          child: Text(strings.portugueseBrazil),
+                          value: AppLocaleMode.portuguese.preferenceCode,
+                          child: Text(strings.portuguese),
                         ),
                       ],
                       onChanged: (value) {
@@ -538,28 +459,22 @@ class SettingsScreen extends ConsumerWidget {
                     DropdownButtonFormField<AppThemePreference>(
                       initialValue: settings.themePreference,
                       decoration: InputDecoration(
-                        labelText: strings.localized(es: 'Tema', en: 'Theme'),
+                        labelText: strings.t('tema'),
                       ),
                       items: [
                         DropdownMenuItem(
                           value: AppThemePreference.system,
                           child: Text(
-                            strings.localized(
-                              es: 'Seguir sistema',
-                              en: 'Follow system',
-                              pt: 'Seguir sistema',
-                            ),
+                            strings.t('seguirSistema'),
                           ),
                         ),
                         DropdownMenuItem(
                           value: AppThemePreference.light,
-                          child:
-                              Text(strings.localized(es: 'Claro', en: 'Light')),
+                          child: Text(strings.t('claro')),
                         ),
                         DropdownMenuItem(
                           value: AppThemePreference.dark,
-                          child:
-                              Text(strings.localized(es: 'Oscuro', en: 'Dark')),
+                          child: Text(strings.t('oscuro')),
                         ),
                       ],
                       onChanged: (value) {
@@ -574,16 +489,21 @@ class SettingsScreen extends ConsumerWidget {
                     DropdownButtonFormField<String>(
                       initialValue: settings.currencyCode,
                       decoration: InputDecoration(
-                        labelText:
-                            strings.localized(es: 'Moneda', en: 'Currency'),
+                        labelText: strings.t('moneda'),
                       ),
-                      items: const [
-                        DropdownMenuItem(value: 'ARS', child: Text('ARS (\$)')),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'ARS',
+                          child: Text(strings.currencyArsOption),
+                        ),
                         DropdownMenuItem(
                           value: 'USD',
-                          child: Text('USD (US\$)'),
+                          child: Text(strings.currencyUsdOption),
                         ),
-                        DropdownMenuItem(value: 'EUR', child: Text('EUR (€)')),
+                        DropdownMenuItem(
+                          value: 'EUR',
+                          child: Text(strings.currencyEurOption),
+                        ),
                       ],
                       onChanged: (value) {
                         if (value == null) {
@@ -624,17 +544,12 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.localized(
-                          es: 'Notificaciones', en: 'Notifications'),
+                      strings.t('notificaciones'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.localized(
-                        es: 'Recibí recordatorios mensuales en este teléfono.',
-                        en: 'Receive monthly reminders on this device.',
-                        pt: 'Receba lembretes mensais neste dispositivo.',
-                      ),
+                      strings.t('recibiRecordatoriosMensualesEnEsteTelefono'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -644,11 +559,7 @@ class SettingsScreen extends ConsumerWidget {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(
-                        strings.localized(
-                          es: 'Notificaciones del sistema',
-                          en: 'System notifications',
-                          pt: 'Notificações do sistema',
-                        ),
+                        strings.t('notificacionesDelSistema'),
                       ),
                       subtitle: _NotificationStatusText(
                         strings: strings,
@@ -663,11 +574,7 @@ class SettingsScreen extends ConsumerWidget {
                       contentPadding: EdgeInsets.zero,
                       leading: const Icon(Icons.schedule_outlined),
                       title: Text(
-                        strings.localized(
-                          es: 'Hora de recordatorio',
-                          en: 'Reminder time',
-                          pt: 'Hora do lembrete',
-                        ),
+                        strings.t('horaDeRecordatorio'),
                       ),
                       subtitle: Text(
                         MaterialLocalizations.of(context).formatTimeOfDay(
@@ -707,16 +614,12 @@ class SettingsScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      strings.localized(es: 'Organización', en: 'Organization'),
+                      strings.t('organizacion'),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.localized(
-                        es: 'Personalizá las listas que usás todos los días para que cargar datos siga siendo rápido y claro.',
-                        en: 'Customize the lists you use every day so adding data stays quick and clear.',
-                        pt: 'Personalize as listas que você usa todos os dias para registrar dados com rapidez e clareza.',
-                      ),
+                      strings.t('personalizaLasListasQueUsasTodosLos'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -771,11 +674,7 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.localized(
-                        es: 'Tus datos viven en tu dispositivo. Podés exportarlos o restaurarlos cuando quieras.',
-                        en: 'Your data lives on your device. You can export or restore it whenever you need.',
-                        pt: 'Seus dados ficam no dispositivo. Você pode exportar ou restaurar quando precisar.',
-                      ),
+                      strings.t('tusDatosVivenEnTuDispositivoPodes'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -792,11 +691,7 @@ class SettingsScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: Text(
-                        strings.localized(
-                          es: 'Nota de seguridad: los backups locales pueden exportarse como JSON plano. Ahora podés agregar una contraseña opcional, pero los datos guardados en SQLite dentro del dispositivo siguen sin cifrado de base.',
-                          en: 'Security note: local backups can be exported as plain JSON. You can now add an optional password, but data stored in SQLite on the device is still not database-encrypted.',
-                          pt: 'Nota de segurança: backups locais podem ser exportados como JSON simples. Agora você pode adicionar uma senha opcional, mas os dados no SQLite do dispositivo ainda não têm criptografia de banco.',
-                        ),
+                        strings.t('notaDeSeguridadLosBackupsLocalesPueden'),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -820,11 +715,7 @@ class SettingsScreen extends ConsumerWidget {
                     TextButton(
                       onPressed: () => _clearAllData(context, ref),
                       child: Text(
-                        strings.localized(
-                          es: 'Borrar todos los datos',
-                          en: 'Delete all data',
-                          pt: 'Excluir todos os dados',
-                        ),
+                        strings.t('borrarTodosLosDatos'),
                       ),
                     ),
                   ],
@@ -833,11 +724,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               SectionCard(
                 child: Text(
-                  strings.localized(
-                    es: 'Privacidad primero: no hay tracking, no se suben datos financieros y todo queda bajo tu control local.',
-                    en: 'Privacy first: no tracking, no financial data uploads and everything stays under your local control.',
-                    pt: 'Privacidade em primeiro lugar: sem rastreamento, sem envio de dados financeiros e tudo sob seu controle local.',
-                  ),
+                  strings.t('privacidadPrimeroNoHayTrackingNoSe'),
                 ),
               ),
             ],
@@ -849,12 +736,8 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             EmptyStateView(
               icon: Icons.error_outline_rounded,
-              title: strings.localized(
-                es: 'No se pudieron cargar los ajustes',
-                en: 'Could not load settings',
-                pt: 'Não foi possível carregar as configurações',
-              ),
-              message: '$error',
+              title: strings.t('noSePudieronCargarLosAjustes'),
+              message: strings.technicalErrorDetails(error),
             ),
           ],
         ),
@@ -878,19 +761,11 @@ class _NotificationStatusText extends ConsumerWidget {
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
       ),
       loading: () => Text(
-        strings.localized(
-          es: 'Revisando permiso...',
-          en: 'Checking permission...',
-          pt: 'Verificando permissão...',
-        ),
+        strings.t('revisandoPermiso'),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
       ),
       error: (_, __) => Text(
-        strings.localized(
-          es: 'No se pudo revisar el permiso',
-          en: 'Permission status unavailable',
-          pt: 'Não foi possível verificar a permissão',
-        ),
+        strings.t('noSePudoRevisarElPermiso'),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: color),
       ),
     );
@@ -899,35 +774,15 @@ class _NotificationStatusText extends ConsumerWidget {
   String _labelFor(CleanFinanceNotificationStatus status) {
     switch (status) {
       case CleanFinanceNotificationStatus.disabled:
-        return strings.localized(
-          es: 'Notificaciones desactivadas',
-          en: 'Notifications are off',
-          pt: 'Notificações desativadas',
-        );
+        return strings.t('notificacionesDesactivadas');
       case CleanFinanceNotificationStatus.active:
-        return strings.localized(
-          es: 'Notificaciones activadas',
-          en: 'Notifications enabled',
-          pt: 'Notificações ativadas',
-        );
+        return strings.t('notificacionesActivadas');
       case CleanFinanceNotificationStatus.permissionPending:
-        return strings.localized(
-          es: 'Permiso pendiente',
-          en: 'Permission pending',
-          pt: 'Permissão pendente',
-        );
+        return strings.t('permisoPendiente');
       case CleanFinanceNotificationStatus.permissionDenied:
-        return strings.localized(
-          es: 'Permiso denegado',
-          en: 'Permission denied',
-          pt: 'Permissão negada',
-        );
+        return strings.t('permisoDenegado');
       case CleanFinanceNotificationStatus.unsupported:
-        return strings.localized(
-          es: 'No disponible en esta plataforma',
-          en: 'Not available on this platform',
-          pt: 'Não disponível nesta plataforma',
-        );
+        return strings.t('noDisponibleEnEstaPlataforma');
     }
   }
 }

@@ -20,8 +20,8 @@ class IconPickerField extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final normalizedKey = IconOptions.normalize(selectedIconKey);
-    final selectedLabel = IconOptions.labelFor(normalizedKey);
-    final resolvedLabel = label ?? (strings.localized(es: 'Ícono', en: 'Icon'));
+    final selectedLabel = strings.t(IconOptions.labelKeyFor(normalizedKey));
+    final resolvedLabel = label ?? (strings.t('icono'));
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -69,8 +69,7 @@ class IconPickerField extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    strings.localized(
-                        es: 'Tocá para cambiar', en: 'Tap to change'),
+                    strings.t('tocaParaCambiar'),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -96,7 +95,7 @@ class _IconPickerSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final selectedLabel = IconOptions.labelFor(selectedIconKey);
+    final selectedLabel = strings.t(IconOptions.labelKeyFor(selectedIconKey));
 
     return SafeArea(
       top: false,
@@ -130,15 +129,12 @@ class _IconPickerSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      strings.localized(
-                          es: 'Elegí un ícono', en: 'Choose an icon'),
+                      strings.t('elegiUnIcono'),
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      strings.isEnglish
-                          ? 'Use a clear option to recognize the category faster.'
-                          : 'Usá una opción clara para reconocer más rápido la categoría.',
+                      strings.t('usaUnaOpcionClaraParaReconocerMas'),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -173,9 +169,7 @@ class _IconPickerSheet extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  strings.isEnglish
-                                      ? 'Selected icon'
-                                      : 'Ícono seleccionado',
+                                  strings.t('iconoSeleccionado'),
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
@@ -208,6 +202,7 @@ class _IconPickerSheet extends StatelessWidget {
                           return _IconOptionTile(
                             option: option,
                             selected: isSelected,
+                            strings: strings,
                             onTap: () => Navigator.of(context).pop(option.key),
                           );
                         },
@@ -228,11 +223,13 @@ class _IconOptionTile extends StatelessWidget {
   const _IconOptionTile({
     required this.option,
     required this.selected,
+    required this.strings,
     required this.onTap,
   });
 
   final IconOption option;
   final bool selected;
+  final AppStrings strings;
   final VoidCallback onTap;
 
   @override
@@ -263,7 +260,7 @@ class _IconOptionTile extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                option.label,
+                strings.t(option.labelKey),
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

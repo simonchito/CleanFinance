@@ -41,25 +41,19 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
 
     if (birthDate.isEmpty || document.isEmpty) {
       _showMessage(
-        AppStrings.of(context).isEnglish
-            ? 'Complete both recovery answers.'
-            : 'Completá ambas respuestas de recuperación.',
+        AppStrings.of(context).t('completaAmbasRespuestasDeRecuperacion'),
       );
       return;
     }
     if (!_isValidBirthDate(birthDate) || !_isValidDocument(document)) {
       _showMessage(
-        AppStrings.of(context).isEnglish
-            ? 'Use a valid date and a document with at least 6 characters.'
-            : 'Usá una fecha válida y un documento con al menos 6 caracteres.',
+        AppStrings.of(context).t('usaUnaFechaValidaYUnDocumento'),
       );
       return;
     }
     if (newPin != confirmPin) {
       _showMessage(
-        AppStrings.of(context).isEnglish
-            ? 'PIN values do not match.'
-            : 'Los PIN no coinciden.',
+        AppStrings.of(context).t('losPinNoCoinciden'),
       );
       return;
     }
@@ -118,17 +112,13 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
           const Center(child: BrandLogo(size: 64)),
           const SizedBox(height: 20),
           Text(
-            strings.isEnglish
-                ? 'Recover access without complications'
-                : 'Recuperá tu acceso sin complicarte',
+            strings.t('recuperaTuAccesoSinComplicarte'),
             style: Theme.of(context).textTheme.headlineSmall,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 10),
           Text(
-            strings.isEnglish
-                ? 'Answer your two personal questions and choose a new PIN.'
-                : 'Respondé tus dos preguntas personales y elegí un PIN nuevo.',
+            strings.t('respondeTusDosPreguntasPersonalesYElegi'),
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -145,9 +135,7 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              strings.isEnglish
-                  ? 'Local recovery is less robust than your PIN. If someone knows this data and has the device, they could try to reset access.'
-                  : 'La recuperación local es menos robusta que tu PIN. Si alguien conoce estos datos y tiene el dispositivo, podría intentar restablecer el acceso.',
+              strings.t('laRecuperacionLocalEsMenosRobustaQue'),
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -158,9 +146,7 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             keyboardType: TextInputType.datetime,
             decoration: InputDecoration(
               labelText: strings.birthDate,
-              hintText: strings.isEnglish
-                  ? 'Example: 02/10/1996'
-                  : 'Ejemplo: 10/02/1996',
+              hintText: strings.t('ejemplo10021996'),
             ),
           ),
           const SizedBox(height: 12),
@@ -169,8 +155,7 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
               labelText: strings.documentId,
-              hintText:
-                  strings.isEnglish ? 'Example: 12345678' : 'Ejemplo: 12345678',
+              hintText: strings.authRecoveryDocumentExample,
             ),
           ),
           const SizedBox(height: 12),
@@ -180,7 +165,7 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             obscureText: true,
             maxLength: AppConstants.defaultPinLength,
             decoration: InputDecoration(
-              labelText: strings.localized(es: 'Nuevo PIN', en: 'New PIN'),
+              labelText: strings.t('nuevoPin'),
             ),
           ),
           const SizedBox(height: 12),
@@ -190,8 +175,7 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             obscureText: true,
             maxLength: AppConstants.defaultPinLength,
             decoration: InputDecoration(
-              labelText:
-                  strings.localized(es: 'Confirmar PIN', en: 'Confirm PIN'),
+              labelText: strings.t('confirmarPin'),
             ),
           ),
           const SizedBox(height: 8),
@@ -202,27 +186,19 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
                 ? (value) => setState(() => _enableBiometrics = value)
                 : null,
             title: Text(
-              strings.isEnglish
-                  ? 'Enable biometrics for next unlocks'
-                  : 'Activar huella para próximos accesos',
+              strings.t('activarHuellaParaProximosAccesos'),
             ),
             subtitle: Text(
               biometricAvailable
-                  ? (strings.isEnglish
-                      ? 'This lets you sign in faster after recovery.'
-                      : 'Así vas a poder entrar más rápido después de recuperar tu cuenta.')
-                  : (strings.isEnglish
-                      ? 'Biometrics are not available on this device.'
-                      : 'La biometría no está disponible en este dispositivo.'),
+                  ? (strings.t('asiVasAPoderEntrarMasRapido'))
+                  : (strings.t('laBiometriaNoEstaDisponibleEnEste')),
             ),
           ),
           const SizedBox(height: 20),
           FilledButton(
             onPressed: _loading ? null : _recover,
             child: Text(
-              _loading
-                  ? (strings.localized(es: 'Validando...', en: 'Validating...'))
-                  : strings.recoverAccess,
+              _loading ? (strings.t('validando')) : strings.recoverAccess,
             ),
           ),
         ],

@@ -118,7 +118,9 @@ void main() {
     expect(reminders, isEmpty);
   });
 
-  test('does not return expense reminder when subcategory already has a payment this month', () {
+  test(
+      'does not return expense reminder when subcategory already has a payment this month',
+      () {
     final reminders = service.buildDueReminders(
       expenseCategories: [
         expenseCategory(id: 'services', name: 'Servicios'),
@@ -186,7 +188,9 @@ void main() {
     expect(reminders, isEmpty);
   });
 
-  test('does not return savings reminder when goal already has a contribution this month', () {
+  test(
+      'does not return savings reminder when goal already has a contribution this month',
+      () {
     final reminders = service.buildDueReminders(
       expenseCategories: const [],
       savingsGoals: [
