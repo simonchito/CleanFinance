@@ -159,8 +159,8 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                       ...topLevelCategories.map(
                         (category) => SelectionSheetItem<String?>(
                           value: category.id,
-                          label: DefaultCategoryNameLocalizer.localize(
-                            category.name,
+                          label: DefaultCategoryNameLocalizer.localizeCategory(
+                            category,
                             strings,
                           ),
                           iconKey: category.iconKey,
@@ -354,11 +354,16 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                   final scheme = Theme.of(context).colorScheme;
                   final displayCategoryName =
                       movement.subcategoryName ?? movement.categoryName;
+                  final displayCategoryIsDefault =
+                      movement.subcategoryName != null
+                          ? movement.subcategoryIsDefault
+                          : movement.categoryIsDefault;
                   final localizedCategoryName = displayCategoryName == null
                       ? null
-                      : DefaultCategoryNameLocalizer.localize(
+                      : DefaultCategoryNameLocalizer.localizeDefaultName(
                           displayCategoryName,
                           strings,
+                          isDefault: displayCategoryIsDefault,
                         );
                   final (icon, color, prefix) = switch (movement.type) {
                     MovementType.income => (
@@ -410,9 +415,11 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                                   [
                                     if (movement.subcategoryName != null &&
                                         movement.categoryName != null)
-                                      DefaultCategoryNameLocalizer.localize(
+                                      DefaultCategoryNameLocalizer
+                                          .localizeDefaultName(
                                         movement.categoryName!,
                                         strings,
+                                        isDefault: movement.categoryIsDefault,
                                       ),
                                     DateFormat('d MMM yyyy', localeCode)
                                         .format(movement.occurredOn),

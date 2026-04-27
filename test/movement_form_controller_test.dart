@@ -78,7 +78,7 @@ void main() {
       );
       await tester.tap(selectionFields.at(1));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Alimentos').last);
+      await tester.tap(find.text('Comida').last);
       await tester.pumpAndSettle();
 
       await tester.tap(selectionFields.last);

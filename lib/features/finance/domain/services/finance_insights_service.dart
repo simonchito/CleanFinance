@@ -39,6 +39,7 @@ class FinanceInsightsService {
         FinanceInsight(
           type: FinanceInsightType.dominantCategory,
           categoryName: topCategory.categoryName,
+          categoryIsDefault: topCategory.categoryIsDefault,
           percentageValue: topCategory.shareOfCurrent * 100,
           tone: topCategory.shareOfCurrent >= 0.35
               ? FinanceInsightTone.warning
@@ -56,6 +57,7 @@ class FinanceInsightsService {
           FinanceInsight(
             type: FinanceInsightType.expenseIncrease,
             categoryName: variableCategory.categoryName,
+            categoryIsDefault: variableCategory.categoryIsDefault,
             percentageValue: variableCategory.deltaPercentage!.abs() * 100,
             tone: FinanceInsightTone.warning,
             kind: FinanceInsightKind.diagnostic,
@@ -66,6 +68,7 @@ class FinanceInsightsService {
           FinanceInsight(
             type: FinanceInsightType.expenseDecrease,
             categoryName: variableCategory.categoryName,
+            categoryIsDefault: variableCategory.categoryIsDefault,
             percentageValue: variableCategory.deltaPercentage!.abs() * 100,
             tone: FinanceInsightTone.positive,
             kind: FinanceInsightKind.diagnostic,

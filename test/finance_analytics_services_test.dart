@@ -28,6 +28,7 @@ void main() {
     required double amount,
     required DateTime occurredOn,
     String? categoryName,
+    String? categoryId,
     String? paymentMethod,
     String? goalId,
   }) {
@@ -35,7 +36,7 @@ void main() {
       id: id,
       type: type,
       amount: amount,
-      categoryId: 'cat-$id',
+      categoryId: categoryId ?? 'cat-$id',
       occurredOn: occurredOn,
       createdAt: occurredOn,
       updatedAt: occurredOn,
@@ -82,6 +83,7 @@ void main() {
           amount: 500,
           occurredOn: DateTime(2026, 3, 5),
           categoryName: 'Comida',
+          categoryId: 'food',
         ),
         movement(
           id: '2',
@@ -89,6 +91,7 @@ void main() {
           amount: 250,
           occurredOn: DateTime(2026, 2, 10),
           categoryName: 'Comida',
+          categoryId: 'food',
         ),
       ],
       referenceDate: referenceDate,

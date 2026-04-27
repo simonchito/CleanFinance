@@ -7,6 +7,7 @@ import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/reports_snapshot.dart';
+import '../mappers/default_category_name_localizer.dart';
 
 class DonutChart extends StatelessWidget {
   const DonutChart({
@@ -77,7 +78,11 @@ class DonutChart extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          items[i].categoryName,
+                          DefaultCategoryNameLocalizer.localizeDefaultName(
+                            items[i].categoryName,
+                            strings,
+                            isDefault: items[i].categoryIsDefault,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

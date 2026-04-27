@@ -113,6 +113,9 @@ class AppStrings {
   String get type => _l10n.type;
   String get date => _l10n.date;
   String get movement => _l10n.movement;
+  String get movementFallbackTitle => _l10n.movementFallbackTitle;
+  String get recentMovementUntitled => _l10n.recentMovementUntitled;
+  String get movementNoDescription => _l10n.movementNoDescription;
   String get movementsTab => _l10n.movementsTab;
   String get createGoal => _l10n.createGoal;
   String get newGoal => _l10n.newGoal;
@@ -895,6 +898,9 @@ class AppStrings {
       'type' => _l10n.type,
       'date' => _l10n.date,
       'movement' => _l10n.movement,
+      'movementFallbackTitle' => _l10n.movementFallbackTitle,
+      'recentMovementUntitled' => _l10n.recentMovementUntitled,
+      'movementNoDescription' => _l10n.movementNoDescription,
       'movementsTab' => _l10n.movementsTab,
       'createGoal' => _l10n.createGoal,
       'newGoal' => _l10n.newGoal,

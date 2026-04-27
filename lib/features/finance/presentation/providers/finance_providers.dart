@@ -280,6 +280,7 @@ final financeOverviewProvider = FutureProvider<FinanceOverview>((ref) async {
           (item) => CategorySpend(
             categoryName: item.categoryName,
             amount: item.currentAmount,
+            categoryIsDefault: item.categoryIsDefault,
           ),
         )
         .toList(),

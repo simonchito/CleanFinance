@@ -270,6 +270,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get movement => 'Movimiento';
 
   @override
+  String get movementFallbackTitle => 'Movimiento';
+
+  @override
+  String get recentMovementUntitled => 'Movimiento';
+
+  @override
+  String get movementNoDescription => 'Sin descripción';
+
+  @override
   String get movementsTab => 'Movs.';
 
   @override
@@ -1807,7 +1816,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get defaultCategoryNameTrabajo => 'Trabajo';
 
   @override
-  String get defaultCategoryNameOcio => 'Ocio';
+  String get defaultCategoryNameOcio => 'Entretenimiento';
 
   @override
   String get defaultCategoryNameVerduleria => 'Verdulería';
@@ -1840,7 +1849,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get defaultCategoryNameCine => 'Cine';
 
   @override
-  String get defaultCategoryNameAlimentacion => 'Alimentación';
+  String get defaultCategoryNameAlimentacion => 'Comida';
 
   @override
   String get defaultCategoryNameCuidadoPersonal => 'Cuidado personal';
@@ -1935,7 +1944,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get defaultCategoryNameEventos => 'Eventos';
 
   @override
-  String get defaultCategoryNameAlimentos => 'Alimentos';
+  String get defaultCategoryNameAlimentos => 'Comida';
 
   @override
   String get defaultCategoryNameMascotas => 'Mascotas';

@@ -3,6 +3,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/end_of_month_projection.dart';
 import '../../domain/entities/finance_insight.dart';
+import 'default_category_name_localizer.dart';
 
 class LocalizedProjectionText {
   const LocalizedProjectionText({
@@ -97,6 +98,13 @@ class FinanceTextMapper {
             insight.amountValue!,
             localeCode: strings.languageCode,
           );
+    final categoryName = insight.categoryName == null
+        ? strings.t('estaCategoria')
+        : DefaultCategoryNameLocalizer.localizeDefaultName(
+            insight.categoryName!,
+            strings,
+            isDefault: insight.categoryIsDefault,
+          );
 
     return LocalizedFinanceInsightText(
       title: switch (insight.type) {
@@ -121,17 +129,17 @@ class FinanceTextMapper {
           strings.t('despuesDeGastarYAhorrarTodaviaTe'),
         FinanceInsightType.dominantCategory =>
           strings.financeInsightDominantCategoryMessage(
-            insight.categoryName ?? strings.t('estaCategoria'),
+            categoryName,
             percentage ?? 0,
           ),
         FinanceInsightType.expenseIncrease =>
           strings.financeInsightExpenseIncreaseMessage(
-            insight.categoryName ?? strings.t('estaCategoria'),
+            categoryName,
             percentage ?? 0,
           ),
         FinanceInsightType.expenseDecrease =>
           strings.financeInsightExpenseDecreaseMessage(
-            insight.categoryName ?? strings.t('estaCategoria'),
+            categoryName,
             percentage ?? 0,
           ),
         FinanceInsightType.endOfMonthRisk =>

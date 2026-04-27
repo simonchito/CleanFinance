@@ -5,6 +5,7 @@ import '../../../../app/app_strings.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/savings_goal.dart';
+import '../mappers/default_category_name_localizer.dart';
 import '../providers/finance_providers.dart';
 import '../providers/monthly_reminder_notification_providers.dart';
 import '../widgets/empty_state_view.dart';
@@ -69,7 +70,10 @@ class ManageRemindersScreen extends ConsumerWidget {
                 for (final category in allExpenseCategories.where(
                   (item) => item.parentId == null,
                 ))
-                  category.id: category.name,
+                  category.id: DefaultCategoryNameLocalizer.localizeCategory(
+                    category,
+                    strings,
+                  ),
               };
 
               return Column(
@@ -78,7 +82,10 @@ class ManageRemindersScreen extends ConsumerWidget {
                       (subcategory) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: _ReminderRow(
-                          title: subcategory.name,
+                          title: DefaultCategoryNameLocalizer.localizeCategory(
+                            subcategory,
+                            strings,
+                          ),
                           subtitle: parentNames[subcategory.parentId],
                           reminderDay: subcategory.reminderDay ?? 1,
                           icon: Icons.receipt_long_outlined,

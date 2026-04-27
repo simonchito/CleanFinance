@@ -8,6 +8,7 @@ import '../../../../app/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/whole_amount_input_formatter.dart';
 import '../../../finance/domain/entities/category.dart';
+import '../../../finance/presentation/mappers/default_category_name_localizer.dart';
 import '../../../finance/presentation/providers/finance_providers.dart';
 import '../../../finance/presentation/widgets/confirm_action_dialog.dart';
 import '../../../finance/presentation/widgets/selection_sheet_field.dart';
@@ -228,7 +229,10 @@ class _BudgetFormScreenState extends ConsumerState<BudgetFormScreen> {
                       .map(
                         (category) => SelectionSheetItem(
                           value: category.id,
-                          label: category.name,
+                          label: DefaultCategoryNameLocalizer.localizeCategory(
+                            category,
+                            strings,
+                          ),
                           iconKey: category.iconKey,
                         ),
                       )

@@ -44,15 +44,15 @@ class BudgetService {
       ),
     );
 
-    final categoryNames = {
-      for (final category in categories) category.id: category.name,
+    final categoriesById = {
+      for (final category in categories) category.id: category,
     };
 
     final statuses = budgets
         .map(
           (budget) => _buildStatus(
             budget: budget,
-            categoryName: categoryNames[budget.categoryId] ?? 'Sin categoría',
+            category: categoriesById[budget.categoryId],
             movements: movements,
           ),
         )
@@ -68,7 +68,7 @@ class BudgetService {
 
   CategoryBudgetStatus _buildStatus({
     required Budget budget,
-    required String categoryName,
+    required Category? category,
     required List<Movement> movements,
   }) {
     final spent = calculateSpentForCategory(
@@ -86,7 +86,8 @@ class BudgetService {
 
     return CategoryBudgetStatus(
       categoryId: budget.categoryId,
-      categoryName: categoryName,
+      categoryName: category?.name ?? 'Sin categoría',
+      categoryIsDefault: category?.isDefault ?? false,
       monthlyLimit: budget.monthlyLimit,
       spent: spent,
       remaining: remaining,

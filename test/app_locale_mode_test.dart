@@ -11,17 +11,14 @@ void main() {
       );
       expect(AppLocaleMode.fromPreferenceCode('es'), AppLocaleMode.spanish);
       expect(AppLocaleMode.fromPreferenceCode('en'), AppLocaleMode.english);
-      expect(
-        AppLocaleMode.fromPreferenceCode('pt-BR'),
-        AppLocaleMode.portuguese,
-      );
+      expect(AppLocaleMode.fromPreferenceCode('pt'), AppLocaleMode.portuguese);
       expect(AppLocaleMode.fromPreferenceCode('fr'), AppLocaleMode.system);
     });
 
     test('resolves supported device locales with Spanish fallback', () {
       expect(
         AppLocaleMode.resolveSystemLocale(
-          const [Locale('pt', 'BR')],
+          const [Locale('pt')],
           AppLocaleMode.supportedLocales,
         ),
         const Locale('pt'),
@@ -46,7 +43,7 @@ void main() {
       expect(
         AppLocaleMode.resolveLocaleCodeFromPreference(
           localePreferenceCode: 'system',
-          deviceLocale: const Locale('pt', 'BR'),
+          deviceLocale: const Locale('pt'),
         ),
         'pt',
       );

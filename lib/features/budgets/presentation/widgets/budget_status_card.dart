@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../features/finance/presentation/widgets/section_card.dart';
+import '../../../../features/finance/presentation/mappers/default_category_name_localizer.dart';
 import '../../domain/models/category_budget_status.dart';
 
 class BudgetStatusCard extends StatelessWidget {
@@ -39,7 +40,11 @@ class BudgetStatusCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.categoryName,
+                      DefaultCategoryNameLocalizer.localizeDefaultName(
+                        item.categoryName,
+                        strings,
+                        isDefault: item.categoryIsDefault,
+                      ),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 4),

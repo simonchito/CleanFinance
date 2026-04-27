@@ -83,8 +83,10 @@ class _CategoryTab extends ConsumerWidget {
                 child: ExpansionTile(
                   leading: Icon(IconMapper.getIcon(category.iconKey)),
                   title: Text(
-                    DefaultCategoryNameLocalizer.localize(
-                        category.name, strings),
+                    DefaultCategoryNameLocalizer.localizeCategory(
+                      category,
+                      strings,
+                    ),
                   ),
                   subtitle: Text(
                     category.isDefault
@@ -95,8 +97,8 @@ class _CategoryTab extends ConsumerWidget {
                     for (final child in children)
                       _CategoryEntryRow(
                         icon: IconMapper.getIcon(child.iconKey),
-                        title: DefaultCategoryNameLocalizer.localize(
-                          child.name,
+                        title: DefaultCategoryNameLocalizer.localizeCategory(
+                          child,
                           strings,
                         ),
                         onEdit: () => _showCategoryDialog(
@@ -111,8 +113,8 @@ class _CategoryTab extends ConsumerWidget {
                       ),
                     _CategoryEntryRow(
                       icon: IconMapper.getIcon(category.iconKey),
-                      title: DefaultCategoryNameLocalizer.localize(
-                        category.name,
+                      title: DefaultCategoryNameLocalizer.localizeCategory(
+                        category,
                         strings,
                       ),
                       subtitle: strings.t('mainCategory'),
@@ -159,8 +161,8 @@ class _CategoryTab extends ConsumerWidget {
   ) async {
     final strings = AppStrings.of(context);
     try {
-      final categoryName = DefaultCategoryNameLocalizer.localize(
-        category.name,
+      final categoryName = DefaultCategoryNameLocalizer.localizeCategory(
+        category,
         strings,
       );
       final confirmed = await showConfirmActionDialog(
@@ -274,8 +276,9 @@ class _CategoryTab extends ConsumerWidget {
                         ...parents.where((item) => item.id != initial?.id).map(
                               (item) => SelectionSheetItem<String?>(
                                 value: item.id,
-                                label: DefaultCategoryNameLocalizer.localize(
-                                  item.name,
+                                label: DefaultCategoryNameLocalizer
+                                    .localizeCategory(
+                                  item,
                                   strings,
                                 ),
                                 iconKey: item.iconKey,

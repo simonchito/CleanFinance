@@ -610,6 +610,24 @@ abstract class AppLocalizations {
   /// **'Movimiento'**
   String get movement;
 
+  /// No description provided for @movementFallbackTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Movimiento'**
+  String get movementFallbackTitle;
+
+  /// No description provided for @recentMovementUntitled.
+  ///
+  /// In es, this message translates to:
+  /// **'Movimiento'**
+  String get recentMovementUntitled;
+
+  /// No description provided for @movementNoDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin descripción'**
+  String get movementNoDescription;
+
   /// No description provided for @movementsTab.
   ///
   /// In es, this message translates to:
@@ -3268,7 +3286,7 @@ abstract class AppLocalizations {
   /// No description provided for @defaultCategoryNameOcio.
   ///
   /// In es, this message translates to:
-  /// **'Ocio'**
+  /// **'Entretenimiento'**
   String get defaultCategoryNameOcio;
 
   /// No description provided for @defaultCategoryNameVerduleria.
@@ -3334,7 +3352,7 @@ abstract class AppLocalizations {
   /// No description provided for @defaultCategoryNameAlimentacion.
   ///
   /// In es, this message translates to:
-  /// **'Alimentación'**
+  /// **'Comida'**
   String get defaultCategoryNameAlimentacion;
 
   /// No description provided for @defaultCategoryNameCuidadoPersonal.
@@ -3520,7 +3538,7 @@ abstract class AppLocalizations {
   /// No description provided for @defaultCategoryNameAlimentos.
   ///
   /// In es, this message translates to:
-  /// **'Alimentos'**
+  /// **'Comida'**
   String get defaultCategoryNameAlimentos;
 
   /// No description provided for @defaultCategoryNameMascotas.

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
+import '../mappers/default_category_name_localizer.dart';
 import '../mappers/finance_text_mapper.dart';
 import '../providers/finance_providers.dart';
 import '../utils/payment_method_icon_resolver.dart';
@@ -559,7 +560,11 @@ class _CategoryComparisonTile extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  item.categoryName,
+                  DefaultCategoryNameLocalizer.localizeDefaultName(
+                    item.categoryName,
+                    strings,
+                    isDefault: item.categoryIsDefault,
+                  ),
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),

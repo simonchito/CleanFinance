@@ -282,8 +282,8 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       .map(
                         (category) => SelectionSheetItem(
                           value: category.id,
-                          label: DefaultCategoryNameLocalizer.localize(
-                            category.name,
+                          label: DefaultCategoryNameLocalizer.localizeCategory(
+                            category,
                             strings,
                           ),
                           iconKey: category.iconKey,
@@ -329,8 +329,8 @@ class _MovementFormScreenState extends ConsumerState<MovementFormScreen> {
                       ...subcategories.map(
                         (category) => SelectionSheetItem<String?>(
                           value: category.id,
-                          label: DefaultCategoryNameLocalizer.localize(
-                            category.name,
+                          label: DefaultCategoryNameLocalizer.localizeCategory(
+                            category,
                             strings,
                           ),
                           iconKey: category.iconKey,

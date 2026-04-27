@@ -270,6 +270,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get movement => 'Movimentação';
 
   @override
+  String get movementFallbackTitle => 'Movimentação';
+
+  @override
+  String get recentMovementUntitled => 'Movimentação';
+
+  @override
+  String get movementNoDescription => 'Sem descrição';
+
+  @override
   String get movementsTab => 'Movs.';
 
   @override
@@ -1808,7 +1817,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get defaultCategoryNameTrabajo => 'Trabalho';
 
   @override
-  String get defaultCategoryNameOcio => 'Lazer';
+  String get defaultCategoryNameOcio => 'Entretenimento';
 
   @override
   String get defaultCategoryNameVerduleria => 'Hortifruti';

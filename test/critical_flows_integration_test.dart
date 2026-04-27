@@ -77,7 +77,7 @@ void main() {
 
     await tester.tap(selectionFields.at(1));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Alimentos').last);
+    await tester.tap(find.text('Comida').last);
     await tester.pumpAndSettle();
 
     await tester.tap(selectionFields.last);
@@ -94,7 +94,7 @@ void main() {
     expect(movementsRepository.savedMovements, hasLength(1));
     expect(find.text('QR'), findsOneWidget);
     expect(find.textContaining('Compra semanal'), findsOneWidget);
-    expect(find.text('Alimentos'), findsOneWidget);
+    expect(find.text('Comida'), findsOneWidget);
   });
 
   testWidgets('enables biometrics during onboarding and keeps settings in sync',
@@ -203,6 +203,7 @@ class _MemoryMovementsRepository implements MovementsRepository {
         .map(
           (movement) => movement.copyWith(
             categoryName: movement.categoryId == 'food' ? 'Alimentos' : null,
+            categoryIsDefault: movement.categoryId == 'food',
           ),
         )
         .toList()

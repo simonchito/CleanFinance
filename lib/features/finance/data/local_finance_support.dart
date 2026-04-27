@@ -56,6 +56,8 @@ class LocalFinanceSupport {
       updatedAt: DateTime.parse(map['updated_at'] as String),
       categoryName: map['category_name'] as String?,
       subcategoryName: map['subcategory_name'] as String?,
+      categoryIsDefault: (map['category_is_default'] as int? ?? 0) == 1,
+      subcategoryIsDefault: (map['subcategory_is_default'] as int? ?? 0) == 1,
       monthlyReminderEnabled:
           (map['monthly_reminder_enabled'] as int? ?? 0) == 1,
       reminderDay: map['reminder_day'] as int?,

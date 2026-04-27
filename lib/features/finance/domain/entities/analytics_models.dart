@@ -22,9 +22,13 @@ class CategoryComparisonItem {
     required this.currentAmount,
     required this.previousAmount,
     required this.shareOfCurrent,
+    this.categoryId,
+    this.categoryIsDefault = false,
   });
 
+  final String? categoryId;
   final String categoryName;
+  final bool categoryIsDefault;
   final double currentAmount;
   final double previousAmount;
   final double shareOfCurrent;

@@ -95,7 +95,9 @@ class LocalMovementRepository implements MovementsRepository {
       SELECT
         m.*,
         c.name AS category_name,
-        s.name AS subcategory_name
+        c.is_default AS category_is_default,
+        s.name AS subcategory_name,
+        s.is_default AS subcategory_is_default
       FROM movements m
       LEFT JOIN categories c ON c.id = m.category_id
       LEFT JOIN categories s ON s.id = m.subcategory_id
@@ -176,11 +178,14 @@ class LocalMovementRepository implements MovementsRepository {
     );
     final topCategories = await db.rawQuery(
       '''
-      SELECT c.name AS category_name, SUM(m.amount) AS amount
+      SELECT
+        c.name AS category_name,
+        SUM(m.amount) AS amount,
+        COALESCE(c.is_default, 0) AS category_is_default
       FROM movements m
       LEFT JOIN categories c ON c.id = m.category_id
       WHERE m.type = 'expense' AND m.occurred_on >= ? AND m.occurred_on < ?
-      GROUP BY m.category_id
+      GROUP BY m.category_id, c.name, c.is_default
       ORDER BY amount DESC
       LIMIT 5
       ''',
@@ -206,6 +211,7 @@ class LocalMovementRepository implements MovementsRepository {
               categoryName:
                   (row['category_name'] as String?) ?? 'Sin categoría',
               amount: _support.readDouble(row['amount']),
+              categoryIsDefault: (row['category_is_default'] as int? ?? 0) == 1,
             ),
           )
           .toList(),

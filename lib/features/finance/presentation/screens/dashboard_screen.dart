@@ -636,6 +636,17 @@ class _MovementTile extends StatelessWidget {
           '+',
         ),
     };
+    final note = movement.note?.trim();
+    final categoryName = _localizedCategoryName(strings);
+    final title = note?.isNotEmpty == true
+        ? note!
+        : categoryName ?? strings.t('movementFallbackTitle');
+    final subtitleParts = [
+      DateFormat('dd MMM', localeCode).format(movement.occurredOn),
+      if (note?.isNotEmpty == true && categoryName != null) categoryName,
+      if (movement.paymentMethod?.isNotEmpty == true)
+        strings.paymentMethodDisplayName(movement.paymentMethod!),
+    ];
 
     return ListTile(
       leading: Container(
@@ -648,21 +659,34 @@ class _MovementTile extends StatelessWidget {
         child: Icon(icon, color: color),
       ),
       title: Text(
-        movement.categoryName == null
-            ? (strings.t('sinCategoria'))
-            : DefaultCategoryNameLocalizer.localize(
-                movement.categoryName!,
-                AppStrings.of(context),
-              ),
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        DateFormat('dd MMM', localeCode).format(movement.occurredOn) +
-            (movement.note?.isNotEmpty == true ? ' · ${movement.note}' : ''),
+        subtitleParts.join(' · '),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
       trailing: Text(
         '$prefix ${CurrencyFormatter.format(movement.amount, symbol: symbol, localeCode: localeCode)}',
         style: Theme.of(context).textTheme.labelLarge?.copyWith(color: color),
       ),
+    );
+  }
+
+  String? _localizedCategoryName(AppStrings strings) {
+    final name = movement.subcategoryName ?? movement.categoryName;
+    if (name == null || name.trim().isEmpty) {
+      return null;
+    }
+    final isDefault = movement.subcategoryName != null
+        ? movement.subcategoryIsDefault
+        : movement.categoryIsDefault;
+    return DefaultCategoryNameLocalizer.localizeDefaultName(
+      name,
+      strings,
+      isDefault: isDefault,
     );
   }
 }

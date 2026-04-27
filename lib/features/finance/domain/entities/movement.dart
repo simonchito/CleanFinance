@@ -15,6 +15,8 @@ class Movement {
     this.paymentMethod,
     this.categoryName,
     this.subcategoryName,
+    this.categoryIsDefault = false,
+    this.subcategoryIsDefault = false,
     this.monthlyReminderEnabled = false,
     this.reminderDay,
   });
@@ -32,6 +34,8 @@ class Movement {
   final DateTime updatedAt;
   final String? categoryName;
   final String? subcategoryName;
+  final bool categoryIsDefault;
+  final bool subcategoryIsDefault;
   final bool monthlyReminderEnabled;
   final int? reminderDay;
 
@@ -49,6 +53,8 @@ class Movement {
     DateTime? updatedAt,
     String? categoryName,
     String? subcategoryName,
+    bool? categoryIsDefault,
+    bool? subcategoryIsDefault,
     bool? monthlyReminderEnabled,
     int? reminderDay,
   }) {
@@ -66,6 +72,8 @@ class Movement {
       updatedAt: updatedAt ?? this.updatedAt,
       categoryName: categoryName ?? this.categoryName,
       subcategoryName: subcategoryName ?? this.subcategoryName,
+      categoryIsDefault: categoryIsDefault ?? this.categoryIsDefault,
+      subcategoryIsDefault: subcategoryIsDefault ?? this.subcategoryIsDefault,
       monthlyReminderEnabled:
           monthlyReminderEnabled ?? this.monthlyReminderEnabled,
       reminderDay: reminderDay ?? this.reminderDay,

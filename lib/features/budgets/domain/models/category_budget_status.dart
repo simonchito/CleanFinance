@@ -9,10 +9,12 @@ class CategoryBudgetStatus {
     required this.remaining,
     required this.percentageUsed,
     required this.status,
+    this.categoryIsDefault = false,
   });
 
   final String categoryId;
   final String categoryName;
+  final bool categoryIsDefault;
   final double monthlyLimit;
   final double spent;
   final double remaining;

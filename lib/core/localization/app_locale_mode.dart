@@ -16,7 +16,7 @@ enum AppLocaleMode {
   static const supportedLocales = [
     Locale('es'),
     Locale('en'),
-    Locale('pt', 'BR'),
+    Locale('pt'),
   ];
 
   static AppLocaleMode fromPreferenceCode(String? value) {
@@ -52,7 +52,7 @@ enum AppLocaleMode {
       'system' => AppLocaleMode.system.preferenceCode,
       'es' => AppLocaleMode.spanish.preferenceCode,
       'en' => AppLocaleMode.english.preferenceCode,
-      'pt' || 'pt_br' => AppLocaleMode.portuguese.preferenceCode,
+      'pt' => AppLocaleMode.portuguese.preferenceCode,
       _ => AppLocaleMode.system.preferenceCode,
     };
   }

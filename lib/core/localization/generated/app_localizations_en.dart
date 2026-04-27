@@ -271,6 +271,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get movement => 'Movement';
 
   @override
+  String get movementFallbackTitle => 'Movement';
+
+  @override
+  String get recentMovementUntitled => 'Movement';
+
+  @override
+  String get movementNoDescription => 'No description';
+
+  @override
   String get movementsTab => 'Activity';
 
   @override
@@ -1793,7 +1802,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get defaultCategoryNameTrabajo => 'Work';
 
   @override
-  String get defaultCategoryNameOcio => 'Leisure';
+  String get defaultCategoryNameOcio => 'Entertainment';
 
   @override
   String get defaultCategoryNameVerduleria => 'Produce store';

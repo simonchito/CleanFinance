@@ -1,9 +1,25 @@
 import '../../../../app/app_strings.dart';
+import '../../domain/entities/category.dart';
 
 class DefaultCategoryNameLocalizer {
   const DefaultCategoryNameLocalizer._();
 
-  static String localize(String name, AppStrings strings) {
+  static String localizeCategory(Category category, AppStrings strings) {
+    return localizeDefaultName(
+      category.name,
+      strings,
+      isDefault: category.isDefault,
+    );
+  }
+
+  static String localizeDefaultName(
+    String name,
+    AppStrings strings, {
+    required bool isDefault,
+  }) {
+    if (!isDefault) {
+      return name;
+    }
     final key = _translationKeysByName[_normalize(name)];
     if (key == null) {
       return name;
@@ -17,6 +33,7 @@ class DefaultCategoryNameLocalizer {
     _normalize('Venta'): 'defaultCategoryNameVenta',
     _normalize('Hogar'): 'defaultCategoryNameHogar',
     _normalize('Servicios'): 'defaultCategoryNameServicios',
+    _normalize('Comida'): 'defaultCategoryNameAlimentos',
     _normalize('Alimentos'): 'defaultCategoryNameAlimentos',
     _normalize('Alimentación'): 'defaultCategoryNameAlimentacion',
     _normalize('Transporte'): 'defaultCategoryNameTransporte',

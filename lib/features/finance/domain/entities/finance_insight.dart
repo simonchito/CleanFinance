@@ -24,6 +24,7 @@ class FinanceInsight {
     required this.tone,
     required this.kind,
     this.categoryName,
+    this.categoryIsDefault = false,
     this.goalName,
     this.percentageValue,
     this.amountValue,
@@ -33,6 +34,7 @@ class FinanceInsight {
   final FinanceInsightTone tone;
   final FinanceInsightKind kind;
   final String? categoryName;
+  final bool categoryIsDefault;
   final String? goalName;
   final double? percentageValue;
   final double? amountValue;

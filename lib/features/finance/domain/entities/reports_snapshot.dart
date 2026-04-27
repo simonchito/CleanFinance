@@ -2,10 +2,12 @@ class CategorySpend {
   const CategorySpend({
     required this.categoryName,
     required this.amount,
+    this.categoryIsDefault = false,
   });
 
   final String categoryName;
   final double amount;
+  final bool categoryIsDefault;
 }
 
 class ReportsSnapshot {
