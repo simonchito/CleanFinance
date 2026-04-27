@@ -12,6 +12,7 @@ import '../../domain/entities/app_settings.dart';
 import '../../domain/entities/category.dart';
 import '../../domain/entities/monthly_payment_reminder.dart';
 import '../../domain/entities/monthly_reminder_schedule_item.dart';
+import '../../domain/entities/movement.dart';
 import '../../domain/entities/movement_filter.dart';
 
 class MonthlyReminderNotificationScheduler {
@@ -60,18 +61,40 @@ class MonthlyReminderNotificationScheduler {
         endDate: currentMonth.endDateInclusive,
       ),
     );
+    final resolvedExpenseSubcategoryIds = currentMonthMovements
+        .where(
+          (movement) =>
+              movement.type == MovementType.expense &&
+              movement.subcategoryId != null,
+        )
+        .map((movement) => movement.subcategoryId!)
+        .toSet();
+    final resolvedSavingsGoalIds = currentMonthMovements
+        .where(
+          (movement) =>
+              movement.type == MovementType.saving && movement.goalId != null,
+        )
+        .map((movement) => movement.goalId!)
+        .toSet();
 
     final reminderService = _ref.read(monthlyPaymentReminderServiceProvider);
     final items = reminderService.buildScheduledReminderItems(
       expenseCategories: expenseCategories,
       savingsGoals: savingsGoals,
-      currentMonthMovements: currentMonthMovements,
-      referenceDate: now,
     );
 
     final desiredNotifications = <int, ScheduledLocalNotification>{};
     for (final item in items) {
       for (var monthOffset = 0; monthOffset < monthsToSchedule; monthOffset++) {
+        if (monthOffset == 0 &&
+            _isResolvedThisMonth(
+              item: item,
+              resolvedExpenseSubcategoryIds: resolvedExpenseSubcategoryIds,
+              resolvedSavingsGoalIds: resolvedSavingsGoalIds,
+            )) {
+          continue;
+        }
+
         final month = DateTime(now.year, now.month + monthOffset);
         final scheduledDate = _scheduledDateFor(
           month: month,
@@ -137,6 +160,19 @@ class MonthlyReminderNotificationScheduler {
 
   int _lastDayOfMonth(DateTime month) {
     return DateTime(month.year, month.month + 1, 0).day;
+  }
+
+  bool _isResolvedThisMonth({
+    required MonthlyReminderScheduleItem item,
+    required Set<String> resolvedExpenseSubcategoryIds,
+    required Set<String> resolvedSavingsGoalIds,
+  }) {
+    switch (item.source) {
+      case MonthlyReminderSource.expenseSubcategory:
+        return resolvedExpenseSubcategoryIds.contains(item.id);
+      case MonthlyReminderSource.savingsGoal:
+        return resolvedSavingsGoalIds.contains(item.id);
+    }
   }
 
   String _titleFor(

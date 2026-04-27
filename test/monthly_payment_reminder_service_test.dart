@@ -214,4 +214,44 @@ void main() {
 
     expect(reminders, isEmpty);
   });
+
+  test('builds scheduled expense items even when current month is resolved',
+      () {
+    final items = service.buildScheduledReminderItems(
+      expenseCategories: [
+        expenseCategory(id: 'services', name: 'Servicios'),
+        expenseCategory(
+          id: 'netflix',
+          name: 'Netflix',
+          parentId: 'services',
+          reminderEnabled: true,
+          reminderDay: 10,
+        ),
+      ],
+      savingsGoals: const [],
+    );
+
+    expect(items, hasLength(1));
+    expect(items.single.source, MonthlyReminderSource.expenseSubcategory);
+    expect(items.single.id, 'netflix');
+  });
+
+  test('builds scheduled savings items even when current month is resolved',
+      () {
+    final items = service.buildScheduledReminderItems(
+      expenseCategories: const [],
+      savingsGoals: [
+        savingsGoal(
+          id: 'goal-travel',
+          name: 'Viaje',
+          reminderEnabled: true,
+          reminderDay: 5,
+        ),
+      ],
+    );
+
+    expect(items, hasLength(1));
+    expect(items.single.source, MonthlyReminderSource.savingsGoal);
+    expect(items.single.id, 'goal-travel');
+  });
 }

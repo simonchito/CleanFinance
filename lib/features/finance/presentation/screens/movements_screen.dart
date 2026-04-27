@@ -9,6 +9,7 @@ import '../../domain/entities/movement.dart';
 import '../../domain/entities/movement_filter.dart';
 import '../mappers/default_category_name_localizer.dart';
 import '../providers/finance_providers.dart';
+import '../providers/monthly_reminder_notification_providers.dart';
 import '../utils/payment_method_icon_resolver.dart';
 import '../widgets/confirm_action_dialog.dart';
 import '../widgets/empty_state_view.dart';
@@ -71,7 +72,18 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
     }
 
     await ref.read(movementsRepositoryProvider).deleteMovement(movement.id);
+    await _syncMonthlyReminderNotifications();
     _refresh();
+  }
+
+  Future<void> _syncMonthlyReminderNotifications() async {
+    try {
+      await ref
+          .read(monthlyReminderNotificationSchedulerProvider)
+          .syncScheduledReminders();
+    } catch (_) {
+      // Movement deletion should remain saved even if scheduling fails.
+    }
   }
 
   Future<void> _openFilters() async {

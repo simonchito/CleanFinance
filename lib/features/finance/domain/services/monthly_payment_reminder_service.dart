@@ -55,25 +55,7 @@ class MonthlyPaymentReminderService {
   List<MonthlyReminderScheduleItem> buildScheduledReminderItems({
     required List<Category> expenseCategories,
     required List<SavingsGoalProgress> savingsGoals,
-    required List<Movement> currentMonthMovements,
-    required DateTime referenceDate,
   }) {
-    final resolvedExpenseSubcategoryIds = currentMonthMovements
-        .where(
-          (movement) =>
-              movement.type == MovementType.expense &&
-              movement.subcategoryId != null,
-        )
-        .map((movement) => movement.subcategoryId!)
-        .toSet();
-    final resolvedSavingsGoalIds = currentMonthMovements
-        .where(
-          (movement) =>
-              movement.type == MovementType.saving && movement.goalId != null,
-        )
-        .map((movement) => movement.goalId!)
-        .toSet();
-
     final parentNames = {
       for (final category
           in expenseCategories.where((item) => item.parentId == null))
@@ -86,8 +68,7 @@ class MonthlyPaymentReminderService {
               category.scope == CategoryScope.expense &&
               category.isSubcategory &&
               category.reminderEnabled &&
-              _isValidReminderDay(category.reminderDay) &&
-              !resolvedExpenseSubcategoryIds.contains(category.id),
+              _isValidReminderDay(category.reminderDay),
         )
         .map(
           (category) => MonthlyReminderScheduleItem(
@@ -105,8 +86,7 @@ class MonthlyPaymentReminderService {
               !progress.goal.isArchived &&
               !progress.completed &&
               progress.goal.reminderEnabled &&
-              _isValidReminderDay(progress.goal.reminderDay) &&
-              !resolvedSavingsGoalIds.contains(progress.goal.id),
+              _isValidReminderDay(progress.goal.reminderDay),
         )
         .map(
           (progress) => MonthlyReminderScheduleItem(
