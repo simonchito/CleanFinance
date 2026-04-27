@@ -110,4 +110,5 @@ Propósito:
 - no hay paquete de routing declarativo
 - no hay cliente HTTP
 - no hay dependencias de backend o sync cloud
+- no se actualizaron versiones durante la auditoría del 2026-04-27 porque `flutter analyze` y `flutter test` pasan y las versiones nuevas listadas por Flutter incluyen saltos mayores que conviene evaluar en una tarea separada
 - el soporte real por plataforma debe leerse junto con [`build-and-run.md`](D:/GITHUB/CleanFinance/docs/build-and-run.md)

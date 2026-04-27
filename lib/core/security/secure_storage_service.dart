@@ -99,8 +99,10 @@ class SecureStorageService {
     try {
       return await operation();
     } catch (error, stackTrace) {
-      debugPrint('[startup] Secure storage failed during $action: $error');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('[startup] Secure storage failed during $action: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       return null;
     }
   }
@@ -112,8 +114,10 @@ class SecureStorageService {
     try {
       await operation();
     } catch (error, stackTrace) {
-      debugPrint('[startup] Secure storage failed during $action: $error');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('[startup] Secure storage failed during $action: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       rethrow;
     }
   }

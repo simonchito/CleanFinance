@@ -11,7 +11,8 @@ void main() {
       );
       expect(AppLocaleMode.fromPreferenceCode('es'), AppLocaleMode.spanish);
       expect(AppLocaleMode.fromPreferenceCode('en'), AppLocaleMode.english);
-      expect(AppLocaleMode.fromPreferenceCode('pt'), AppLocaleMode.portuguese);
+      expect(AppLocaleMode.fromPreferenceCode('pt'), AppLocaleMode.system);
+      expect(AppLocaleMode.fromPreferenceCode('pt_BR'), AppLocaleMode.system);
       expect(AppLocaleMode.fromPreferenceCode('fr'), AppLocaleMode.system);
     });
 
@@ -21,7 +22,7 @@ void main() {
           const [Locale('pt')],
           AppLocaleMode.supportedLocales,
         ),
-        const Locale('pt'),
+        const Locale('es'),
       );
       expect(
         AppLocaleMode.resolveSystemLocale(
@@ -45,7 +46,7 @@ void main() {
           localePreferenceCode: 'system',
           deviceLocale: const Locale('pt'),
         ),
-        'pt',
+        'es',
       );
     });
   });

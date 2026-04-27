@@ -20,7 +20,9 @@ class AuthController extends StateNotifier<AuthState> {
   DateTime? _pausedAt;
 
   Future<void> bootstrap() async {
-    debugPrint('[startup] Auth bootstrap begin');
+    if (kDebugMode) {
+      debugPrint('[startup] Auth bootstrap begin');
+    }
 
     final hasCredential = await _safeStartupStep<bool>(
       'read stored credential',
@@ -57,10 +59,12 @@ class AuthController extends StateNotifier<AuthState> {
       recoveryConfigured: recoveryConfigured,
       pinSecurityState: pinSecurityState,
     );
-    debugPrint(
-      '[startup] Auth bootstrap done. status=${state.status.name}, '
-      'biometricAvailable=$biometricAvailable, biometricEnabled=$biometricEnabled',
-    );
+    if (kDebugMode) {
+      debugPrint(
+        '[startup] Auth bootstrap done. status=${state.status.name}, '
+        'biometricAvailable=$biometricAvailable, biometricEnabled=$biometricEnabled',
+      );
+    }
   }
 
   Future<bool> createPin(
@@ -278,8 +282,10 @@ class AuthController extends StateNotifier<AuthState> {
     try {
       return await action();
     } catch (error, stackTrace) {
-      debugPrint('[startup] Auth bootstrap step failed: $label -> $error');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('[startup] Auth bootstrap step failed: $label -> $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
 
       state = state.copyWith(
         error: const AuthErrorState(

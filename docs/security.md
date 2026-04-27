@@ -175,6 +175,12 @@ Esto es un bloqueo de sesión, no cifrado de base de datos.
 - no hay audit log de eventos de autenticación
 - soporte biométrico fuera de plataformas móviles principales requiere validación por entorno
 
+## Logging y errores
+
+- Los logs técnicos de startup, storage, SQLite y biometría quedan restringidos a `kDebugMode`.
+- En release no se imprimen rutas locales, excepciones de plugins ni stack traces por estos flujos.
+- La UI muestra mensajes amigables/localizados; los detalles técnicos visibles se reservan para pantallas donde ya existe un estado de error controlado.
+
 ## Backups
 
 - el backup puede exportarse como JSON plano o como JSON cifrado con contraseña

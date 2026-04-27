@@ -810,7 +810,6 @@
   "defaultCategoryNameTransporteLaboral": "Work transport",
   "defaultCategoryNameAhorroGeneral": "General savings",
   "defaultCategoryNameOtros": "Other",
-  "portuguese": "Portuguese",
   "technicalErrorDetails": "Technical details: {error}",
   "@technicalErrorDetails": {
     "placeholders": {

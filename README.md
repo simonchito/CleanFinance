@@ -68,6 +68,17 @@ Resumen:
 - exportación e importación local en JSON
 - exportación opcional protegida con contraseña
 
+## Idiomas y localización
+
+Idiomas soportados actualmente:
+
+- Español (`es`)
+- Inglés (`en`)
+
+La app usa el idioma del dispositivo cuando está en modo sistema y cae a español si el idioma del dispositivo no está soportado. Desde Ajustes el usuario puede fijar manualmente español o inglés; esa preferencia se persiste en `app_settings.locale_code`.
+
+El soporte de portugués/`pt_BR` no está activo en esta versión. Los archivos ARB fuente viven en `lib/l10n/` y deben mantenerse con las mismas keys antes de regenerar localizaciones.
+
 ## Flujo actual de seguridad
 
 - el PIN y los datos de recuperación viven en secure storage
@@ -132,9 +143,12 @@ flutter test
 Build Android:
 
 ```bash
+flutter build apk --debug
 flutter build apk --release
 flutter build appbundle --release
 ```
+
+La build release exige `android/key.properties` y un upload keystore fuera del control de versiones. El proyecto usa `applicationId`/`namespace` `app.cleanfinance`, `minSdk 24`, `targetSdk 35`, `compileSdk 36`, Java 17 y desugaring.
 
 ## Plataformas
 

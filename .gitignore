@@ -10,7 +10,13 @@
 android/
 build/
 coverage/
+android/key.properties
+android/*.jks
+android/*.keystore
+android/*.p12
 ios/
+ios/**/*.p12
+ios/**/*.mobileprovision
 linux/
 macos/
 web/

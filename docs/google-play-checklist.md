@@ -1,12 +1,12 @@
 # Google Play Checklist - CleanFinance
 
-Estado evaluado sobre el código del repositorio el 2026-04-17.
+Estado evaluado sobre el código del repositorio el 2026-04-27.
 
 ## 1. Identidad y build Android
 
 - [x] `applicationId` y `namespace` dejan de usar `com.example.*`
 - [x] `MainActivity` queda alineada con el package Android final
-- [x] `compileSdk` fijado en 35
+- [x] `compileSdk` fijado en 36
 - [x] `targetSdk` fijado en 35
 - [x] `minSdk` fijado en 24 para coincidir con `local_auth`
 - [x] la build `release` ya no usa firma debug

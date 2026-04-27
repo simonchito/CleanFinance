@@ -9,19 +9,27 @@ class BiometricService {
 
   Future<bool> isAvailable() async {
     try {
-      debugPrint('[startup] Checking biometric availability');
+      if (kDebugMode) {
+        debugPrint('[startup] Checking biometric availability');
+      }
       final canCheck = await _localAuthentication.canCheckBiometrics;
       if (canCheck) {
         return true;
       }
       return await _localAuthentication.isDeviceSupported();
     } on LocalAuthException catch (error, stackTrace) {
-      debugPrint('[startup] Biometric availability failed: $error');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('[startup] Biometric availability failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       return false;
     } catch (error, stackTrace) {
-      debugPrint('[startup] Unexpected biometric availability failure: $error');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint(
+          '[startup] Unexpected biometric availability failure: $error',
+        );
+        debugPrintStack(stackTrace: stackTrace);
+      }
       return false;
     }
   }
@@ -33,18 +41,24 @@ class BiometricService {
     }
 
     try {
-      debugPrint('[startup] Starting biometric authentication');
+      if (kDebugMode) {
+        debugPrint('[startup] Starting biometric authentication');
+      }
       return _localAuthentication.authenticate(
         localizedReason: 'Usá tu biometría para desbloquear Clean Finance',
         biometricOnly: true,
       );
     } on LocalAuthException catch (error, stackTrace) {
-      debugPrint('[startup] Biometric auth failed: $error');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('[startup] Biometric auth failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       return false;
     } catch (error, stackTrace) {
-      debugPrint('[startup] Unexpected biometric auth failure: $error');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('[startup] Unexpected biometric auth failure: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       return false;
     }
   }

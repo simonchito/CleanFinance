@@ -11,7 +11,7 @@ Archivo principal:
 Identidad actual:
 
 - nombre: `clean_finance.db`
-- versión: `7`
+- versión: `9`
 
 `AppDatabase.instance` memoiza una sola instancia de `Database`.
 
@@ -134,14 +134,19 @@ Columnas:
 - `theme_mode TEXT NOT NULL`
 - `biometric_enabled INTEGER NOT NULL DEFAULT 0`
 - `auto_lock_minutes INTEGER NOT NULL DEFAULT 5`
-- `locale_code TEXT NOT NULL DEFAULT 'es'`
+- `locale_code TEXT NOT NULL DEFAULT 'system'`
 - `payment_methods TEXT NOT NULL`
+- `notifications_enabled INTEGER NOT NULL DEFAULT 0`
+- `notification_reminder_hour INTEGER NOT NULL DEFAULT 9`
+- `notification_reminder_minute INTEGER NOT NULL DEFAULT 0`
+- `notification_permission_requested INTEGER NOT NULL DEFAULT 0`
 
 Notas:
 
 - se inicializa con una única fila `id = 1`
 - `biometric_enabled` es la fuente de verdad persistida para la preferencia de biometría
 - `payment_methods` guarda una lista JSON de labels visibles/canonicalizados
+- `locale_code` puede ser `system`, `es` o `en`; valores antiguos no soportados se normalizan a `system`
 
 ## Relaciones
 
@@ -189,6 +194,14 @@ Referencia:
 ### Version 7
 
 - agrega `icon_key` a `categories`
+
+### Version 8
+
+- normaliza `locale_code` vacío o no soportado a `system`
+
+### Version 9
+
+- agrega settings de notificaciones y horario de recordatorio
 
 ## Seed actual
 

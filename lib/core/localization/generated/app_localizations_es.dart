@@ -2028,9 +2028,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get defaultCategoryNameOtros => 'Otros';
 
   @override
-  String get portuguese => 'Portugués';
-
-  @override
   String technicalErrorDetails(Object error) {
     return 'Detalle técnico: $error';
   }

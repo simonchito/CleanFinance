@@ -80,6 +80,33 @@ Salida esperada:
 build/app/outputs/
 ```
 
+Configuración Android actual:
+
+- `namespace`: `app.cleanfinance`
+- `applicationId`: `app.cleanfinance`
+- `minSdk`: 24
+- `targetSdk`: 35
+- `compileSdk`: 36
+- Java/Kotlin target: 17
+- core library desugaring: habilitado
+- permisos principales: biometría, notificaciones y boot completed para recordatorios
+
+Firma release:
+
+- `android/key.properties` debe existir solo en la máquina de firma.
+- El archivo debe definir `storeFile`, `storePassword`, `keyAlias` y `keyPassword`.
+- El keystore real (`.jks`, `.keystore`, `.p12`) no debe versionarse.
+- Si se intenta una tarea release sin signing, Gradle falla de forma explícita.
+
+## Localización
+
+Idiomas soportados:
+
+- Español (`es`)
+- Inglés (`en`)
+
+El modo `system` usa el idioma del teléfono si está soportado y cae a español en cualquier otro caso. Las preferencias manuales se guardan en `app_settings.locale_code`. Portugués/`pt_BR` no está soportado en esta versión.
+
 ## Otras plataformas
 
 El repo incluye carpetas para:
