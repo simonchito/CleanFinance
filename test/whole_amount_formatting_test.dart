@@ -1,3 +1,4 @@
+import 'package:clean_finance/core/utils/amount_visibility_formatter.dart';
 import 'package:clean_finance/core/utils/currency_formatter.dart';
 import 'package:clean_finance/core/utils/whole_amount_input_formatter.dart';
 import 'package:flutter/services.dart';
@@ -36,6 +37,29 @@ void main() {
       expect(
         CurrencyFormatter.tryParseWholeAmount('1000.50', localeCode: 'es'),
         1000,
+      );
+    });
+  });
+
+  group('AmountVisibilityFormatter', () {
+    test('masks sensitive currency amounts when visibility is disabled', () {
+      expect(
+        AmountVisibilityFormatter.formatCurrency(
+          amount: 15000,
+          symbol: r'$',
+          isVisible: false,
+          localeCode: 'es',
+        ),
+        r'$ ••••••',
+      );
+      expect(
+        AmountVisibilityFormatter.formatCurrency(
+          amount: 15000,
+          symbol: r'$',
+          isVisible: true,
+          localeCode: 'es',
+        ),
+        contains('15.000'),
       );
     });
   });

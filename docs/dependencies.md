@@ -105,10 +105,30 @@ Propósito:
 
 - tooling de generación PDF usado desde scripts/utilidades del repo, no desde el flujo principal de runtime revisado
 
+## Estado de actualización 2026-04-27
+
+Actualizaciones patch aplicadas:
+
+- `sqflite`: `2.4.2` -> `2.4.2+1`
+- `sqflite_common`: `2.5.6` -> `2.5.6+1`
+- `mocktail`: `1.0.4` -> `1.0.5`
+
+Updates directos riesgosos o con migración pendiente:
+
+- `file_picker` 8 -> 11
+- `flutter_local_notifications` 18 -> 21
+- `flutter_riverpod` 2 -> 3
+- `flutter_timezone` 3 -> 5
+- `google_fonts` 6 -> 8
+- `share_plus` 10 -> 13
+- `timezone` 0.10 -> 0.11
+- `flutter_lints` 5 -> 6
+
+No se aplicaron saltos mayores porque requieren revisar breaking changes y validar Android/iOS/runtime.
+
 ## Notas
 
 - no hay paquete de routing declarativo
 - no hay cliente HTTP
 - no hay dependencias de backend o sync cloud
-- no se actualizaron versiones durante la auditoría del 2026-04-27 porque `flutter analyze` y `flutter test` pasan y las versiones nuevas listadas por Flutter incluyen saltos mayores que conviene evaluar en una tarea separada
 - el soporte real por plataforma debe leerse junto con [`build-and-run.md`](D:/GITHUB/CleanFinance/docs/build-and-run.md)

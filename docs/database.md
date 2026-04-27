@@ -11,7 +11,7 @@ Archivo principal:
 Identidad actual:
 
 - nombre: `clean_finance.db`
-- versión: `9`
+- versión: `10`
 
 `AppDatabase.instance` memoiza una sola instancia de `Database`.
 
@@ -146,7 +146,7 @@ Notas:
 - se inicializa con una única fila `id = 1`
 - `biometric_enabled` es la fuente de verdad persistida para la preferencia de biometría
 - `payment_methods` guarda una lista JSON de labels visibles/canonicalizados
-- `locale_code` puede ser `system`, `es` o `en`; valores antiguos no soportados se normalizan a `system`
+- `locale_code` puede ser `system`, `es`, `en` o `pt`; variantes portuguesas legacy `pt_*` se normalizan a `pt`
 
 ## Relaciones
 
@@ -198,10 +198,15 @@ Referencia:
 ### Version 8
 
 - normaliza `locale_code` vacío o no soportado a `system`
+- conserva portugués genérico `pt` y normaliza variantes portuguesas a `pt`
 
 ### Version 9
 
 - agrega settings de notificaciones y horario de recordatorio
+
+### Version 10
+
+- normaliza preferencias portuguesas legacy (`pt_*`) a `pt`
 
 ## Seed actual
 

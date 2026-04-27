@@ -3,7 +3,7 @@ import '../localization/app_locale_mode.dart';
 class AppConstants {
   static const appName = 'CleanFinance';
   static const databaseName = 'clean_finance.db';
-  static const databaseVersion = 9;
+  static const databaseVersion = 10;
   static const defaultCurrencyCode = 'ARS';
   static const defaultCurrencySymbol = r'$';
   static const defaultShowSensitiveAmounts = true;
@@ -11,8 +11,8 @@ class AppConstants {
   static const defaultPinLength = 6;
   static const defaultLocalePreferenceCode = 'system';
   static const defaultLocaleCode = 'es';
-  static const supportedLocaleCodes = ['es', 'en'];
-  static const supportedLocalePreferenceCodes = ['system', 'es', 'en'];
+  static const supportedLocaleCodes = ['es', 'en', 'pt'];
+  static const supportedLocalePreferenceCodes = ['system', 'es', 'en', 'pt'];
   static const defaultPaymentMethods = [
     'transfer',
     'debit_card',

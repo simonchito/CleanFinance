@@ -104,8 +104,9 @@ Idiomas soportados:
 
 - Español (`es`)
 - Inglés (`en`)
+- Portugués genérico (`pt`)
 
-El modo `system` usa el idioma del teléfono si está soportado y cae a español en cualquier otro caso. Las preferencias manuales se guardan en `app_settings.locale_code`. Portugués/`pt_BR` no está soportado en esta versión.
+El modo `system` usa el idioma del teléfono si está soportado y cae a español en cualquier otro caso. Las preferencias manuales se guardan en `app_settings.locale_code`. Variantes portuguesas del dispositivo como `pt_BR` o `pt_PT` se resuelven a portugués genérico `pt`.
 
 ## Otras plataformas
 
@@ -136,6 +137,7 @@ Lo que sí puede afirmarse desde el código:
 - iOS: plausible a nivel dependencias/carpeta, requiere validación de runtime
 - Desktop: presencia de carpetas, pero soporte real depende de plugins usados
 - Web: presencia de carpeta, pero el proyecto no implementa guards específicos para plugins de auth, secure storage y SQLite
+- Web/Desktop/iOS: requieren validación manual de runtime antes de declararlos soportados en stores o releases públicas
 
 Plugins que condicionan soporte real:
 
@@ -175,3 +177,4 @@ main.dart
 - si `flutter run` no encuentra dispositivo, validar `flutter doctor`
 - en plataformas no móviles, verificar compatibilidad real de `sqflite`, `local_auth` y `flutter_secure_storage`
 - para iOS/release signing, el repo no documenta aún configuración de firma o distribución
+- validar manualmente biometría, secure storage, notificaciones, import/export y apertura de SQLite en cada plataforma objetivo

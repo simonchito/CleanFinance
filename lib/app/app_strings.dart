@@ -5,6 +5,7 @@ import 'package:clean_finance/core/utils/payment_method_utils.dart';
 import '../core/localization/generated/app_localizations.dart';
 import '../core/localization/generated/app_localizations_en.dart';
 import '../core/localization/generated/app_localizations_es.dart';
+import '../core/localization/generated/app_localizations_pt.dart';
 
 class AppStrings {
   AppStrings(this._l10n);
@@ -18,6 +19,7 @@ class AppStrings {
         ) ??
         switch (Localizations.localeOf(context).languageCode) {
           'en' => AppLocalizationsEn(),
+          'pt' => AppLocalizationsPt(),
           _ => AppLocalizationsEs(),
         };
     return AppStrings(l10n);
@@ -25,6 +27,7 @@ class AppStrings {
 
   String get languageCode => _l10n.localeName;
   bool get isEnglish => _l10n.localeName.startsWith('en');
+  bool get isPortuguese => _l10n.localeName.startsWith('pt');
 
   String get appName => _l10n.appName;
   String get settings => _l10n.settings;
@@ -32,6 +35,7 @@ class AppStrings {
   String get useDeviceLanguage => _l10n.useDeviceLanguage;
   String get spanish => _l10n.spanish;
   String get english => _l10n.english;
+  String get portuguese => _l10n.portuguese;
   String get dashboard => _l10n.dashboard;
   String get movements => _l10n.movements;
   String get savings => _l10n.savings;
@@ -1488,6 +1492,7 @@ class AppStrings {
       'defaultCategoryNameAhorroGeneral' =>
         _l10n.defaultCategoryNameAhorroGeneral,
       'defaultCategoryNameOtros' => _l10n.defaultCategoryNameOtros,
+      'portuguese' => _l10n.portuguese,
       _ => key,
     };
   }

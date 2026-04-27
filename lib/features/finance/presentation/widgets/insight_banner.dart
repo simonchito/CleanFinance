@@ -7,15 +7,24 @@ import '../mappers/finance_text_mapper.dart';
 class InsightBanner extends StatelessWidget {
   const InsightBanner({
     required this.insight,
+    this.showAmounts = true,
+    this.currencySymbol = r'$',
     super.key,
   });
 
   final FinanceInsight insight;
+  final bool showAmounts;
+  final String currencySymbol;
 
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
-    final localized = FinanceTextMapper.insight(strings, insight);
+    final localized = FinanceTextMapper.insight(
+      strings,
+      insight,
+      showAmounts: showAmounts,
+      currencySymbol: currencySymbol,
+    );
     final scheme = Theme.of(context).colorScheme;
     final (icon, color) = switch (insight.tone) {
       FinanceInsightTone.positive => (

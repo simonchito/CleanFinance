@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/movement_filter.dart';
@@ -261,6 +261,7 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final symbol = settings?.currencySymbol ?? r'$';
     final localeCode = ref.watch(appLocaleCodeProvider);
+    final showSensitiveAmounts = ref.watch(showSensitiveAmountsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -465,7 +466,12 @@ class _MovementsScreenState extends ConsumerState<MovementsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                '$prefix ${CurrencyFormatter.format(movement.amount, symbol: symbol, localeCode: localeCode)}',
+                                '$prefix ${AmountVisibilityFormatter.formatCurrency(
+                                  amount: movement.amount,
+                                  symbol: symbol,
+                                  isVisible: showSensitiveAmounts,
+                                  localeCode: localeCode,
+                                )}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelLarge

@@ -50,6 +50,7 @@ class BudgetsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final symbol = settings?.currencySymbol ?? r'$';
     final localeCode = ref.watch(appLocaleCodeProvider);
+    final showSensitiveAmounts = ref.watch(showSensitiveAmountsProvider);
     final monthLabel =
         DateFormat.yMMMM(strings.languageCode).format(DateTime.now());
 
@@ -129,6 +130,7 @@ class BudgetsScreen extends ConsumerWidget {
                         item: item,
                         currencySymbol: symbol,
                         localeCode: localeCode,
+                        showAmounts: showSensitiveAmounts,
                         onTap: () async {
                           final budget = await _findBudget(ref, item);
                           if (!context.mounted) {

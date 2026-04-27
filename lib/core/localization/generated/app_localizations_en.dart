@@ -27,6 +27,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get english => 'English';
 
   @override
+  String get portuguese => 'Portuguese';
+
+  @override
   String get dashboard => 'Home';
 
   @override

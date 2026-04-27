@@ -74,10 +74,11 @@ Idiomas soportados actualmente:
 
 - Español (`es`)
 - Inglés (`en`)
+- Portugués genérico (`pt`)
 
-La app usa el idioma del dispositivo cuando está en modo sistema y cae a español si el idioma del dispositivo no está soportado. Desde Ajustes el usuario puede fijar manualmente español o inglés; esa preferencia se persiste en `app_settings.locale_code`.
+La app usa el idioma del dispositivo cuando está en modo sistema y cae a español si el idioma del dispositivo no está soportado. Desde Ajustes el usuario puede fijar manualmente español, inglés o portugués; esa preferencia se persiste en `app_settings.locale_code`.
 
-El soporte de portugués/`pt_BR` no está activo en esta versión. Los archivos ARB fuente viven en `lib/l10n/` y deben mantenerse con las mismas keys antes de regenerar localizaciones.
+Portugués se soporta como locale genérico `pt`; variantes del sistema como `pt_BR` o `pt_PT` se resuelven a `pt`, no como idiomas separados. Los archivos ARB fuente viven en `lib/l10n/` y deben mantenerse con las mismas keys antes de regenerar localizaciones.
 
 ## Flujo actual de seguridad
 
@@ -92,6 +93,7 @@ El soporte de portugués/`pt_BR` no está activo en esta versión. Los archivos 
 - SQLite local sigue sin cifrado a nivel base de datos para mantener bajo peso y simplicidad
 - el acceso a SQLite está encapsulado en repositorios (`LocalFinanceRepository` y `LocalBudgetRepository`) para reducir dispersión, pero no reemplaza cifrado en reposo del archivo
 - los backups sin contraseña se exportan como JSON legible y deben tratarse como archivos sensibles
+- la preferencia de ocultar montos se aplica globalmente en dashboard, movimientos, reportes, ahorro, presupuestos, gráficos e insights
 
 ## Flujo actual de movimientos
 

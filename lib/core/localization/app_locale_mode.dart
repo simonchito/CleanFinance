@@ -3,7 +3,8 @@ import 'package:flutter/widgets.dart';
 enum AppLocaleMode {
   system('system', null),
   spanish('es', Locale('es')),
-  english('en', Locale('en'));
+  english('en', Locale('en')),
+  portuguese('pt', Locale('pt'));
 
   const AppLocaleMode(this.preferenceCode, this.locale);
 
@@ -15,6 +16,7 @@ enum AppLocaleMode {
   static const supportedLocales = [
     Locale('es'),
     Locale('en'),
+    Locale('pt'),
   ];
 
   static AppLocaleMode fromPreferenceCode(String? value) {
@@ -22,6 +24,7 @@ enum AppLocaleMode {
     return switch (normalized) {
       'es' => AppLocaleMode.spanish,
       'en' => AppLocaleMode.english,
+      'pt' => AppLocaleMode.portuguese,
       _ => AppLocaleMode.system,
     };
   }
@@ -33,6 +36,9 @@ enum AppLocaleMode {
     if (locale.languageCode == 'en') {
       return AppLocaleMode.english;
     }
+    if (locale.languageCode == 'pt') {
+      return AppLocaleMode.portuguese;
+    }
     return fallback;
   }
 
@@ -42,6 +48,9 @@ enum AppLocaleMode {
       return AppLocaleMode.system.preferenceCode;
     }
     final normalized = raw.replaceAll('-', '_').toLowerCase();
+    if (normalized == 'pt' || normalized.startsWith('pt_')) {
+      return AppLocaleMode.portuguese.preferenceCode;
+    }
     return switch (normalized) {
       'system' => AppLocaleMode.system.preferenceCode,
       'es' => AppLocaleMode.spanish.preferenceCode,
@@ -69,6 +78,9 @@ enum AppLocaleMode {
       }
       if (locale.languageCode == 'en') {
         return AppLocaleMode.english.locale!;
+      }
+      if (locale.languageCode == 'pt') {
+        return AppLocaleMode.portuguese.locale!;
       }
     }
     return fallback.locale!;

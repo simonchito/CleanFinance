@@ -1,5 +1,5 @@
 import '../../../../app/app_strings.dart';
-import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/end_of_month_projection.dart';
 import '../../domain/entities/finance_insight.dart';
@@ -89,13 +89,17 @@ class FinanceTextMapper {
 
   static LocalizedFinanceInsightText insight(
     AppStrings strings,
-    FinanceInsight insight,
-  ) {
+    FinanceInsight insight, {
+    bool showAmounts = true,
+    String currencySymbol = r'$',
+  }) {
     final percentage = insight.percentageValue?.round();
     final amount = insight.amountValue == null
         ? null
-        : CurrencyFormatter.formatWholeNumber(
-            insight.amountValue!,
+        : AmountVisibilityFormatter.formatCurrency(
+            amount: insight.amountValue!,
+            symbol: currencySymbol,
+            isVisible: showAmounts,
             localeCode: strings.languageCode,
           );
     final categoryName = insight.categoryName == null

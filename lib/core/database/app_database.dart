@@ -228,7 +228,12 @@ class AppDatabase {
           await db.execute(
             "UPDATE app_settings SET locale_code = 'system' "
             "WHERE locale_code IS NULL OR TRIM(locale_code) = '' "
-            "OR LOWER(locale_code) NOT IN ('system', 'es', 'en')",
+            "OR (LOWER(REPLACE(locale_code, '-', '_')) NOT IN ('system', 'es', 'en', 'pt') "
+            "AND LOWER(REPLACE(locale_code, '-', '_')) NOT LIKE 'pt_%')",
+          );
+          await db.execute(
+            "UPDATE app_settings SET locale_code = 'pt' "
+            "WHERE LOWER(REPLACE(locale_code, '-', '_')) LIKE 'pt_%'",
           );
         }
         if (oldVersion < 9) {
@@ -243,6 +248,12 @@ class AppDatabase {
           );
           await db.execute(
             'ALTER TABLE app_settings ADD COLUMN notification_permission_requested INTEGER NOT NULL DEFAULT 0',
+          );
+        }
+        if (oldVersion < 10) {
+          await db.execute(
+            "UPDATE app_settings SET locale_code = 'pt' "
+            "WHERE LOWER(REPLACE(locale_code, '-', '_')) LIKE 'pt_%'",
           );
         }
       },

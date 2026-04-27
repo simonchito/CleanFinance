@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/app_strings.dart';
 import '../../../../core/utils/amount_visibility_formatter.dart';
-import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../../domain/entities/reports_snapshot.dart';
 import '../mappers/default_category_name_localizer.dart';
@@ -12,11 +11,15 @@ import '../mappers/default_category_name_localizer.dart';
 class DonutChart extends StatelessWidget {
   const DonutChart({
     required this.items,
+    this.showAmounts = true,
+    this.currencySymbol = r'$',
     this.localeCode = 'es',
     super.key,
   });
 
   final List<CategorySpend> items;
+  final bool showAmounts;
+  final String currencySymbol;
   final String localeCode;
 
   @override
@@ -46,8 +49,10 @@ class DonutChart extends StatelessWidget {
                   Text(
                     total == 0
                         ? '-'
-                        : CurrencyFormatter.formatWholeNumber(
-                            total,
+                        : AmountVisibilityFormatter.formatCurrency(
+                            amount: total,
+                            symbol: currencySymbol,
+                            isVisible: showAmounts,
                             localeCode: localeCode,
                           ),
                     style: Theme.of(context).textTheme.titleLarge,

@@ -27,6 +27,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get english => 'Inglés';
 
   @override
+  String get portuguese => 'Portugués';
+
+  @override
   String get dashboard => 'Inicio';
 
   @override

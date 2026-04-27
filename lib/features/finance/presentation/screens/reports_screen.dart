@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../domain/entities/analytics_models.dart';
 import '../mappers/default_category_name_localizer.dart';
 import '../mappers/finance_text_mapper.dart';
@@ -24,6 +24,14 @@ class ReportsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final symbol = settings?.currencySymbol ?? r'$';
     final localeCode = ref.watch(appLocaleCodeProvider);
+    final showSensitiveAmounts = ref.watch(showSensitiveAmountsProvider);
+    String formatAmount(double amount) =>
+        AmountVisibilityFormatter.formatCurrency(
+          amount: amount,
+          symbol: symbol,
+          isVisible: showSensitiveAmounts,
+          localeCode: localeCode,
+        );
 
     return Scaffold(
       appBar: AppBar(title: Text(strings.reports)),
@@ -105,11 +113,7 @@ class ReportsScreen extends ConsumerWidget {
                         Expanded(
                           child: _MetricBox(
                             label: strings.income,
-                            value: CurrencyFormatter.format(
-                              overview.cashflow.income,
-                              symbol: symbol,
-                              localeCode: localeCode,
-                            ),
+                            value: formatAmount(overview.cashflow.income),
                             color: scheme.primary,
                           ),
                         ),
@@ -117,11 +121,7 @@ class ReportsScreen extends ConsumerWidget {
                         Expanded(
                           child: _MetricBox(
                             label: strings.expense,
-                            value: CurrencyFormatter.format(
-                              overview.cashflow.expense,
-                              symbol: symbol,
-                              localeCode: localeCode,
-                            ),
+                            value: formatAmount(overview.cashflow.expense),
                             color: scheme.error,
                           ),
                         ),
@@ -133,11 +133,7 @@ class ReportsScreen extends ConsumerWidget {
                         Expanded(
                           child: _MetricBox(
                             label: strings.saving,
-                            value: CurrencyFormatter.format(
-                              overview.cashflow.savings,
-                              symbol: symbol,
-                              localeCode: localeCode,
-                            ),
+                            value: formatAmount(overview.cashflow.savings),
                             color: scheme.tertiary,
                           ),
                         ),
@@ -145,11 +141,7 @@ class ReportsScreen extends ConsumerWidget {
                         Expanded(
                           child: _MetricBox(
                             label: strings.t('saldoNeto'),
-                            value: CurrencyFormatter.format(
-                              overview.cashflow.netBalance,
-                              symbol: symbol,
-                              localeCode: localeCode,
-                            ),
+                            value: formatAmount(overview.cashflow.netBalance),
                             color: overview.cashflow.netBalance >= 0
                                 ? scheme.primary
                                 : scheme.error,
@@ -161,6 +153,7 @@ class ReportsScreen extends ConsumerWidget {
                     IncomeExpenseComparison(
                       income: overview.cashflow.income,
                       expense: overview.cashflow.expense,
+                      showAmounts: showSensitiveAmounts,
                       currencySymbol: symbol,
                       localeCode: localeCode,
                     ),
@@ -214,6 +207,8 @@ class ReportsScreen extends ConsumerWidget {
                     else ...[
                       DonutChart(
                         items: overview.reports.topExpenseCategories,
+                        showAmounts: showSensitiveAmounts,
+                        currencySymbol: symbol,
                         localeCode: localeCode,
                       ),
                       const SizedBox(height: 18),
@@ -224,6 +219,7 @@ class ReportsScreen extends ConsumerWidget {
                             item: item,
                             symbol: symbol,
                             localeCode: localeCode,
+                            showAmounts: showSensitiveAmounts,
                           ),
                         ),
                       ),
@@ -253,10 +249,8 @@ class ReportsScreen extends ConsumerWidget {
                         Expanded(
                           child: _MetricBox(
                             label: strings.spent,
-                            value: CurrencyFormatter.format(
+                            value: formatAmount(
                               overview.spendingPace.spentSoFar,
-                              symbol: symbol,
-                              localeCode: localeCode,
                             ),
                             color: scheme.error,
                           ),
@@ -265,10 +259,8 @@ class ReportsScreen extends ConsumerWidget {
                         Expanded(
                           child: _MetricBox(
                             label: strings.t('esperadoHoy'),
-                            value: CurrencyFormatter.format(
+                            value: formatAmount(
                               overview.spendingPace.expectedSpendToDate,
-                              symbol: symbol,
-                              localeCode: localeCode,
                             ),
                             color: scheme.secondary,
                           ),
@@ -281,10 +273,8 @@ class ReportsScreen extends ConsumerWidget {
                         Expanded(
                           child: _MetricBox(
                             label: strings.t('proyeccion'),
-                            value: CurrencyFormatter.format(
+                            value: formatAmount(
                               overview.spendingPace.projectedEndOfMonth,
-                              symbol: symbol,
-                              localeCode: localeCode,
                             ),
                             color: scheme.tertiary,
                           ),
@@ -363,6 +353,7 @@ class ReportsScreen extends ConsumerWidget {
                             goal: goal,
                             symbol: symbol,
                             localeCode: localeCode,
+                            showAmounts: showSensitiveAmounts,
                           ),
                         ),
                       ),
@@ -394,6 +385,7 @@ class ReportsScreen extends ConsumerWidget {
                             item: item,
                             symbol: symbol,
                             localeCode: localeCode,
+                            showAmounts: showSensitiveAmounts,
                           ),
                         ),
                       ),
@@ -411,7 +403,11 @@ class ReportsScreen extends ConsumerWidget {
                 ...overview.insights.map(
                   (insight) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
-                    child: InsightBanner(insight: insight),
+                    child: InsightBanner(
+                      insight: insight,
+                      showAmounts: showSensitiveAmounts,
+                      currencySymbol: symbol,
+                    ),
                   ),
                 ),
               ],
@@ -532,11 +528,13 @@ class _CategoryComparisonTile extends StatelessWidget {
     required this.item,
     required this.symbol,
     required this.localeCode,
+    required this.showAmounts,
   });
 
   final CategoryComparisonItem item;
   final String symbol;
   final String localeCode;
+  final bool showAmounts;
 
   @override
   Widget build(BuildContext context) {
@@ -577,9 +575,10 @@ class _CategoryComparisonTile extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  CurrencyFormatter.format(
-                    item.currentAmount,
+                  AmountVisibilityFormatter.formatCurrency(
+                    amount: item.currentAmount,
                     symbol: symbol,
+                    isVisible: showAmounts,
                     localeCode: localeCode,
                   ),
                   style: Theme.of(context).textTheme.bodyLarge,
@@ -599,9 +598,10 @@ class _CategoryComparisonTile extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               strings.reportsPreviousMonth(
-                CurrencyFormatter.format(
-                  item.previousAmount,
+                AmountVisibilityFormatter.formatCurrency(
+                  amount: item.previousAmount,
                   symbol: symbol,
+                  isVisible: showAmounts,
                   localeCode: localeCode,
                 ),
               ),
@@ -621,11 +621,13 @@ class _GoalForecastTile extends StatelessWidget {
     required this.goal,
     required this.symbol,
     required this.localeCode,
+    required this.showAmounts,
   });
 
   final SavingsGoalForecast goal;
   final String symbol;
   final String localeCode;
+  final bool showAmounts;
 
   @override
   Widget build(BuildContext context) {
@@ -652,14 +654,16 @@ class _GoalForecastTile extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             strings.savingsGoalProgress(
-              CurrencyFormatter.format(
-                goal.progress.savedAmount,
+              AmountVisibilityFormatter.formatCurrency(
+                amount: goal.progress.savedAmount,
                 symbol: symbol,
+                isVisible: showAmounts,
                 localeCode: localeCode,
               ),
-              CurrencyFormatter.format(
-                goal.progress.goal.targetAmount,
+              AmountVisibilityFormatter.formatCurrency(
+                amount: goal.progress.goal.targetAmount,
                 symbol: symbol,
+                isVisible: showAmounts,
                 localeCode: localeCode,
               ),
             ),
@@ -678,9 +682,10 @@ class _GoalForecastTile extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             strings.goalAverageContribution(
-              CurrencyFormatter.format(
-                goal.averageMonthlyContribution,
+              AmountVisibilityFormatter.formatCurrency(
+                amount: goal.averageMonthlyContribution,
                 symbol: symbol,
+                isVisible: showAmounts,
                 localeCode: localeCode,
               ),
             ),
@@ -691,9 +696,10 @@ class _GoalForecastTile extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             strings.goalContributionThisMonth(
-              CurrencyFormatter.format(
-                goal.currentMonthContribution,
+              AmountVisibilityFormatter.formatCurrency(
+                amount: goal.currentMonthContribution,
                 symbol: symbol,
+                isVisible: showAmounts,
                 localeCode: localeCode,
               ),
             ),
@@ -719,11 +725,13 @@ class _PaymentMethodTile extends StatelessWidget {
     required this.item,
     required this.symbol,
     required this.localeCode,
+    required this.showAmounts,
   });
 
   final PaymentMethodSpend item;
   final String symbol;
   final String localeCode;
+  final bool showAmounts;
 
   @override
   Widget build(BuildContext context) {
@@ -766,9 +774,10 @@ class _PaymentMethodTile extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            CurrencyFormatter.format(
-              item.amount,
+            AmountVisibilityFormatter.formatCurrency(
+              amount: item.amount,
               symbol: symbol,
+              isVisible: showAmounts,
               localeCode: localeCode,
             ),
             style: Theme.of(context).textTheme.labelLarge,

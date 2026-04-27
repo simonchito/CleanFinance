@@ -18,31 +18,38 @@ void main() {
           .map((file) => file.uri.pathSegments.last)
           .toSet();
 
-      expect(arbFiles, {'app_es.arb', 'app_en.arb'});
+      expect(arbFiles, {'app_es.arb', 'app_en.arb', 'app_pt.arb'});
 
       final spanish = _loadMessages(File('lib/l10n/app_es.arb'));
       final english = _loadMessages(File('lib/l10n/app_en.arb'));
+      final portuguese = _loadMessages(File('lib/l10n/app_pt.arb'));
 
       expect(english.keys.toSet(), spanish.keys.toSet());
+      expect(portuguese.keys.toSet(), spanish.keys.toSet());
     });
 
-    test('does not expose retired Portuguese preferences', () {
-      expect(AppConstants.supportedLocaleCodes, ['es', 'en']);
+    test('exposes Spanish, English and generic Portuguese preferences', () {
+      expect(AppConstants.supportedLocaleCodes, ['es', 'en', 'pt']);
       expect(AppConstants.supportedLocalePreferenceCodes, [
         'system',
         'es',
         'en',
+        'pt',
       ]);
       expect(AppLocaleMode.supportedLocales, const [
         Locale('es'),
         Locale('en'),
+        Locale('pt'),
       ]);
       expect(AppLocalizations.supportedLocales, const [
         Locale('en'),
         Locale('es'),
+        Locale('pt'),
       ]);
-      expect(AppConstants.normalizeLocalePreferenceCode('pt_BR'), 'system');
-      expect(AppConstants.normalizeLocalePreferenceCode('pt'), 'system');
+      expect(AppConstants.normalizeLocalePreferenceCode('pt'), 'pt');
+      expect(AppConstants.normalizeLocalePreferenceCode('pt_BR'), 'pt');
+      expect(AppConstants.normalizeLocalePreferenceCode('pt-PT'), 'pt');
+      expect(AppConstants.normalizeLocalePreferenceCode('pt_AO'), 'pt');
     });
   });
 }

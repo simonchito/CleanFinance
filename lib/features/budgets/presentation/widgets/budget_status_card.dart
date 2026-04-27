@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../../../features/finance/presentation/widgets/section_card.dart';
 import '../../../../features/finance/presentation/mappers/default_category_name_localizer.dart';
 import '../../domain/models/category_budget_status.dart';
@@ -11,6 +11,7 @@ class BudgetStatusCard extends StatelessWidget {
     required this.item,
     required this.currencySymbol,
     required this.localeCode,
+    required this.showAmounts,
     this.onTap,
     super.key,
   });
@@ -18,6 +19,7 @@ class BudgetStatusCard extends StatelessWidget {
   final CategoryBudgetStatus item;
   final String currencySymbol;
   final String localeCode;
+  final bool showAmounts;
   final VoidCallback? onTap;
 
   @override
@@ -49,7 +51,7 @@ class BudgetStatusCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${strings.monthlyLimit}: ${CurrencyFormatter.format(item.monthlyLimit, symbol: currencySymbol, localeCode: localeCode)}',
+                      '${strings.monthlyLimit}: ${_formatAmount(item.monthlyLimit)}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: scheme.onSurfaceVariant,
                           ),
@@ -111,22 +113,14 @@ class BudgetStatusCard extends StatelessWidget {
               Expanded(
                 child: _BudgetMetric(
                   label: strings.spent,
-                  value: CurrencyFormatter.format(
-                    item.spent,
-                    symbol: currencySymbol,
-                    localeCode: localeCode,
-                  ),
+                  value: _formatAmount(item.spent),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _BudgetMetric(
                   label: strings.remaining,
-                  value: CurrencyFormatter.format(
-                    item.remaining,
-                    symbol: currencySymbol,
-                    localeCode: localeCode,
-                  ),
+                  value: _formatAmount(item.remaining),
                   valueColor:
                       item.remaining < 0 ? scheme.error : scheme.primary,
                 ),
@@ -162,6 +156,15 @@ class BudgetStatusCard extends StatelessWidget {
           background: scheme.primaryContainer,
         );
     }
+  }
+
+  String _formatAmount(double amount) {
+    return AmountVisibilityFormatter.formatCurrency(
+      amount: amount,
+      symbol: currencySymbol,
+      isVisible: showAmounts,
+      localeCode: localeCode,
+    );
   }
 }
 

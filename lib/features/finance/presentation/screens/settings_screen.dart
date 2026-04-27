@@ -440,6 +440,10 @@ class SettingsScreen extends ConsumerWidget {
                           value: AppLocaleMode.english.preferenceCode,
                           child: Text(strings.english),
                         ),
+                        DropdownMenuItem(
+                          value: AppLocaleMode.portuguese.preferenceCode,
+                          child: Text(strings.portuguese),
+                        ),
                       ],
                       onChanged: (value) {
                         if (value != null &&

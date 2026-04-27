@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../app/app_strings.dart';
-import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/amount_visibility_formatter.dart';
 import '../../../../shared/providers.dart';
 import '../../domain/entities/movement.dart';
 import '../../domain/entities/savings_goal.dart';
@@ -111,6 +111,14 @@ class SavingsScreen extends ConsumerWidget {
     final settings = ref.watch(settingsControllerProvider).valueOrNull;
     final symbol = settings?.currencySymbol ?? r'$';
     final localeCode = ref.watch(appLocaleCodeProvider);
+    final showSensitiveAmounts = ref.watch(showSensitiveAmountsProvider);
+    String formatAmount(double amount) =>
+        AmountVisibilityFormatter.formatCurrency(
+          amount: amount,
+          symbol: symbol,
+          isVisible: showSensitiveAmounts,
+          localeCode: localeCode,
+        );
 
     return Scaffold(
       appBar: AppBar(title: Text(strings.savings)),
@@ -163,22 +171,14 @@ class SavingsScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              CurrencyFormatter.format(
-                                summary.totalSavedAmount,
-                                symbol: symbol,
-                                localeCode: localeCode,
-                              ),
+                              formatAmount(summary.totalSavedAmount),
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
                             const SizedBox(height: 8),
                             Text(
                               unassigned.hasSavings
                                   ? strings.savingsGeneralIncluded(
-                                      CurrencyFormatter.format(
-                                        unassigned.totalAmount,
-                                        symbol: symbol,
-                                        localeCode: localeCode,
-                                      ),
+                                      formatAmount(unassigned.totalAmount),
                                     )
                                   : (strings
                                       .t('todoLoQueAhorrasteEstaOrganizadoEn')),
@@ -203,10 +203,8 @@ class SavingsScreen extends ConsumerWidget {
                                 Expanded(
                                   child: _SummaryStat(
                                     label: strings.t('objetivo'),
-                                    value: CurrencyFormatter.format(
+                                    value: formatAmount(
                                       summary.totalGoalTargetAmount,
-                                      symbol: symbol,
-                                      localeCode: localeCode,
                                     ),
                                   ),
                                 ),
@@ -227,6 +225,7 @@ class SavingsScreen extends ConsumerWidget {
                           summary: unassigned,
                           symbol: symbol,
                           localeCode: localeCode,
+                          showAmounts: showSensitiveAmounts,
                           onContribute: () =>
                               _openGeneralContribution(context, ref),
                           onCreateGoal: () => _openGoalEditor(context, ref),
@@ -249,6 +248,7 @@ class SavingsScreen extends ConsumerWidget {
                               progress: progress,
                               symbol: symbol,
                               localeCode: localeCode,
+                              showAmounts: showSensitiveAmounts,
                               onEdit: () => _openGoalEditor(
                                 context,
                                 ref,
@@ -279,6 +279,7 @@ class SavingsScreen extends ConsumerWidget {
                               progress: progress,
                               symbol: symbol,
                               localeCode: localeCode,
+                              showAmounts: showSensitiveAmounts,
                               onEdit: () => _openGoalEditor(
                                 context,
                                 ref,
@@ -327,6 +328,7 @@ class _GeneralSavingsCard extends StatelessWidget {
     required this.summary,
     required this.symbol,
     required this.localeCode,
+    required this.showAmounts,
     required this.onContribute,
     required this.onCreateGoal,
   });
@@ -334,6 +336,7 @@ class _GeneralSavingsCard extends StatelessWidget {
   final UnassignedSavingsSummary summary;
   final String symbol;
   final String localeCode;
+  final bool showAmounts;
   final VoidCallback onContribute;
   final VoidCallback onCreateGoal;
 
@@ -362,9 +365,10 @@ class _GeneralSavingsCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            CurrencyFormatter.format(
-              summary.totalAmount,
+            AmountVisibilityFormatter.formatCurrency(
+              amount: summary.totalAmount,
               symbol: symbol,
+              isVisible: showAmounts,
               localeCode: localeCode,
             ),
             style: Theme.of(context).textTheme.headlineSmall,
@@ -425,6 +429,7 @@ class _GoalCard extends StatelessWidget {
     required this.progress,
     required this.symbol,
     required this.localeCode,
+    required this.showAmounts,
     required this.onEdit,
     required this.onContribute,
     required this.onDelete,
@@ -433,6 +438,7 @@ class _GoalCard extends StatelessWidget {
   final SavingsGoalProgress progress;
   final String symbol;
   final String localeCode;
+  final bool showAmounts;
   final VoidCallback onEdit;
   final VoidCallback onContribute;
   final VoidCallback onDelete;
@@ -482,14 +488,16 @@ class _GoalCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             strings.savingsGoalProgress(
-              CurrencyFormatter.format(
-                progress.savedAmount,
+              AmountVisibilityFormatter.formatCurrency(
+                amount: progress.savedAmount,
                 symbol: symbol,
+                isVisible: showAmounts,
                 localeCode: localeCode,
               ),
-              CurrencyFormatter.format(
-                goal.targetAmount,
+              AmountVisibilityFormatter.formatCurrency(
+                amount: goal.targetAmount,
                 symbol: symbol,
+                isVisible: showAmounts,
                 localeCode: localeCode,
               ),
             ),
@@ -516,10 +524,12 @@ class _GoalCard extends StatelessWidget {
             progress.completed
                 ? (strings.t('excelenteYaAlcanzasteEstaMeta'))
                 : strings.savingsGoalRemaining(
-                    CurrencyFormatter.format(
-                      (goal.targetAmount - progress.savedAmount)
-                          .clamp(0, goal.targetAmount),
+                    AmountVisibilityFormatter.formatCurrency(
+                      amount: (goal.targetAmount - progress.savedAmount)
+                          .clamp(0, goal.targetAmount)
+                          .toDouble(),
                       symbol: symbol,
+                      isVisible: showAmounts,
                       localeCode: localeCode,
                     ),
                   ),

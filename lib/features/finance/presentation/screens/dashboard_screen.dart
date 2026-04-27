@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/utils/amount_visibility_formatter.dart';
-import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/monthly_payment_reminder.dart';
 import '../../domain/entities/movement.dart';
 import '../mappers/default_category_name_localizer.dart';
@@ -395,7 +394,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   ...overview.insights.map(
                     (insight) => Padding(
                       padding: const EdgeInsets.only(bottom: 10),
-                      child: InsightBanner(insight: insight),
+                      child: InsightBanner(
+                        insight: insight,
+                        showAmounts: showSensitiveAmounts,
+                        currencySymbol: symbol,
+                      ),
                     ),
                   ),
                 const SizedBox(height: 22),
@@ -509,6 +512,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               movement: movement,
                               symbol: symbol,
                               localeCode: localeCode,
+                              showAmounts: showSensitiveAmounts,
                             ),
                           )
                           .toList(),
@@ -609,11 +613,13 @@ class _MovementTile extends StatelessWidget {
     required this.movement,
     required this.symbol,
     required this.localeCode,
+    required this.showAmounts,
   });
 
   final Movement movement;
   final String symbol;
   final String localeCode;
+  final bool showAmounts;
 
   @override
   Widget build(BuildContext context) {
@@ -690,7 +696,12 @@ class _MovementTile extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            '$prefix ${CurrencyFormatter.format(movement.amount, symbol: symbol, localeCode: localeCode)}',
+            '$prefix ${AmountVisibilityFormatter.formatCurrency(
+              amount: movement.amount,
+              symbol: symbol,
+              isVisible: showAmounts,
+              localeCode: localeCode,
+            )}',
             textAlign: TextAlign.right,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   color: color,
