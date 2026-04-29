@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
 import '../constants/app_constants.dart';
+import 'database_platform.dart';
 
 // SQLite remains unencrypted by design to keep the app lightweight and offline-first.
 // Access is intentionally centralized behind repositories so the storage boundary
@@ -28,14 +28,13 @@ class AppDatabase {
       await existing.close();
     }
 
-    final databasesPath = await getDatabasesPath();
-    final path = p.join(databasesPath, AppConstants.databaseName);
-    await deleteDatabase(path);
+    final path = await databasePathFor(AppConstants.databaseName);
+    await deleteDatabasePath(path);
   }
 
   Future<Database> _open() async {
-    final databasesPath = await getDatabasesPath();
-    final path = p.join(databasesPath, AppConstants.databaseName);
+    configureDatabasePlatform();
+    final path = await databasePathFor(AppConstants.databaseName);
     if (kDebugMode) {
       debugPrint('[startup] Opening SQLite database at $path');
     }

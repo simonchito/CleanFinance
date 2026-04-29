@@ -1,9 +1,8 @@
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/app_strings.dart';
@@ -43,14 +42,16 @@ class SettingsScreen extends ConsumerWidget {
     final payload = await ref
         .read(dataManagementControllerProvider)
         .exportData(password: password);
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File(
-      '${directory.path}/clean_finance_backup_${DateTime.now().millisecondsSinceEpoch}.json',
+    final filename =
+        'clean_finance_backup_${DateTime.now().millisecondsSinceEpoch}.json';
+    final file = XFile.fromData(
+      utf8.encode(payload),
+      name: filename,
+      mimeType: 'application/json',
     );
-    await file.writeAsString(payload);
 
     await Share.shareXFiles(
-      [XFile(file.path)],
+      [file],
       text: strings.t('backupLocalDeCleanfinance'),
     );
 
@@ -59,8 +60,8 @@ class SettingsScreen extends ConsumerWidget {
         SnackBar(
           content: Text(
             password.trim().isEmpty
-                ? '${strings.exportBackup}: ${file.path}. ${strings.t('advertenciaElArchivoNoEstaCifrado')}'
-                : '${strings.exportBackup}: ${file.path}',
+                ? '${strings.exportBackup}: $filename. ${strings.t('advertenciaElArchivoNoEstaCifrado')}'
+                : '${strings.exportBackup}: $filename',
           ),
         ),
       );
@@ -72,9 +73,10 @@ class SettingsScreen extends ConsumerWidget {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
+      withData: true,
     );
-    final path = result?.files.single.path;
-    if (path == null || !context.mounted) {
+    final fileBytes = result?.files.single.bytes;
+    if (fileBytes == null || !context.mounted) {
       return;
     }
 
@@ -91,7 +93,7 @@ class SettingsScreen extends ConsumerWidget {
     }
 
     try {
-      final payload = await File(path).readAsString();
+      final payload = utf8.decode(fileBytes);
       if (!context.mounted) {
         return;
       }

@@ -57,13 +57,21 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
     }
 
     setState(() => _isSubmitting = true);
-    final success = await ref.read(authControllerProvider.notifier).createPin(
-          pin,
-          birthDate: birthDate,
-          documentId: document,
-          enableBiometrics: _enableBiometrics,
-        );
-    setState(() => _isSubmitting = false);
+    bool success;
+    try {
+      success = await ref.read(authControllerProvider.notifier).createPin(
+            pin,
+            birthDate: birthDate,
+            documentId: document,
+            enableBiometrics: _enableBiometrics,
+          );
+    } catch (_) {
+      success = false;
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
 
     if (!success && mounted) {
       _showMessage(
