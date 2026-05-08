@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -10,6 +9,7 @@ import '../../../../app/app_strings.dart';
 import '../../../../brand_logo_asset.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/localization/app_locale_mode.dart';
+import '../../../../core/platform/app_exit_service.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../../budgets/presentation/screens/budgets_screen.dart';
 import '../../domain/entities/app_theme_preference.dart';
@@ -27,6 +27,8 @@ import 'privacy_policy_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
+
+  static const _appExitService = AppExitService();
 
   Future<void> _exportData(BuildContext context, WidgetRef ref) async {
     final strings = AppStrings.of(context);
@@ -244,7 +246,7 @@ class SettingsScreen extends ConsumerWidget {
 
   Future<void> _exitApp(WidgetRef ref) async {
     ref.read(authControllerProvider.notifier).lock();
-    await SystemNavigator.pop();
+    await _appExitService.exitApp();
   }
 
   @override

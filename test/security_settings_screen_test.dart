@@ -182,10 +182,11 @@ void main() {
     final settingsRepository = _FakeSettingsRepository();
     var didRequestExit = false;
 
+    const appChannel = MethodChannel('app.cleanfinance/app');
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
+      appChannel,
       (call) async {
-        if (call.method == 'SystemNavigator.pop') {
+        if (call.method == 'exitApp') {
           didRequestExit = true;
         }
         return null;
@@ -193,7 +194,7 @@ void main() {
     );
     addTearDown(() {
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
+        appChannel,
         null,
       );
     });
