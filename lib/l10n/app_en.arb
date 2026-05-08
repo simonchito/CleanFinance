@@ -458,14 +458,7 @@
   "iconoSeleccionado": "Selected icon",
   "todaviaTeQuedaPagarOAhorrarPara": "You still need to pay or save for:",
   "pinLabel": "PIN",
-  "authPinLengthInvalid": "PIN must be {length} digits.",
-  "@authPinLengthInvalid": {
-    "placeholders": {
-      "length": {
-        "type": "Object"
-      }
-    }
-  },
+  "authPinLengthInvalid": "Your PIN must be between 6 and 12 characters.",
   "authLockoutActive": "Too many failed attempts. Wait {seconds} seconds before trying again.",
   "@authLockoutActive": {
     "placeholders": {

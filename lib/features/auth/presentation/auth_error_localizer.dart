@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 import '../../../app/app_strings.dart';
-import '../../../core/constants/app_constants.dart';
 import 'auth_state.dart';
 
 String localizeAuthError(BuildContext context, AuthErrorState? error) {
@@ -12,7 +11,7 @@ String localizeAuthError(BuildContext context, AuthErrorState? error) {
 
   switch (error.code) {
     case AuthErrorCode.pinLengthInvalid:
-      return strings.authPinLengthInvalid(AppConstants.defaultPinLength);
+      return strings.authPinLengthInvalid;
     case AuthErrorCode.recoveryDataInvalid:
       return strings.t('revisaTusDatosDeRecuperacionEIntenta');
     case AuthErrorCode.incorrectPin:

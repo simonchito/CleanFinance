@@ -1351,9 +1351,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get pinLabel => 'PIN';
 
   @override
-  String authPinLengthInvalid(Object length) {
-    return 'O PIN deve ter $length dígitos.';
-  }
+  String get authPinLengthInvalid => 'O PIN deve ter entre 6 e 12 caracteres.';
 
   @override
   String authLockoutActive(Object seconds) {

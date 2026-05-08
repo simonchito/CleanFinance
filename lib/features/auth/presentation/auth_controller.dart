@@ -73,7 +73,7 @@ class AuthController extends StateNotifier<AuthState> {
     required String documentId,
     bool enableBiometrics = false,
   }) async {
-    if (pin.length != AppConstants.defaultPinLength) {
+    if (!_isValidPinLength(pin)) {
       state = state.copyWith(
         error: const AuthErrorState(
           code: AuthErrorCode.pinLengthInvalid,
@@ -194,7 +194,7 @@ class AuthController extends StateNotifier<AuthState> {
     required String newPin,
     bool enableBiometrics = false,
   }) async {
-    if (newPin.length != AppConstants.defaultPinLength) {
+    if (!_isValidPinLength(newPin)) {
       state = state.copyWith(
         error: const AuthErrorState(
           code: AuthErrorCode.pinLengthInvalid,
@@ -299,6 +299,11 @@ class AuthController extends StateNotifier<AuthState> {
   bool _isValidRecoveryBirthDate(String value) {
     final normalized = value.replaceAll(RegExp(r'[^0-9]'), '');
     return normalized.length == 8;
+  }
+
+  bool _isValidPinLength(String value) {
+    return value.length >= AppConstants.minPinLength &&
+        value.length <= AppConstants.maxPinLength;
   }
 
   bool _isValidRecoveryDocument(String value) {

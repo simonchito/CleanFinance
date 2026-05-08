@@ -132,7 +132,13 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).at(0), '123456');
     await tester.enterText(find.byType(TextField).at(1), '123456');
-    await tester.enterText(find.byType(TextField).at(2), '10/02/1996');
+    await tester.tap(find.byType(TextField).at(2));
+    await tester.pumpAndSettle();
+    final datePickerContext = tester.element(find.byType(DatePickerDialog));
+    await tester.tap(
+      find.text(MaterialLocalizations.of(datePickerContext).okButtonLabel),
+    );
+    await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField).at(3), '12345678');
     final onboardingBiometricText =
         find.text('Activar huella para entrar más rápido');

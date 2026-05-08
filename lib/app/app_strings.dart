@@ -775,8 +775,7 @@ class AppStrings {
       _l10n.financeInsightGoalOnTrackMessage(goalName, percentage);
   String authWaitBeforeRetry(Object seconds) =>
       _l10n.authWaitBeforeRetry(seconds);
-  String authPinLengthInvalid(Object length) =>
-      _l10n.authPinLengthInvalid(length);
+  String get authPinLengthInvalid => _l10n.authPinLengthInvalid;
   String authLockoutActive(Object seconds) => _l10n.authLockoutActive(seconds);
   String categoriesLoadError(Object error) => _l10n.categoriesLoadError(error);
   String deleteSubcategoryMessage(Object name) =>

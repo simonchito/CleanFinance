@@ -8,7 +8,8 @@ class AppConstants {
   static const defaultCurrencySymbol = r'$';
   static const defaultShowSensitiveAmounts = true;
   static const defaultAutoLockMinutes = 5;
-  static const defaultPinLength = 6;
+  static const minPinLength = 6;
+  static const maxPinLength = 12;
   static const defaultLocalePreferenceCode = 'system';
   static const defaultLocaleCode = 'es';
   static const supportedLocaleCodes = ['es', 'en', 'pt'];

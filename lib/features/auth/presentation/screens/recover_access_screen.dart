@@ -163,7 +163,7 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             controller: _newPinController,
             keyboardType: TextInputType.number,
             obscureText: true,
-            maxLength: AppConstants.defaultPinLength,
+            maxLength: AppConstants.maxPinLength,
             decoration: InputDecoration(
               labelText: strings.t('nuevoPin'),
             ),
@@ -173,7 +173,7 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
             controller: _confirmPinController,
             keyboardType: TextInputType.number,
             obscureText: true,
-            maxLength: AppConstants.defaultPinLength,
+            maxLength: AppConstants.maxPinLength,
             decoration: InputDecoration(
               labelText: strings.t('confirmarPin'),
             ),

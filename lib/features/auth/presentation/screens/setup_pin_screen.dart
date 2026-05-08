@@ -22,6 +22,8 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
   final _documentController = TextEditingController();
   bool _isSubmitting = false;
   bool _enableBiometrics = false;
+  bool _isPinVisible = false;
+  bool _isRepeatPinVisible = false;
 
   @override
   void dispose() {
@@ -37,6 +39,10 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
     final confirm = _confirmController.text.trim();
     final birthDate = _birthDateController.text.trim();
     final document = _documentController.text.trim();
+    if (!_isValidPinLength(pin)) {
+      _showMessage(AppStrings.of(context).authPinLengthInvalid);
+      return;
+    }
     if (pin != confirm) {
       _showMessage(
         AppStrings.of(context).t('losPinNoCoinciden'),
@@ -95,10 +101,44 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
     return value.replaceAll(RegExp(r'[^0-9]'), '').length == 8;
   }
 
+  bool _isValidPinLength(String value) {
+    return value.length >= AppConstants.minPinLength &&
+        value.length <= AppConstants.maxPinLength;
+  }
+
   bool _isValidDocument(String value) {
     final normalized =
         value.replaceAll(RegExp(r'[^0-9a-zA-Z]'), '').toUpperCase();
     return normalized.length >= 6 && normalized.length <= 16;
+  }
+
+  Future<void> _pickBirthDate() async {
+    final now = DateTime.now();
+    final firstDate = DateTime(now.year - 120, now.month, now.day);
+    final initialDate = DateTime(now.year - 18, now.month, now.day);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: now,
+    );
+    if (picked == null || !mounted) {
+      return;
+    }
+    setState(() {
+      _birthDateController.text = _formatBirthDate(picked);
+    });
+  }
+
+  String _formatBirthDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString().padLeft(4, '0');
+    final languageCode = AppStrings.of(context).languageCode;
+    if (languageCode.startsWith('en')) {
+      return '$month/$day/$year';
+    }
+    return '$day/$month/$year';
   }
 
   @override
@@ -154,29 +194,59 @@ class _SetupPinScreenState extends ConsumerState<SetupPinScreen> {
                     TextField(
                       controller: _pinController,
                       keyboardType: TextInputType.number,
-                      obscureText: true,
-                      maxLength: AppConstants.defaultPinLength,
+                      obscureText: !_isPinVisible,
+                      maxLength: AppConstants.maxPinLength,
                       decoration: InputDecoration(
                         labelText: strings.t('elegiTuPin'),
+                        suffixIcon: IconButton(
+                          tooltip:
+                              _isPinVisible ? strings.hidePin : strings.showPin,
+                          onPressed: () {
+                            setState(() => _isPinVisible = !_isPinVisible);
+                          },
+                          icon: Icon(
+                            _isPinVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: _confirmController,
                       keyboardType: TextInputType.number,
-                      obscureText: true,
-                      maxLength: AppConstants.defaultPinLength,
+                      obscureText: !_isRepeatPinVisible,
+                      maxLength: AppConstants.maxPinLength,
                       decoration: InputDecoration(
                         labelText: strings.t('repetiTuPin'),
+                        suffixIcon: IconButton(
+                          tooltip: _isRepeatPinVisible
+                              ? strings.hidePin
+                              : strings.showPin,
+                          onPressed: () {
+                            setState(
+                              () => _isRepeatPinVisible = !_isRepeatPinVisible,
+                            );
+                          },
+                          icon: Icon(
+                            _isRepeatPinVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: _birthDateController,
-                      keyboardType: TextInputType.datetime,
+                      readOnly: true,
+                      keyboardType: TextInputType.none,
+                      onTap: _pickBirthDate,
                       decoration: InputDecoration(
                         labelText: strings.birthDate,
                         hintText: strings.t('ejemplo10021996'),
+                        suffixIcon: const Icon(Icons.calendar_today_outlined),
                       ),
                     ),
                     const SizedBox(height: 12),

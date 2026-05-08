@@ -2488,8 +2488,8 @@ abstract class AppLocalizations {
   /// No description provided for @authPinLengthInvalid.
   ///
   /// In es, this message translates to:
-  /// **'El PIN debe tener {length} dígitos.'**
-  String authPinLengthInvalid(Object length);
+  /// **'El PIN debe tener entre 6 y 12 caracteres.'**
+  String get authPinLengthInvalid;
 
   /// No description provided for @authLockoutActive.
   ///
