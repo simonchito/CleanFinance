@@ -1,5 +1,6 @@
 import 'package:clean_finance/features/auth/domain/entities/pin_security_state.dart';
 import 'package:clean_finance/features/auth/domain/repositories/auth_repository.dart';
+import 'package:clean_finance/features/auth/presentation/auth_state.dart';
 import 'package:clean_finance/features/auth/presentation/providers/auth_providers.dart';
 import 'package:clean_finance/features/finance/domain/entities/app_settings.dart';
 import 'package:clean_finance/features/finance/domain/entities/app_theme_preference.dart';
@@ -169,6 +170,54 @@ void main() {
 
     expect(biometricTile.value, isTrue);
     expect(settingsRepository.current.biometricEnabled, isFalse);
+  });
+
+  testWidgets('exit app button locks without changing persisted data',
+      (tester) async {
+    final authRepository = _FakeAuthRepository(
+      biometricAvailable: true,
+      biometricEnabled: true,
+    );
+    final settingsRepository = _FakeSettingsRepository();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(authRepository),
+          settingsRepositoryProvider.overrideWithValue(settingsRepository),
+          categoriesRepositoryProvider.overrideWithValue(
+            _FakeCategoriesRepository(),
+          ),
+        ],
+        child: const MaterialApp(
+          locale: Locale('es'),
+          supportedLocales: [Locale('es'), Locale('en')],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          home: SettingsScreen(),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsScreen)),
+    );
+    await container
+        .read(authControllerProvider.notifier)
+        .unlockWithPin('123456');
+    await tester.pumpAndSettle();
+
+    expect(container.read(authControllerProvider).status, AuthStatus.unlocked);
+    expect(find.text('Salir de la app'), findsOneWidget);
+
+    await tester.tap(find.text('Salir de la app'));
+    await tester.pumpAndSettle();
+
+    expect(container.read(authControllerProvider).status, AuthStatus.locked);
+    expect(authRepository.lastSetBiometricEnabled, isNull);
+    expect(settingsRepository.current, settingsRepositoryCurrent);
   });
 }
 

@@ -133,6 +133,9 @@ class AppStrings {
   String get spent => _l10n.spent;
   String get remaining => _l10n.remaining;
   String get lockNow => _l10n.lockNow;
+  String get exitApp => _l10n.exitApp;
+  String get showPin => _l10n.showPin;
+  String get hidePin => _l10n.hidePin;
   String get add => _l10n.add;
   String get all => _l10n.all;
   String get from => _l10n.from;
@@ -917,6 +920,9 @@ class AppStrings {
       'spent' => _l10n.spent,
       'remaining' => _l10n.remaining,
       'lockNow' => _l10n.lockNow,
+      'exitApp' => _l10n.exitApp,
+      'showPin' => _l10n.showPin,
+      'hidePin' => _l10n.hidePin,
       'add' => _l10n.add,
       'all' => _l10n.all,
       'from' => _l10n.from,

@@ -20,6 +20,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   final _pinController = TextEditingController();
   bool _loading = false;
   bool _biometricAttempted = false;
+  bool _isPinVisible = false;
   Timer? _lockRefreshTimer;
 
   @override
@@ -157,11 +158,23 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                     TextField(
                       controller: _pinController,
                       keyboardType: TextInputType.number,
-                      obscureText: true,
+                      obscureText: !_isPinVisible,
                       enabled: !_loading && !isPinLocked,
                       decoration: InputDecoration(
                         labelText: strings.pinLabel,
                         prefixIcon: const Icon(Icons.lock_outline_rounded),
+                        suffixIcon: IconButton(
+                          tooltip:
+                              _isPinVisible ? strings.hidePin : strings.showPin,
+                          onPressed: () {
+                            setState(() => _isPinVisible = !_isPinVisible);
+                          },
+                          icon: Icon(
+                            _isPinVisible
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                          ),
+                        ),
                       ),
                       onSubmitted: (_) => _unlockWithPin(),
                     ),

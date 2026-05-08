@@ -730,6 +730,24 @@ abstract class AppLocalizations {
   /// **'Bloquear ahora'**
   String get lockNow;
 
+  /// No description provided for @exitApp.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir de la app'**
+  String get exitApp;
+
+  /// No description provided for @showPin.
+  ///
+  /// In es, this message translates to:
+  /// **'Mostrar PIN'**
+  String get showPin;
+
+  /// No description provided for @hidePin.
+  ///
+  /// In es, this message translates to:
+  /// **'Ocultar PIN'**
+  String get hidePin;
+
   /// No description provided for @add.
   ///
   /// In es, this message translates to:

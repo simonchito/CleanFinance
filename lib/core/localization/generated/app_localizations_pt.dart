@@ -330,6 +330,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get lockNow => 'Bloquear agora';
 
   @override
+  String get exitApp => 'Sair do app';
+
+  @override
+  String get showPin => 'Mostrar PIN';
+
+  @override
+  String get hidePin => 'Ocultar PIN';
+
+  @override
   String get add => 'Adicionar';
 
   @override

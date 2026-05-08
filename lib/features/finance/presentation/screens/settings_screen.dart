@@ -299,6 +299,14 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () {
+                  ref.read(authControllerProvider.notifier).lock();
+                },
+                icon: const Icon(Icons.logout_rounded),
+                label: Text(strings.exitApp),
+              ),
+              const SizedBox(height: 16),
               SectionCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
