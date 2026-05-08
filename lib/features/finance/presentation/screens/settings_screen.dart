@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -241,6 +242,11 @@ class SettingsScreen extends ConsumerWidget {
         );
   }
 
+  Future<void> _exitApp(WidgetRef ref) async {
+    ref.read(authControllerProvider.notifier).lock();
+    await SystemNavigator.pop();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final strings = AppStrings.of(context);
@@ -300,9 +306,13 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(
-                onPressed: () {
-                  ref.read(authControllerProvider.notifier).lock();
-                },
+                onPressed: () => _exitApp(ref),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
                 icon: const Icon(Icons.logout_rounded),
                 label: Text(strings.exitApp),
               ),

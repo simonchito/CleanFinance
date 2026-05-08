@@ -12,6 +12,7 @@ import 'package:clean_finance/features/finance/presentation/screens/settings_scr
 import 'package:clean_finance/shared/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -172,13 +173,30 @@ void main() {
     expect(settingsRepository.current.biometricEnabled, isFalse);
   });
 
-  testWidgets('exit app button locks without changing persisted data',
+  testWidgets('exit app button locks, closes the app, and keeps data',
       (tester) async {
     final authRepository = _FakeAuthRepository(
       biometricAvailable: true,
       biometricEnabled: true,
     );
     final settingsRepository = _FakeSettingsRepository();
+    var didRequestExit = false;
+
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'SystemNavigator.pop') {
+          didRequestExit = true;
+        }
+        return null;
+      },
+    );
+    addTearDown(() {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
+    });
 
     await tester.pumpWidget(
       ProviderScope(
@@ -211,11 +229,22 @@ void main() {
 
     expect(container.read(authControllerProvider).status, AuthStatus.unlocked);
     expect(find.text('Salir de la app'), findsOneWidget);
+    final exitButton = tester.widget<OutlinedButton>(
+      find.ancestor(
+        of: find.text('Salir de la app'),
+        matching: find.byType(OutlinedButton),
+      ),
+    );
+    expect(
+      exitButton.style?.foregroundColor?.resolve({}),
+      Theme.of(tester.element(find.byType(SettingsScreen))).colorScheme.error,
+    );
 
     await tester.tap(find.text('Salir de la app'));
     await tester.pumpAndSettle();
 
     expect(container.read(authControllerProvider).status, AuthStatus.locked);
+    expect(didRequestExit, isTrue);
     expect(authRepository.lastSetBiometricEnabled, isNull);
     expect(settingsRepository.current, settingsRepositoryCurrent);
   });
