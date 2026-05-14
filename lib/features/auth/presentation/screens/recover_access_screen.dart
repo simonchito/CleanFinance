@@ -59,14 +59,19 @@ class _RecoverAccessScreenState extends ConsumerState<RecoverAccessScreen> {
     }
 
     setState(() => _loading = true);
-    final success =
-        await ref.read(authControllerProvider.notifier).recoverAccess(
-              birthDate: birthDate,
-              documentId: document,
-              newPin: newPin,
-              enableBiometrics: _enableBiometrics,
-            );
-    setState(() => _loading = false);
+    var success = false;
+    try {
+      success = await ref.read(authControllerProvider.notifier).recoverAccess(
+            birthDate: birthDate,
+            documentId: document,
+            newPin: newPin,
+            enableBiometrics: _enableBiometrics,
+          );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
 
     if (!success && mounted) {
       _showMessage(

@@ -11,6 +11,7 @@ enum AuthErrorCode {
   biometricAuthFailed,
   recoveryVerificationFailed,
   startupSafetyMode,
+  authOperationFailed,
   lockoutActive,
 }
 

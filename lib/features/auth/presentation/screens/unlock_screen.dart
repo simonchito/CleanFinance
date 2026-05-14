@@ -49,10 +49,16 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
   Future<void> _unlockWithPin() async {
     setState(() => _loading = true);
-    final success = await ref
-        .read(authControllerProvider.notifier)
-        .unlockWithPin(_pinController.text.trim());
-    setState(() => _loading = false);
+    var success = false;
+    try {
+      success = await ref
+          .read(authControllerProvider.notifier)
+          .unlockWithPin(_pinController.text.trim());
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
     if (!success && mounted) {
       _showMessage(
         localizeAuthError(context, ref.read(authControllerProvider).error),
@@ -62,9 +68,16 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
   Future<void> _unlockWithBiometrics() async {
     setState(() => _loading = true);
-    final success =
-        await ref.read(authControllerProvider.notifier).unlockWithBiometrics();
-    setState(() => _loading = false);
+    var success = false;
+    try {
+      success = await ref
+          .read(authControllerProvider.notifier)
+          .unlockWithBiometrics();
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
     if (!success && mounted) {
       _showMessage(
         localizeAuthError(context, ref.read(authControllerProvider).error),

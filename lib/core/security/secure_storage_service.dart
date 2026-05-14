@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 
 class SecureStorageService {
+  static const _operationTimeout = Duration(seconds: 8);
   static const _credentialKey = 'auth.credential';
   static const _biometricEnabledKey = 'auth.biometric_enabled';
   static const _recoveryBirthDateKey = 'auth.recovery.birth_date';
@@ -97,7 +100,17 @@ class SecureStorageService {
     Future<String?> Function() operation,
   ) async {
     try {
-      return await operation();
+      final value = await operation().timeout(_operationTimeout);
+      if (kDebugMode) {
+        debugPrint('[startup] Secure storage completed $action');
+      }
+      return value;
+    } on TimeoutException catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('[startup] Secure storage timed out during $action: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+      return null;
     } catch (error, stackTrace) {
       if (kDebugMode) {
         debugPrint('[startup] Secure storage failed during $action: $error');
@@ -112,7 +125,16 @@ class SecureStorageService {
     Future<void> Function() operation,
   ) async {
     try {
-      await operation();
+      await operation().timeout(_operationTimeout);
+      if (kDebugMode) {
+        debugPrint('[startup] Secure storage completed $action');
+      }
+    } on TimeoutException catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('[startup] Secure storage timed out during $action: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+      rethrow;
     } catch (error, stackTrace) {
       if (kDebugMode) {
         debugPrint('[startup] Secure storage failed during $action: $error');

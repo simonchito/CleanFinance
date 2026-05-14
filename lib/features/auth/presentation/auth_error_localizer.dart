@@ -26,6 +26,8 @@ String localizeAuthError(BuildContext context, AuthErrorState? error) {
       return strings.t('noSePudoVerificarLaRecuperacionRevisa');
     case AuthErrorCode.startupSafetyMode:
       return strings.t('algunasValidacionesDeSeguridadNoPudieronInicializarse');
+    case AuthErrorCode.authOperationFailed:
+      return strings.t('errorInesperado');
     case AuthErrorCode.lockoutActive:
       final seconds = error.lockSeconds ?? 1;
       return strings.authLockoutActive(seconds);

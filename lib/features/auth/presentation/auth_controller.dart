@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +10,8 @@ import '../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
 
 class AuthController extends StateNotifier<AuthState> {
+  static const _authOperationTimeout = Duration(seconds: 30);
+
   AuthController({
     required AuthRepository authRepository,
     required CategoriesRepository categoriesRepository,
@@ -73,63 +77,75 @@ class AuthController extends StateNotifier<AuthState> {
     required String documentId,
     bool enableBiometrics = false,
   }) async {
-    if (!_isValidPinLength(pin)) {
-      state = state.copyWith(
-        error: const AuthErrorState(
-          code: AuthErrorCode.pinLengthInvalid,
-        ),
-      );
-      return false;
-    }
-    if (!_isValidRecoveryBirthDate(birthDate) ||
-        !_isValidRecoveryDocument(documentId)) {
-      state = state.copyWith(
-        error: const AuthErrorState(
-          code: AuthErrorCode.recoveryDataInvalid,
-        ),
-      );
-      return false;
-    }
+    return _guardAuthOperation('create PIN', () async {
+      if (!_isValidPinLength(pin)) {
+        state = state.copyWith(
+          error: const AuthErrorState(
+            code: AuthErrorCode.pinLengthInvalid,
+          ),
+        );
+        return false;
+      }
+      if (!_isValidRecoveryBirthDate(birthDate) ||
+          !_isValidRecoveryDocument(documentId)) {
+        state = state.copyWith(
+          error: const AuthErrorState(
+            code: AuthErrorCode.recoveryDataInvalid,
+          ),
+        );
+        return false;
+      }
 
-    await _authRepository.savePin(pin);
-    await _authRepository.saveRecoveryData(
-      birthDate: birthDate,
-      documentId: documentId,
-    );
-    await _authRepository.setBiometricEnabled(enableBiometrics);
-    await _ensureFinanceSeed();
+      await _authRepository.savePin(pin);
+      await _authRepository.saveRecoveryData(
+        birthDate: birthDate,
+        documentId: documentId,
+      );
+      await _authRepository.setBiometricEnabled(enableBiometrics);
+      final biometricEnabled =
+          enableBiometrics && await _authRepository.isBiometricEnabled();
+      await _ensureFinanceSeed();
 
-    state = state.copyWith(
-      status: AuthStatus.unlocked,
-      biometricEnabled: enableBiometrics,
-      recoveryConfigured: true,
-      pinSecurityState: const PinSecurityState.initial(),
-      clearError: true,
-    );
-    return true;
+      state = state.copyWith(
+        status: AuthStatus.unlocked,
+        biometricEnabled: biometricEnabled,
+        recoveryConfigured: true,
+        pinSecurityState: const PinSecurityState.initial(),
+        clearError: true,
+      );
+      return true;
+    });
   }
 
   Future<bool> unlockWithPin(String pin) async {
-    final result = await _authRepository.verifyPin(pin);
-    if (!result.isSuccess) {
-      state = state.copyWith(
-        pinSecurityState: result.securityState,
-        error: result.isLocked
-            ? _lockoutError(result.securityState)
-            : const AuthErrorState(
-                code: AuthErrorCode.incorrectPin,
-              ),
-      );
-      return false;
-    }
+    return _guardAuthOperation('unlock with PIN', () async {
+      if (kDebugMode) {
+        debugPrint('[auth] Verifying PIN');
+      }
+      final result = await _authRepository.verifyPin(pin);
+      if (!result.isSuccess) {
+        state = state.copyWith(
+          pinSecurityState: result.securityState,
+          error: result.isLocked
+              ? _lockoutError(result.securityState)
+              : const AuthErrorState(
+                  code: AuthErrorCode.incorrectPin,
+                ),
+        );
+        return false;
+      }
 
-    await _ensureFinanceSeed();
-    state = state.copyWith(
-      status: AuthStatus.unlocked,
-      pinSecurityState: result.securityState,
-      clearError: true,
-    );
-    return true;
+      if (kDebugMode) {
+        debugPrint('[auth] PIN verified, preparing finance data');
+      }
+      await _ensureFinanceSeed();
+      state = state.copyWith(
+        status: AuthStatus.unlocked,
+        pinSecurityState: result.securityState,
+        clearError: true,
+      );
+      return true;
+    });
   }
 
   Future<bool> unlockWithBiometrics() async {
@@ -169,23 +185,27 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Future<bool> setBiometricEnabled(bool enabled) async {
-    final available = await _authRepository.isBiometricAvailable();
-    if (enabled && !available) {
-      state = state.copyWith(
-        error: const AuthErrorState(
-          code: AuthErrorCode.biometricUnavailable,
-        ),
-      );
-      return false;
-    }
+    return _guardAuthOperation('set biometric preference', () async {
+      final available = await _authRepository.isBiometricAvailable();
+      if (enabled && !available) {
+        state = state.copyWith(
+          biometricAvailable: available,
+          biometricEnabled: false,
+          error: const AuthErrorState(
+            code: AuthErrorCode.biometricUnavailable,
+          ),
+        );
+        return false;
+      }
 
-    await _authRepository.setBiometricEnabled(enabled);
-    state = state.copyWith(
-      biometricAvailable: available,
-      biometricEnabled: enabled,
-      clearError: true,
-    );
-    return true;
+      await _authRepository.setBiometricEnabled(enabled);
+      state = state.copyWith(
+        biometricAvailable: available,
+        biometricEnabled: enabled && available,
+        clearError: true,
+      );
+      return true;
+    });
   }
 
   Future<bool> recoverAccess({
@@ -194,48 +214,52 @@ class AuthController extends StateNotifier<AuthState> {
     required String newPin,
     bool enableBiometrics = false,
   }) async {
-    if (!_isValidPinLength(newPin)) {
-      state = state.copyWith(
-        error: const AuthErrorState(
-          code: AuthErrorCode.pinLengthInvalid,
-        ),
-      );
-      return false;
-    }
-    if (!_isValidRecoveryBirthDate(birthDate) ||
-        !_isValidRecoveryDocument(documentId)) {
-      state = state.copyWith(
-        error: const AuthErrorState(
-          code: AuthErrorCode.recoveryDataInvalid,
-        ),
-      );
-      return false;
-    }
+    return _guardAuthOperation('recover access', () async {
+      if (!_isValidPinLength(newPin)) {
+        state = state.copyWith(
+          error: const AuthErrorState(
+            code: AuthErrorCode.pinLengthInvalid,
+          ),
+        );
+        return false;
+      }
+      if (!_isValidRecoveryBirthDate(birthDate) ||
+          !_isValidRecoveryDocument(documentId)) {
+        state = state.copyWith(
+          error: const AuthErrorState(
+            code: AuthErrorCode.recoveryDataInvalid,
+          ),
+        );
+        return false;
+      }
 
-    final valid = await _authRepository.verifyRecoveryData(
-      birthDate: birthDate,
-      documentId: documentId,
-    );
-    if (!valid) {
-      state = state.copyWith(
-        error: const AuthErrorState(
-          code: AuthErrorCode.recoveryVerificationFailed,
-        ),
+      final valid = await _authRepository.verifyRecoveryData(
+        birthDate: birthDate,
+        documentId: documentId,
       );
-      return false;
-    }
+      if (!valid) {
+        state = state.copyWith(
+          error: const AuthErrorState(
+            code: AuthErrorCode.recoveryVerificationFailed,
+          ),
+        );
+        return false;
+      }
 
-    await _authRepository.savePin(newPin);
-    await _authRepository.setBiometricEnabled(enableBiometrics);
-    await _ensureFinanceSeed();
-    state = state.copyWith(
-      status: AuthStatus.unlocked,
-      biometricEnabled: enableBiometrics,
-      recoveryConfigured: true,
-      pinSecurityState: const PinSecurityState.initial(),
-      clearError: true,
-    );
-    return true;
+      await _authRepository.savePin(newPin);
+      await _authRepository.setBiometricEnabled(enableBiometrics);
+      final biometricEnabled =
+          enableBiometrics && await _authRepository.isBiometricEnabled();
+      await _ensureFinanceSeed();
+      state = state.copyWith(
+        status: AuthStatus.unlocked,
+        biometricEnabled: biometricEnabled,
+        recoveryConfigured: true,
+        pinSecurityState: const PinSecurityState.initial(),
+        clearError: true,
+      );
+      return true;
+    });
   }
 
   Future<void> refreshPinSecurityState() async {
@@ -272,6 +296,33 @@ class AuthController extends StateNotifier<AuthState> {
 
   Future<void> _ensureFinanceSeed() {
     return _categoriesRepository.ensureSeedData();
+  }
+
+  Future<bool> _guardAuthOperation(
+    String label,
+    Future<bool> Function() action,
+  ) async {
+    try {
+      return await action().timeout(_authOperationTimeout);
+    } on TimeoutException catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('[auth] Auth operation timed out: $label -> $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+      state = state.copyWith(
+        error: const AuthErrorState(code: AuthErrorCode.authOperationFailed),
+      );
+      return false;
+    } catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('[auth] Auth operation failed: $label -> $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+      state = state.copyWith(
+        error: const AuthErrorState(code: AuthErrorCode.authOperationFailed),
+      );
+      return false;
+    }
   }
 
   Future<T> _safeStartupStep<T>(
