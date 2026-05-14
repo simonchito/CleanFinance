@@ -8,6 +8,10 @@ class BiometricService {
       : _localAuthentication = localAuthentication ?? LocalAuthentication();
 
   Future<bool> isAvailable() async {
+    if (!_isSupportedPlatform) {
+      return false;
+    }
+
     try {
       if (kDebugMode) {
         debugPrint('[startup] Checking biometric availability');
@@ -35,6 +39,10 @@ class BiometricService {
   }
 
   Future<bool> authenticate() async {
+    if (!_isSupportedPlatform) {
+      return false;
+    }
+
     final available = await isAvailable();
     if (!available) {
       return false;
@@ -61,5 +69,22 @@ class BiometricService {
       }
       return false;
     }
+  }
+
+  bool get _isSupportedPlatform {
+    if (kIsWeb) {
+      return false;
+    }
+
+    return switch (defaultTargetPlatform) {
+      TargetPlatform.android ||
+      TargetPlatform.iOS ||
+      TargetPlatform.macOS =>
+        true,
+      TargetPlatform.fuchsia ||
+      TargetPlatform.linux ||
+      TargetPlatform.windows =>
+        false,
+    };
   }
 }
